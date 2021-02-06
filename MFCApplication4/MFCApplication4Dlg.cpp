@@ -7,6 +7,7 @@
 #include "MFCApplication4.h"
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
+#include "Misc.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -159,46 +160,53 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 }
 
 
+// 按下开始监听按钮
+void CMFCApplication4Dlg::OnBnClickedOk()
+{
+	m_Server->Start(ADDRESS, PORT);
+}
 
 
 
+
+// 回调函数的实现
 EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
-	std::cout<<("OnPrepareListen\n");
+	printf("OnPrepareListen: \n");
 	return HR_OK;
 }
 
 
 EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
 {
-	std::cout << ("OnAccept\n");
+	printf("[Client %d] OnAccept: \n", dwConnID);
+	BYTE pbData[] = "I am iyzyi";
+	DWORD dwLen = 10;
+	if (!m_Server->Send(dwConnID, pbData, dwLen))
+		return HR_ERROR;
 	return HR_OK;
 }
 
 
 EnHandleResult CMFCApplication4Dlg::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	std::cout << ("OnSend\n");
+	printf("[Client %d] OnSend: \n", dwConnID);
+	//PrintBytes((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 
 
 EnHandleResult CMFCApplication4Dlg::OnReceive(ITcpServer* pSender, CONNID dwConnID, int iLength) {
-	std::cout << ("OnReceive\n");
+	printf("[Client %d] OnReceive: \n", dwConnID);
 	return HR_OK;
 }
 
 
 EnHandleResult CMFCApplication4Dlg::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
-	std::cout << ("OnClose\n");
+	printf("[Client %d] OnClose: \n", dwConnID);
 	return HR_OK;
 }
 
 
 EnHandleResult CMFCApplication4Dlg::OnShutdown(ITcpServer* pSender) {
-	std::cout << ("OnShutdown\n");
+	printf("OnShutdown: \n");
 	return HR_OK;
-}
-
-void CMFCApplication4Dlg::OnBnClickedOk()
-{
-	m_Server->Start(ADDRESS, PORT);
 }

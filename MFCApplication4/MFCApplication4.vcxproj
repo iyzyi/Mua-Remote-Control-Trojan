@@ -24,6 +24,7 @@
     <Keyword>MFCProj</Keyword>
     <RootNamespace>MFCApplication4</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>Socket Test</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -190,6 +191,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="MFCApplication4.h" />
     <ClInclude Include="MFCApplication4Dlg.h" />
+    <ClInclude Include="Misc.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Socket.h" />
@@ -198,6 +200,7 @@
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -37,7 +37,7 @@ CMFCApplication4App::CMFCApplication4App()
 	freopen("CON", "r", stdin);
 	freopen("CON", "w", stdout);
 	freopen("CON", "w", stderr);
-	std::cout << "启动控制台\n";
+	printf("启动控制台\n");
 #endif
 }
 
