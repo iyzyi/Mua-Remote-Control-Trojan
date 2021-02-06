@@ -193,12 +193,6 @@ EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET 
 }
 
 
-EnHandleResult CMFCApplication4Dlg::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
-	printf("OnHandShake: \n");
-	return HR_OK;
-}
-
-
 EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
 {
 	printf("[Client %d] OnAccept: \n", dwConnID);
@@ -206,6 +200,12 @@ EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnI
 	DWORD dwLen = 10;
 	if (!m_Server->Send(dwConnID, pbData, dwLen))
 		return HR_ERROR;*/
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
+	printf("[Client %d] OnHandShake: \n", dwConnID);
 	return HR_OK;
 }
 
