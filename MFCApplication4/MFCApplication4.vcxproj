@@ -189,6 +189,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HPSocket\HPSocket-SSL.h" />
+    <ClInclude Include="HPSocket\HPSocket.h" />
+    <ClInclude Include="HPSocket\HPTypeDef.h" />
+    <ClInclude Include="HPSocket\SocketInterface.h" />
     <ClInclude Include="MFCApplication4.h" />
     <ClInclude Include="MFCApplication4Dlg.h" />
     <ClInclude Include="Misc.h" />

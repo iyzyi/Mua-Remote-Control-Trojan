@@ -71,6 +71,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDOK, &CMFCApplication4Dlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CMFCApplication4Dlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 
@@ -164,12 +165,28 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 void CMFCApplication4Dlg::OnBnClickedOk()
 {
 	m_Server->Start(ADDRESS, PORT);
+
+	//  设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
+	m_Server->SetMaxPackSize(0x3FFFFF);
+
+	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
+	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
+}
+
+
+// 按下取消按钮
+void CMFCApplication4Dlg::OnBnClickedCancel()
+{
+	m_Server->Stop();
 }
 
 
 
 
+
 // 回调函数的实现
+
+// 
 EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
 	printf("OnPrepareListen: \n");
 	return HR_OK;
@@ -179,10 +196,10 @@ EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET 
 EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
 {
 	printf("[Client %d] OnAccept: \n", dwConnID);
-	BYTE pbData[] = "I am iyzyi";
+	/*BYTE pbData[] = "I am iyzyi";
 	DWORD dwLen = 10;
 	if (!m_Server->Send(dwConnID, pbData, dwLen))
-		return HR_ERROR;
+		return HR_ERROR;*/
 	return HR_OK;
 }
 
@@ -194,9 +211,11 @@ EnHandleResult CMFCApplication4Dlg::OnSend(ITcpServer* pSender, CONNID dwConnID,
 }
 
 
-EnHandleResult CMFCApplication4Dlg::OnReceive(ITcpServer* pSender, CONNID dwConnID, int iLength) {
+EnHandleResult CMFCApplication4Dlg::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
-	return HR_OK;
+	PrintBytes((LPBYTE)pData, iLength);
+	BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
+	return bRet ? HR_OK : HR_ERROR;
 }
 
 
@@ -210,3 +229,4 @@ EnHandleResult CMFCApplication4Dlg::OnShutdown(ITcpServer* pSender) {
 	printf("OnShutdown: \n");
 	return HR_OK;
 }
+

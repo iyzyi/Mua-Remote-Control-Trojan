@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\HPSocket">
+      <UniqueIdentifier>{412f4aae-c433-49dc-805b-d8a026547401}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
@@ -38,6 +41,18 @@
     </ClInclude>
     <ClInclude Include="Misc.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPSocket.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPTypeDef.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\SocketInterface.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPSocket-SSL.h">
+      <Filter>头文件\HPSocket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
