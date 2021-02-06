@@ -29,7 +29,4 @@
 #endif
 
 
-static BOOL bIsLittleEndding;		// 全局变量，区别大小端存储
-
-
 #endif //PCH_H

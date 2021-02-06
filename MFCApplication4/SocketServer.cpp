@@ -11,8 +11,6 @@
 
 CSocketServer::CSocketServer() : m_Server(this) {
 
-
-	bIsLittleEndding = IsLittleEndding();		// 全局变量
 }
 
 

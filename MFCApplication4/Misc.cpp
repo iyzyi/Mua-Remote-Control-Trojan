@@ -46,26 +46,17 @@ BOOL IsLittleEndding() {
 	return 1 ? true : false;
 }
 
-// 从buffer中偏移dwPos处取出一个DWORD，考虑大小端存储问题
+
+// 从buffer中偏移dwPos处取出一个DWORD，暂时默认小端存储，以后再完善吧。
 DWORD GetDwordFromBuffer(PBYTE pbData, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
-	printf("test - %d\n\n", bIsLittleEndding);
-	if (bIsLittleEndding) {
-		
-		return pbData2[0] + (pbData2[1] << 8) + (pbData2[2] << 16) + (pbData2[3] << 24);
-	}
-		
-	else
-		return pbData2[3] + (pbData2[2] << 8) + (pbData2[1] << 16) + (pbData2[0] << 24);
+	return pbData2[0] + (pbData2[1] << 8) + (pbData2[2] << 16) + (pbData2[3] << 24);
 }
 
 
 WORD GetWordFromBuffer(PBYTE pbData, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
-	if (bIsLittleEndding)
-		return pbData2[0] + (pbData2[1] << 8);
-	else
-		return pbData2[0] + (pbData2[1] << 8);
+	return pbData2[0] + (pbData2[1] << 8);
 }
 
 BYTE GetByteFromBuffer(PBYTE pbData, DWORD dwPos) {
