@@ -7,8 +7,12 @@
 #define PORT ((USHORT)(5555))
 
 
+
+
 CSocketServer::CSocketServer() : m_Server(this) {
 
+
+	bIsLittleEndding = IsLittleEndding();		// 全局变量
 }
 
 
@@ -23,7 +27,7 @@ VOID CSocketServer::InitSocketServer() {
 	m_Server->Start(ADDRESS, PORT);
 
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
-	m_Server->SetMaxPackSize(0x3FFFFF);
+	m_Server->SetMaxPackSize(PACKET_MAX_LENGTH);
 
 	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
 	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
@@ -36,8 +40,10 @@ VOID CSocketServer::StopSocketServer() {
 
 
 // 解析封包
-VOID CSocketServer::PacketParse() {
-	;
+VOID CSocketServer::PacketParse(PBYTE pbData, DWORD dwLength) {
+	
+	PACKET_HEAD PacketHead((PBYTE)pbData);
+	printf("cid = 0x%x\tseq = 0x%x\tsplit = 0x%x\n", PacketHead.wCommandId, PacketHead.dwCheckSum, PacketHead.bySplitNum);
 }
 
 
@@ -91,9 +97,11 @@ EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const
 
 EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
-	PrintBytes((LPBYTE)pData, iLength);
-	BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
-	return bRet ? HR_OK : HR_ERROR;
+	PrintBytes((PBYTE)pData, iLength);
+	PacketParse((PBYTE)pData, iLength);
+	//BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
+	//return bRet ? HR_OK : HR_ERROR;
+	return HR_OK;
 }
 
 
