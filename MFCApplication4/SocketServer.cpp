@@ -40,8 +40,9 @@ VOID CSocketServer::StopSocketServer() {
 // ½âÎö·â°ü
 VOID CSocketServer::PacketParse(PBYTE pbData, DWORD dwLength) {
 	
-	PACKET_HEAD PacketHead((PBYTE)pbData);
-	printf("cid = 0x%x\tseq = 0x%x\tsplit = 0x%x\n", PacketHead.wCommandId, PacketHead.dwCheckSum, PacketHead.bySplitNum);
+	
+	PACKET Packet(pbData, dwLength);
+	printf("0x%x\n", Packet.PacketHead.dwCheckSum);
 }
 
 

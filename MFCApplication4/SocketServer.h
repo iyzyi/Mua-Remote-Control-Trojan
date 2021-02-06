@@ -21,17 +21,35 @@ typedef struct _PACKET_HEAD {
 											//	 BYTE就够用了，更大的数据量的话还是换个协议吧，这个通信协议没有校验机制。
 
 	_PACKET_HEAD(PBYTE pbData) {
-		wCommandId = GetWordFromBuffer(pbData, 0);
-		dwCheckSum = GetDwordFromBuffer(pbData, 2);
-		bySplitNum = GetByteFromBuffer(pbData, 6);
+		this->wCommandId = GetWordFromBuffer(pbData, 0);
+		this->dwCheckSum = GetDwordFromBuffer(pbData, 2);
+		this->bySplitNum = GetByteFromBuffer(pbData, 6);
 	}
+
+	_PACKET_HEAD(){
+		this->wCommandId = 0;
+		this->dwCheckSum = 0;
+		this->bySplitNum = 0;
+	}
+
 }PACKET_HEAD, *PPACKET_HEAD;
 
 
 typedef struct _PACKET {
-	DWORD				dwLength;			// 整个封包的长度(不包括这表示长度的4个字节)
-	PACKET_HEAD			PacketHead;			// 包头
-	PBYTE				pPacketBody;		// 包体
+	DWORD				dwPacketLength;			// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
+	PACKET_HEAD			PacketHead;				// 包头
+	PBYTE				pPacketBody;			// 包体
+
+	DWORD				dwPacketBodyLength;		// 包体长度
+
+	// pbPacketBuffer是从包头开始的缓冲区（当然也不含开头4个字节的长度）
+	_PACKET(PBYTE pbData, DWORD dwLength) {
+		this->dwPacketLength			= dwLength;
+		this->PacketHead				= PACKET_HEAD((PBYTE)pbData);
+		this->pPacketBody				= pbData + PACKET_HEAD_LENGTH;
+		this->dwPacketBodyLength		= dwPacketLength - PACKET_HEAD_LENGTH;
+	}
+
 } PACKET, *PPACKET;
 
 
