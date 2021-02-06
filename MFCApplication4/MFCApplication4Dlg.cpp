@@ -7,6 +7,7 @@
 #include "MFCApplication4.h"
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
+
 #include "Misc.h"
 
 #ifdef _DEBUG
@@ -163,7 +164,7 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 // 按下开始监听按钮
 void CMFCApplication4Dlg::OnBnClickedOk()
 {
-	m_Server.InitSocketServer();
+	m_Server.StartSocketServer();
 
 }
 

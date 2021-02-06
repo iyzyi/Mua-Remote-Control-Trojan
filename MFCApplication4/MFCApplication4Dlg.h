@@ -35,7 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	CSocketServer			m_Server;			// CPacket继承了CTcpPackServerPtr
+	CSocketServer			m_Server;			// CSocketServer继承了CTcpPackServerPtr
 
 public:
 	afx_msg void OnBnClickedOk();

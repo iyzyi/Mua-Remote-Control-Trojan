@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "SocketServer.h"
-#include "Misc.h"
 
 
 #define ADDRESS (L"0.0.0.0")
@@ -20,7 +19,7 @@ CSocketServer::~CSocketServer() {
 
 
 // 初始化socket服务端
-VOID CSocketServer::InitSocketServer() {
+VOID CSocketServer::StartSocketServer() {
 
 	m_Server->Start(ADDRESS, PORT);
 
@@ -41,8 +40,8 @@ VOID CSocketServer::StopSocketServer() {
 VOID CSocketServer::PacketParse(PBYTE pbData, DWORD dwLength) {
 	
 	
-	PACKET Packet(pbData, dwLength);
-	printf("0x%x\n", Packet.PacketHead.dwCheckSum);
+	CPacket Packet(pbData, dwLength);
+	//printf("0x%x\n", Packet.m_Packet.dwPacketBodyLength);
 }
 
 

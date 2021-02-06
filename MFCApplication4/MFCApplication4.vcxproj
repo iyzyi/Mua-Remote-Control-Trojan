@@ -196,6 +196,7 @@
     <ClInclude Include="MFCApplication4.h" />
     <ClInclude Include="MFCApplication4Dlg.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SocketServer.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -45,9 +45,6 @@
     <ClInclude Include="framework.h">
       <Filter>头文件\frame</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>头文件\frame</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>头文件\frame</Filter>
     </ClInclude>
@@ -55,6 +52,12 @@
       <Filter>头文件\frame</Filter>
     </ClInclude>
     <ClInclude Include="SocketServer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -72,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SocketServer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

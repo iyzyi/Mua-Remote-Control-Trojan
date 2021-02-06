@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "misc.h"
-#include <random>
+
 
 
 VOID RandomBytes(LPBYTE pbData, DWORD dwDataLen) {
@@ -62,4 +62,15 @@ WORD GetWordFromBuffer(PBYTE pbData, DWORD dwPos) {
 BYTE GetByteFromBuffer(PBYTE pbData, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
 	return pbData2[0];
+}
+
+
+// 返回拷贝好的地址
+PBYTE CopyBuffer(PBYTE pbSrc, DWORD dwLength, DWORD dwPos) {
+	PBYTE pbDest = (PBYTE)xmalloc(dwLength);
+	if (pbDest == NULL) {
+		return NULL;
+	}
+	memcpy(pbDest, pbSrc+dwPos, dwLength);
+	return pbDest;
 }

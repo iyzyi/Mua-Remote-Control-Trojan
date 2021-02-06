@@ -1,5 +1,4 @@
-﻿
-// MFCApplication4.h: PROJECT_NAME 应用程序的主头文件
+﻿// MFCApplication4.h: PROJECT_NAME 应用程序的主头文件
 //
 
 #pragma once
