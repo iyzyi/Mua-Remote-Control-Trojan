@@ -193,6 +193,12 @@ EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET 
 }
 
 
+EnHandleResult CMFCApplication4Dlg::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
+	printf("OnHandShake: \n");
+	return HR_OK;
+}
+
+
 EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
 {
 	printf("[Client %d] OnAccept: \n", dwConnID);
@@ -229,4 +235,3 @@ EnHandleResult CMFCApplication4Dlg::OnShutdown(ITcpServer* pSender) {
 	printf("OnShutdown: \n");
 	return HR_OK;
 }
-
