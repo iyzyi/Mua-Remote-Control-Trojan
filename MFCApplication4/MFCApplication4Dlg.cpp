@@ -13,6 +13,10 @@
 #endif
 
 
+LPCTSTR ADDRESS = L"0.0.0.0";
+USHORT PORT = 5555;
+
+
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
@@ -51,7 +55,7 @@ END_MESSAGE_MAP()
 
 
 CMFCApplication4Dlg::CMFCApplication4Dlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_MFCAPPLICATION4_DIALOG, pParent)
+	: CDialogEx(IDD_MFCAPPLICATION4_DIALOG, pParent), m_Server(this)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -65,6 +69,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDOK, &CMFCApplication4Dlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -153,3 +158,47 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+
+
+EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
+	std::cout<<("OnPrepareListen\n");
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
+{
+	std::cout << ("OnAccept\n");
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
+	std::cout << ("OnSend\n");
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnReceive(ITcpServer* pSender, CONNID dwConnID, int iLength) {
+	std::cout << ("OnReceive\n");
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
+	std::cout << ("OnClose\n");
+	return HR_OK;
+}
+
+
+EnHandleResult CMFCApplication4Dlg::OnShutdown(ITcpServer* pSender) {
+	std::cout << ("OnShutdown\n");
+	return HR_OK;
+}
+
+void CMFCApplication4Dlg::OnBnClickedOk()
+{
+	m_Server->Start(ADDRESS, PORT);
+}

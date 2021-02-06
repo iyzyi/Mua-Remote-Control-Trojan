@@ -12,6 +12,8 @@
 #endif
 
 
+
+
 // CMFCApplication4App
 
 BEGIN_MESSAGE_MAP(CMFCApplication4App, CWinApp)
@@ -28,6 +30,15 @@ CMFCApplication4App::CMFCApplication4App()
 
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
+
+#ifdef DEBUG
+	AllocConsole();
+	#pragma warning(disable : 4996)
+	freopen("CON", "r", stdin);
+	freopen("CON", "w", stdout);
+	freopen("CON", "w", stderr);
+	std::cout << "启动控制台\n";
+#endif
 }
 
 
@@ -99,6 +110,11 @@ BOOL CMFCApplication4App::InitInstance()
 #if !defined(_AFXDLL) && !defined(_AFX_NO_MFC_CONTROLS_IN_DIALOGS)
 	ControlBarCleanUp();
 #endif
+
+
+	//CTcpPackServerPtr m_Server;
+	//m_Server->Start(ADDRESS, PORT);
+
 
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。

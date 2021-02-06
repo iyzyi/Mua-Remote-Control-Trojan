@@ -10,4 +10,23 @@
 // 添加要在此处预编译的标头
 #include "framework.h"
 
+#include <iostream>
+
+#include "./HPSocket/HPSocket.h"
+
+#ifdef _WIN64
+	#ifdef _DEBUG
+		#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
+	#else
+		#pragma comment(lib, "./HPSocket/HPSocket_U.lib")
+	#endif
+#else
+	#ifdef _DEBUG
+		#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
+	#else
+		#pragma comment(lib, "./HPSocket/HPSocket_U.lib")
+	#endif
+#endif
+
+
 #endif //PCH_H

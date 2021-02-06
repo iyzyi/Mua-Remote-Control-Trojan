@@ -5,8 +5,9 @@
 #pragma once
 
 
+
 // CMFCApplication4Dlg 对话框
-class CMFCApplication4Dlg : public CDialogEx
+class CMFCApplication4Dlg : public CDialogEx, public CTcpPullServerListener
 {
 // 构造
 public:
@@ -31,4 +32,15 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+private:
+	virtual EnHandleResult OnPrepareListen(ITcpServer* pSender, SOCKET soListen);
+	virtual EnHandleResult OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient);
+	virtual EnHandleResult OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
+	virtual EnHandleResult OnReceive(ITcpServer* pSender, CONNID dwConnID, int iLength);
+	virtual EnHandleResult OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
+	virtual EnHandleResult OnShutdown(ITcpServer* pSender);
+
+	CTcpPackServerPtr m_Server;
+public:
+	afx_msg void OnBnClickedOk();
 };
