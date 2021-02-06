@@ -20,11 +20,11 @@ typedef struct _PACKET {
 
 
 // ¼Ì³Ð×ÔCTcpServerListener
-class CPacket : public CTcpServerListener {
+class CSocketServer : public CTcpServerListener {
 public:
 
-	CPacket();
-	~CPacket();
+	CSocketServer();
+	~CSocketServer();
 
 	VOID PacketParse();
 	VOID PacketCombine();

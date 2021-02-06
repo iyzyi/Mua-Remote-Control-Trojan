@@ -163,7 +163,7 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 // 按下开始监听按钮
 void CMFCApplication4Dlg::OnBnClickedOk()
 {
-	m_Packet.InitSocketServer();
+	m_Server.InitSocketServer();
 
 }
 
@@ -171,5 +171,5 @@ void CMFCApplication4Dlg::OnBnClickedOk()
 // 按下取消按钮
 void CMFCApplication4Dlg::OnBnClickedCancel()
 {
-	m_Packet.StopSocketServer();
+	m_Server.StopSocketServer();
 }

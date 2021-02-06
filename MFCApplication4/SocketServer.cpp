@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Packet.h"
+#include "SocketServer.h"
 #include "Misc.h"
 
 
@@ -7,18 +7,18 @@
 #define PORT ((USHORT)(5555))
 
 
-CPacket::CPacket() : m_Server(this) {
+CSocketServer::CSocketServer() : m_Server(this) {
 
 }
 
 
-CPacket::~CPacket() {
+CSocketServer::~CSocketServer() {
 	;
 }
 
 
 // 初始化socket服务端
-VOID CPacket::InitSocketServer() {
+VOID CSocketServer::InitSocketServer() {
 
 	m_Server->Start(ADDRESS, PORT);
 
@@ -30,42 +30,42 @@ VOID CPacket::InitSocketServer() {
 }
 
 
-VOID CPacket::StopSocketServer() {
+VOID CSocketServer::StopSocketServer() {
 	m_Server->Stop();
 }
 
 
 // 解析封包
-VOID CPacket::PacketParse() {
+VOID CSocketServer::PacketParse() {
 	;
 }
 
 
 // 组装封包
-VOID CPacket::PacketCombine() {
+VOID CSocketServer::PacketCombine() {
 
 }
 
 
-VOID CPacket::SendPacket() {
+VOID CSocketServer::SendPacket() {
 	;
 }
 
 
-VOID CPacket::SendPacketToALLClient() {
+VOID CSocketServer::SendPacketToALLClient() {
 	;
 }
 
 
 // 回调函数的实现
 
-EnHandleResult CPacket::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
+EnHandleResult CSocketServer::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
 	printf("OnPrepareListen: \n");
 	return HR_OK;
 }
 
 
-EnHandleResult CPacket::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
+EnHandleResult CSocketServer::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
 {
 	printf("[Client %d] OnAccept: \n", dwConnID);
 	/*BYTE pbData[] = "I am iyzyi";
@@ -76,20 +76,20 @@ EnHandleResult CPacket::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET so
 }
 
 
-EnHandleResult CPacket::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
+EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
 	printf("[Client %d] OnHandShake: \n", dwConnID);
 	return HR_OK;
 }
 
 
-EnHandleResult CPacket::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
+EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnSend: \n", dwConnID);
 	//PrintBytes((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 
 
-EnHandleResult CPacket::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
+EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
 	PrintBytes((LPBYTE)pData, iLength);
 	BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
@@ -97,13 +97,13 @@ EnHandleResult CPacket::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BY
 }
 
 
-EnHandleResult CPacket::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
+EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	printf("[Client %d] OnClose: \n", dwConnID);
 	return HR_OK;
 }
 
 
-EnHandleResult CPacket::OnShutdown(ITcpServer* pSender) {
+EnHandleResult CSocketServer::OnShutdown(ITcpServer* pSender) {
 	printf("OnShutdown: \n");
 	return HR_OK;
 }

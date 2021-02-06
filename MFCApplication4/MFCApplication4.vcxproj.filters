@@ -54,7 +54,7 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件\frame</Filter>
     </ClInclude>
-    <ClInclude Include="Packet.h">
+    <ClInclude Include="SocketServer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="Misc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Packet.cpp">
+    <ClCompile Include="SocketServer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

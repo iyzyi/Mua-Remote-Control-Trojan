@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Packet.h"
+#include "SocketServer.h"
 
 
 // CMFCApplication4Dlg 对话框
@@ -35,7 +35,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	CPacket			m_Packet;			// CPacket继承了CTcpPackServerPtr
+	CSocketServer			m_Server;			// CPacket继承了CTcpPackServerPtr
 
 public:
 	afx_msg void OnBnClickedOk();
