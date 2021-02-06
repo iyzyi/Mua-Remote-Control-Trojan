@@ -16,27 +16,15 @@
     <Filter Include="头文件\HPSocket">
       <UniqueIdentifier>{412f4aae-c433-49dc-805b-d8a026547401}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\frame">
+      <UniqueIdentifier>{c7abdd18-7816-468a-9107-6db812de3cd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="MFCApplication4Dlg.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Misc.h">
@@ -54,6 +42,21 @@
     <ClInclude Include="HPSocket\HPSocket-SSL.h">
       <Filter>头文件\HPSocket</Filter>
     </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>头文件\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>头文件\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件\frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -65,10 +68,10 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Socket.cpp">
+    <ClCompile Include="Misc.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Misc.cpp">
+    <ClCompile Include="Packet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

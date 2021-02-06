@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include "Packet.h"
 
 
 // CMFCApplication4Dlg 对话框
-class CMFCApplication4Dlg : public CDialogEx, public CTcpServerListener
+class CMFCApplication4Dlg : public CDialogEx
 {
 // 构造
 public:
@@ -32,18 +33,10 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-private:
-	// CTcpServerListener的抽象函数（用于回调）全都得实现，不然会报错：不能实例化抽象类
-	virtual EnHandleResult OnPrepareListen(ITcpServer* pSender, SOCKET soListen);
-	virtual EnHandleResult OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient);
-	virtual EnHandleResult OnHandShake(ITcpServer* pSender, CONNID dwConnID);
-	virtual EnHandleResult OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
-	virtual EnHandleResult OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
-	virtual EnHandleResult OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
-	virtual EnHandleResult OnShutdown(ITcpServer* pSender);
 
+public:
+	CPacket			m_Packet;			// CPacket继承了CTcpPackServerPtr
 
-	CTcpPackServerPtr m_Server;
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();

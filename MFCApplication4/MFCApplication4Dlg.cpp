@@ -14,8 +14,7 @@
 #endif
 
 
-LPCTSTR ADDRESS = L"0.0.0.0";
-USHORT PORT = 5555;
+
 
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
@@ -56,7 +55,7 @@ END_MESSAGE_MAP()
 
 
 CMFCApplication4Dlg::CMFCApplication4Dlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_MFCAPPLICATION4_DIALOG, pParent), m_Server(this)
+	: CDialogEx(IDD_MFCAPPLICATION4_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -164,74 +163,13 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 // 按下开始监听按钮
 void CMFCApplication4Dlg::OnBnClickedOk()
 {
-	m_Server->Start(ADDRESS, PORT);
+	m_Packet.InitSocketServer();
 
-	//  设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
-	m_Server->SetMaxPackSize(0x3FFFFF);
-
-	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
-	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
 }
 
 
 // 按下取消按钮
 void CMFCApplication4Dlg::OnBnClickedCancel()
 {
-	m_Server->Stop();
-}
-
-
-
-
-
-// 回调函数的实现
-
-// 
-EnHandleResult CMFCApplication4Dlg::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
-	printf("OnPrepareListen: \n");
-	return HR_OK;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient)
-{
-	printf("[Client %d] OnAccept: \n", dwConnID);
-	/*BYTE pbData[] = "I am iyzyi";
-	DWORD dwLen = 10;
-	if (!m_Server->Send(dwConnID, pbData, dwLen))
-		return HR_ERROR;*/
-	return HR_OK;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
-	printf("[Client %d] OnHandShake: \n", dwConnID);
-	return HR_OK;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnSend: \n", dwConnID);
-	//PrintBytes((LPBYTE)pData, iLength);
-	return HR_OK;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnReceive: \n", dwConnID);
-	PrintBytes((LPBYTE)pData, iLength);
-	BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
-	return bRet ? HR_OK : HR_ERROR;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
-	printf("[Client %d] OnClose: \n", dwConnID);
-	return HR_OK;
-}
-
-
-EnHandleResult CMFCApplication4Dlg::OnShutdown(ITcpServer* pSender) {
-	printf("OnShutdown: \n");
-	return HR_OK;
+	m_Packet.StopSocketServer();
 }
