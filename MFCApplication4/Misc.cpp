@@ -65,6 +65,29 @@ BYTE GetByteFromBuffer(PBYTE pbData, DWORD dwPos) {
 }
 
 
+VOID WriteDwordToBuffer(PBYTE pbData, DWORD dwNum, DWORD dwPos) {
+	PBYTE pbData2 = pbData + dwPos;
+	pbData2[0] = dwNum & 0xff;
+	pbData2[1] = (dwNum >> 8) & 0xff;
+	pbData2[2] = (dwNum >> 16) & 0xff;
+	pbData2[3] = (dwNum >> 24) & 0xff;
+}
+
+
+VOID WriteWordToBuffer(PBYTE pbData, WORD wNum, DWORD dwPos) {
+	PBYTE pbData2 = pbData + dwPos;
+	pbData2[0] = wNum & 0xff;
+	pbData2[1] = (wNum >> 8) & 0xff;
+}
+
+
+VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos) {
+	PBYTE pbData2 = pbData + dwPos;
+	pbData2[0] = byNum;
+}
+
+
+
 // 返回拷贝好的地址
 PBYTE CopyBuffer(PBYTE pbSrc, DWORD dwLength, DWORD dwPos) {
 	PBYTE pbDest = (PBYTE)xmalloc(dwLength);

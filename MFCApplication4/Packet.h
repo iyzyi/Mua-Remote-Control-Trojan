@@ -23,15 +23,21 @@ typedef struct _PACKET_HEAD {
 											//	 BYTE就够用了，更大的数据量的话还是换个协议吧，这个通信协议没有校验机制。
 
 	_PACKET_HEAD(PBYTE pbData) {
-		this->wCommandId = GetWordFromBuffer(pbData, 0);
-		this->dwCheckSum = GetDwordFromBuffer(pbData, 2);
-		this->bySplitNum = GetByteFromBuffer(pbData, 6);
+		wCommandId = GetWordFromBuffer(pbData, 0);
+		dwCheckSum = GetDwordFromBuffer(pbData, 2);
+		bySplitNum = GetByteFromBuffer(pbData, 6);
 	}
 
 	_PACKET_HEAD() {
-		this->wCommandId = 0;
-		this->dwCheckSum = 0;
-		this->bySplitNum = 0;
+		wCommandId = 0;
+		dwCheckSum = 0;
+		bySplitNum = 0;
+	}
+
+	VOID StructToBuffer(PBYTE pbOutBuffer) {
+		WriteWordToBuffer(pbOutBuffer, wCommandId, 0);
+		WriteDwordToBuffer(pbOutBuffer, dwCheckSum, 2);
+		WriteByteToBuffer(pbOutBuffer, bySplitNum, 6);
 	}
 
 }PACKET_HEAD, *PPACKET_HEAD;
@@ -82,16 +88,28 @@ class CPacket {
 public:
 
 	// 接收到的封包用这个构造函数
-	CPacket(PBYTE pbData, DWORD dwLength);
+	//CPacket(PBYTE pbData, DWORD dwLength);
 
 	// 要发送的封包用这个构造函数
-	CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
+	//CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
+
+	CPacket(CONNID dwConnID);
+
+	VOID PacketParse(PBYTE pbData, DWORD dwLength);
+	VOID PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
+
 
 	~CPacket();
 
 public:
+	CONNID				m_dwConnId;
+	
 	DWORD				m_dwPacketLength;			// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
 	PACKET_HEAD			m_PacketHead;				// 包头
-	PBYTE				m_pPacketBody;				// 包体
+	PBYTE				m_pbPacketBody;				// 包体
+	
 	DWORD				m_dwPacketBodyLength;		// 包体长度
+
+	PBYTE				m_pbPacketPlainData;
+	PBYTE				m_pbPacketCipherData;
 };

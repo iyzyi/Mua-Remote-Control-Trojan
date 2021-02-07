@@ -190,6 +190,7 @@
   <ItemGroup>
     <ClInclude Include="AES.h" />
     <ClInclude Include="Crypto.h" />
+    <ClInclude Include="DoubleLinkedList.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />
@@ -207,6 +208,7 @@
   <ItemGroup>
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="DoubleLinkedList.cpp" />
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
     <ClCompile Include="Misc.cpp" />

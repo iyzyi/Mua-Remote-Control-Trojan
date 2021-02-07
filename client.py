@@ -156,7 +156,25 @@ def test7():
         s.sendall(send_data)
         print('send', i)
 
-def crypto1():
-    a = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
-		0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}
-    for i in 
+def test8():
+    ls = []
+    for i in range(socket_num):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        ls.append(s)
+        print('connect', i)
+
+    for i in range(socket_num):
+        s = ls[i]
+        data = 'A'
+        send_data = struct.pack('<I', len(data)) + (data).encode()
+        #print(send_data)
+        s.sendall(send_data)
+        print('send', i)
+    for i in range(socket_num):
+        s = ls[i]
+        recv_data = s.recv(1024)
+        print('recv', i)
+        print(len(recv_data), recv_data)
+
+test8()
