@@ -29,7 +29,7 @@ CPacket::CPacket(PBYTE pbData, DWORD dwLength) {
 // bySplitNum表示封包分片数量
 CPacket::CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum) {
 
-	// 代码
+	
 
 	// TODO：加密封包
 
@@ -37,5 +37,7 @@ CPacket::CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum) {
 	
 	
 CPacket::~CPacket() {
-
+	if (m_pPacketBody) {
+		xfree(m_pPacketBody);
+	}
 }

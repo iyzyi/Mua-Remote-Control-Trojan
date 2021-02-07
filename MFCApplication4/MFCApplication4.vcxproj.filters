@@ -19,6 +19,12 @@
     <Filter Include="头文件\frame">
       <UniqueIdentifier>{c7abdd18-7816-468a-9107-6db812de3cd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Crypto">
+      <UniqueIdentifier>{9d223e02-f69f-44a3-82e9-d8f8ab82a27c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Crypto">
+      <UniqueIdentifier>{0391a08b-a7f3-4159-a786-09aa9ff020ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
@@ -60,6 +66,12 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AES.h">
+      <Filter>头文件\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto.h">
+      <Filter>头文件\Crypto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -79,6 +91,12 @@
     </ClCompile>
     <ClCompile Include="Packet.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AES.cpp">
+      <Filter>源文件\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="Crypto.cpp">
+      <Filter>源文件\Crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

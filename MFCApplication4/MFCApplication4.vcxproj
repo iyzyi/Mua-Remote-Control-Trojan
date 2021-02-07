@@ -188,6 +188,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AES.h" />
+    <ClInclude Include="Crypto.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />
@@ -203,6 +205,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AES.cpp" />
+    <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
     <ClCompile Include="Misc.cpp" />

@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "SocketServer.h"
+#include "Crypto.h"
 
 
 #define ADDRESS (L"0.0.0.0")
