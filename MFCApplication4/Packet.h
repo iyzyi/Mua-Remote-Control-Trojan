@@ -75,12 +75,7 @@ typedef struct _PACKET_HEAD {
 //} PACKET, *PPACKET;
 
 
-enum COMMAND_ID {
-	SHELL_REMOTE,			// 远程shell	
-	FILE_TRANSFOR,			// 文件传输
-	SCREEN_MONITOR			// 屏幕监控
 
-};
 
 
 class CPacket {

@@ -52,7 +52,7 @@ CMFCApplication4App theApp;
 BOOL CMFCApplication4App::InitInstance()
 {
 	// Socket Server的启动
-	m_Server.StartSocketServer();
+	m_Server.StartSocketServer(ManageRecvPacket);
 
 
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
@@ -129,4 +129,9 @@ BOOL CMFCApplication4App::InitInstance()
 CMFCApplication4App::~CMFCApplication4App() {
 	// 关闭Socket服务端
 	m_Server.StopSocketServer();
+}
+
+
+void CALLBACK CMFCApplication4App::ManageRecvPacket(CPacket Packet) {
+	printf("回调\n");
 }

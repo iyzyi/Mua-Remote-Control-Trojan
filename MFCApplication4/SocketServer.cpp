@@ -19,7 +19,7 @@ CSocketServer::~CSocketServer() {
 
 
 // 初始化socket服务端
-VOID CSocketServer::StartSocketServer() {
+VOID CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc) {
 
 	m_Server->Start(ADDRESS, PORT);
 
@@ -28,6 +28,8 @@ VOID CSocketServer::StartSocketServer() {
 
 	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
 	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
+
+	m_pfnManageRecvPacket = pfnNotifyProc;
 }
 
 
@@ -85,6 +87,9 @@ EnHandleResult CSocketServer::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOC
 
 EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
 	printf("[Client %d] OnHandShake: \n", dwConnID);
+
+
+
 	return HR_OK;
 }
 
@@ -99,15 +104,21 @@ EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const
 EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
 	PrintBytes((PBYTE)pData, iLength);
+	
 	//PacketParse((PBYTE)pData, iLength);
 	//BOOL bRet = m_Server->Send(dwConnID, pData, iLength);
 	//return bRet ? HR_OK : HR_ERROR;
 	
-	if (pData[0] == 'A') {
-		BYTE Buffer[] = "I am iyzyi!";
-		PBYTE pbData = CopyBuffer(Buffer, 11);		// 不这样多加一层，xfree(m_pPacketBody)直接崩。
-		SendPacket(dwConnID, FILE_TRANSFOR, pbData, 11);
-	}
+	//if (pData[0] == 'A') {
+	//	BYTE Buffer[] = "I am iyzyi!";
+	//	PBYTE pbData = CopyBuffer(Buffer, 11);		// 不这样多加一层，xfree(m_pPacketBody)直接崩。
+	//	SendPacket(dwConnID, FILE_TRANSFOR, pbData, 11);
+	//}
+	
+	CPacket Packet = CPacket(dwConnID);
+	Packet.PacketParse((PBYTE)pData, (DWORD)iLength);
+
+	m_pfnManageRecvPacket(Packet);
 	return HR_OK;
 }
 

@@ -37,4 +37,5 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+	CListCtrl m_ListCtrl;
 };

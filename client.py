@@ -177,4 +177,30 @@ def test8():
         print('recv', i)
         print(len(recv_data), recv_data)
 
-test8()
+def test9():
+    ls = []
+    for i in range(socket_num):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        ls.append(s)
+        print('connect', i)
+
+    for i in range(socket_num):
+        s = ls[i]
+        data = ''
+        length = len(data) + 7
+        commandid = 0x1000
+        checksum = 0
+        splitnum = 0
+        send_data = struct.pack('<I', length) + struct.pack('<H', commandid) + b'\x00\x00\x00\x00' + b'\x00' + (data).encode()
+        print(send_data)
+        s.sendall(send_data)
+        print('send', i)
+
+    for i in range(socket_num):
+        s = ls[i]
+        recv_data = s.recv(1024)
+        print('recv', i)
+        print(len(recv_data), recv_data)
+
+test9()

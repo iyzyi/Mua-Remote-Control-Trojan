@@ -25,6 +25,12 @@
     <Filter Include="源文件\Crypto">
       <UniqueIdentifier>{0391a08b-a7f3-4159-a786-09aa9ff020ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\组件-远程SHELL">
+      <UniqueIdentifier>{281b0381-1fff-46d8-b87b-d4175222258e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\组件-远程SHELL">
+      <UniqueIdentifier>{52d7ff22-fee7-45b0-97be-abb55041c5c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
@@ -76,7 +82,7 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="RemoteShell.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +114,7 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RemoteShell.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\组件-远程SHELL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

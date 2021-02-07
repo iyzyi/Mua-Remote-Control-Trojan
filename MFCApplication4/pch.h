@@ -33,4 +33,15 @@
 #define xfree(p)   HeapFree(GetProcessHeap(),0,(p))
 
 
+enum COMMAND_ID {
+	LOGIN,					// 上线包
+
+	SHELL_REMOTE,			// 远程shell	
+	FILE_TRANSFOR,					// 文件传输
+	SCREEN_MONITOR					// 屏幕监控
+
+};
+
+
+
 #endif //PCH_H

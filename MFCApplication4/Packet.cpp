@@ -1,6 +1,11 @@
 #include "pch.h"
 #include "Packet.h"
 
+// 统一声明：
+// 本类中的封包包括封包包头和封包包体
+// 封包包头的定义详见PACKET_HEAD结构体
+// 并不包括开头的4字节长度哦，这个是由HP-Socket负责的
+
 
 //CPacket::CPacket(PBYTE pbData, DWORD dwLength) {
 //
@@ -64,11 +69,25 @@ CPacket::~CPacket() {
 }
 
 
-VOID CPacket::PacketParse(PBYTE pbData, DWORD dwLength) {
+// 解析封包，不可与PacketCombine在同一个Packet对象中同时使用
+VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
+	m_dwPacketLength = dwPacketLength;
+	m_dwPacketBodyLength = m_dwPacketLength - PACKET_HEAD_LENGTH;
 
+	m_pbPacketCipherData = CopyBuffer(pbData, dwPacketLength);
+
+	// TODO : 解密封包
+	m_pbPacketPlainData = CopyBuffer(m_pbPacketCipherData, m_dwPacketLength);
+
+	// 解析包头
+	m_PacketHead = PACKET_HEAD((PBYTE)m_pbPacketPlainData);
+
+	// 拷贝包体
+	m_pbPacketBody = CopyBuffer(m_pbPacketPlainData, m_dwPacketBodyLength, PACKET_HEAD_LENGTH);
 }
 
 
+// 组装封包，不可与PacketParse在同一个Packet对象中同时使用
 VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
 	m_dwPacketLength = PACKET_HEAD_LENGTH + dwPacketBodyLength;
 	m_dwPacketBodyLength = dwPacketBodyLength;
@@ -88,8 +107,8 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 	memcpy(m_pbPacketPlainData, pbPacketHead, PACKET_HEAD_LENGTH);
 	memcpy(m_pbPacketPlainData + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
 
-	// 加密封包
-	// TODO
+
+	// TODO : 加密封包
 	m_pbPacketCipherData = (PBYTE)xmalloc(m_dwPacketLength);
 	memcpy(m_pbPacketCipherData, m_pbPacketPlainData, m_dwPacketLength);
 }

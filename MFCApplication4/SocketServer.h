@@ -6,6 +6,10 @@
 #include "DoubleLinkedList.h"
 
 
+typedef void (CALLBACK* NOTIFYPROC)(CPacket Packet);		// NOTIFYPROC: 通知程序，是回调函数
+
+
+
 // 继承自CTcpServerListener
 class CSocketServer : public CTcpServerListener {
 public:
@@ -19,11 +23,14 @@ public:
 	VOID SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 	VOID SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 
-	VOID StartSocketServer();
+	VOID StartSocketServer(NOTIFYPROC pfnNotifyProc);
 	VOID StopSocketServer();
 
 public:
 	CTcpPackServerPtr			m_Server;
+
+	NOTIFYPROC					m_pfnManageRecvPacket;	// 回调函数，接收到的封包均传给这个函数处理，
+														// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
 
 	//doubleLinkedList<CONNID>	m_ClientList;			// 双向链表，用于记录连接中的ConnectId
 

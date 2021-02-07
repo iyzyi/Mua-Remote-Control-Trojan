@@ -8,6 +8,7 @@
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
 #include "RemoteShell.h"
+#include "resource.h"
 
 #include "Misc.h"
 
@@ -65,6 +66,7 @@ CMFCApplication4Dlg::CMFCApplication4Dlg(CWnd* pParent /*=nullptr*/)
 void CMFCApplication4Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST2, m_ListCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
@@ -108,6 +110,43 @@ BOOL CMFCApplication4Dlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// TODO: 在此添加额外的初始化代码
+
+	// 以下是List Control
+	//标题所需字段
+	CString head[] = { TEXT("ID"),TEXT("IP"),TEXT("计算机名") };
+
+	CString name[] = { TEXT("李白"),TEXT("鲁班"),TEXT("韩信"),
+					TEXT("亚索"),TEXT("达摩"),TEXT("小明") };
+
+	//插入列标题
+	m_ListCtrl.InsertColumn(0, head[0], LVCFMT_LEFT, 100);
+	m_ListCtrl.InsertColumn(1, head[1], LVCFMT_LEFT, 100);
+	m_ListCtrl.InsertColumn(2, head[2], LVCFMT_LEFT, 100);
+
+	////插入正文内容
+	//for (int i = 0; i < 6; i++) {
+	//	//	CString str;
+	//	//  str.Format(TEXT("张三_%d"),i);
+	//	//	str.Format(TEXT("name[i]_%d"),i);
+
+	//		//确定行数
+	//	m_ListCtrl.InsertItem(i, name[i]);
+
+	//	//设置列内容
+	//	int j = 0;
+	//	int age = 23;
+	//	m_ListCtrl.SetItemText(i, ++j, TEXT("23"));//怎么设置int
+	//	m_ListCtrl.SetItemText(i, ++j, TEXT("男"));
+	//}
+
+	//设置风格样式
+	//LVS_EX_GRIDLINES 网格
+	//LVS_EX_FULLROWSELECT 选中整行
+	m_ListCtrl.SetExtendedStyle(m_ListCtrl.GetExtendedStyle()
+		| LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
+	// 以上是List Control
+
+
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -176,3 +215,5 @@ void CMFCApplication4Dlg::OnBnClickedCancel()
 {
 	//m_Server.StopSocketServer();
 }
+
+
