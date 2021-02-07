@@ -6,21 +6,23 @@ CPacket::CPacket(PBYTE pbData, DWORD dwLength) {
 
 	// TODO：解密封包
 
+
+	// 封包长度
+	m_dwPacketLength = dwLength;
+	m_dwPacketBodyLength = dwLength - PACKET_HEAD_LENGTH;
+
 	// 解析包头
-	PACKET_HEAD PacketHead((PBYTE)pbData);
+	m_PacketHead = PACKET_HEAD((PBYTE)pbData);
 
 	// 拷贝包体
-	PBYTE pPacketBody = CopyBuffer(pbData, dwLength - PACKET_HEAD_LENGTH, PACKET_HEAD_LENGTH);
-	if (pPacketBody == NULL){
-		printf("xmalloc(%d) failed\n", dwLength);
+	m_pPacketBody = CopyBuffer(pbData, dwLength - PACKET_HEAD_LENGTH, PACKET_HEAD_LENGTH);
+	if (m_pPacketBody == NULL){
+		printf("xmalloc(%d) PacketBody failed\n", dwLength);
 	}
 	else {
-		// 封包以PACKET结构体的形式存在
-		m_Packet = PACKET(dwLength, PacketHead, pPacketBody);
-
-		printf("命令号 = 0x%x\n校验和 = 0x%x\n分片数 = 0x%x\n", m_Packet.PacketHead.wCommandId, m_Packet.PacketHead.dwCheckSum, m_Packet.PacketHead.bySplitNum);
-		printf("封包长度 = 0x%x\n包体长度 = 0x%x\n包体明文数据: \n", m_Packet.dwPacketLength, m_Packet.dwPacketBodyLength);
-		PrintChars((CHAR*)(m_Packet.pPacketBody), m_Packet.dwPacketBodyLength);
+		printf("命令号 = 0x%x\n校验和 = 0x%x\n分片数 = 0x%x\n", m_PacketHead.wCommandId, m_PacketHead.dwCheckSum, m_PacketHead.bySplitNum);
+		printf("封包长度 = 0x%x\n包体长度 = 0x%x\n包体明文数据: \n", m_dwPacketLength, m_dwPacketBodyLength);
+		PrintChars((CHAR*)(m_pPacketBody), m_dwPacketBodyLength);
 	}
 }
 
