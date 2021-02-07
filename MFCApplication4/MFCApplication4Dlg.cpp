@@ -7,6 +7,7 @@
 #include "MFCApplication4.h"
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
+#include "RemoteShell.h"
 
 #include "Misc.h"
 
@@ -161,11 +162,12 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 }
 
 
-// 按下开始监听按钮
+// 按下远程Shell按钮
 void CMFCApplication4Dlg::OnBnClickedOk()
 {
-	//m_Server.StartSocketServer();
-
+	RemoteShell *dlg = new RemoteShell();
+	dlg->Create(IDD_DIALOG1, GetDesktopWindow());
+	dlg->ShowWindow(SW_SHOW);
 }
 
 
