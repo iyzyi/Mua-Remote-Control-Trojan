@@ -9,6 +9,7 @@
 
 #include "resource.h"		// 主符号
 
+#include "SocketServer.h"
 
 // CMFCApplication4App:
 // 有关此类的实现，请参阅 MFCApplication4.cpp
@@ -17,7 +18,11 @@
 class CMFCApplication4App : public CWinApp
 {
 public:
+	CSocketServer			m_Server;			// CSocketServer继承了CTcpPackServerPtr
+
+public:
 	CMFCApplication4App();
+	~CMFCApplication4App();
 
 // 重写
 public:

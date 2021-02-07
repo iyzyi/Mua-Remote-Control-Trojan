@@ -75,6 +75,9 @@
     <ClInclude Include="DoubleLinkedList.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="RemoteShell.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -102,6 +105,9 @@
       <Filter>源文件\Crypto</Filter>
     </ClCompile>
     <ClCompile Include="DoubleLinkedList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteShell.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

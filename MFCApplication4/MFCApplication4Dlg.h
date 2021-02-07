@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SocketServer.h"
+
 
 
 // CMFCApplication4Dlg 对话框
@@ -33,9 +33,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
-
-public:
-	CSocketServer			m_Server;			// CSocketServer继承了CTcpPackServerPtr
 
 public:
 	afx_msg void OnBnClickedOk();

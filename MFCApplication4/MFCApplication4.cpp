@@ -51,6 +51,10 @@ CMFCApplication4App theApp;
 
 BOOL CMFCApplication4App::InitInstance()
 {
+	// Socket Server的启动
+	m_Server.StartSocketServer();
+
+
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
 	// 使用 ComCtl32.dll 版本 6 或更高版本来启用可视化方式，
 	//则需要 InitCommonControlsEx()。  否则，将无法创建窗口。
@@ -112,8 +116,8 @@ BOOL CMFCApplication4App::InitInstance()
 #endif
 
 
-	//CTcpPackServerPtr m_Server;
-	//m_Server->Start(ADDRESS, PORT);
+	// Socket Server的启动代码，如果写在这里，就不会执行，难道是上面的某处代码阻塞了？？
+	// m_Server.StartSocketServer();
 
 
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
@@ -121,3 +125,8 @@ BOOL CMFCApplication4App::InitInstance()
 	return FALSE;
 }
 
+
+CMFCApplication4App::~CMFCApplication4App() {
+	// 关闭Socket服务端
+	m_Server.StopSocketServer();
+}
