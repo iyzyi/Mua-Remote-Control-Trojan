@@ -50,7 +50,7 @@ CPacket::CPacket(CONNID dwConnID) {
 
 
 CPacket::~CPacket() {
-	if (m_pbPacketBody) {
+	if (m_pbPacketBody) {		// 如果这里不是用xmalloc，而是直接用栈，那这里free必然崩溃。还在想怎么改。暂时先不允许栈吧，PacketBody都得xmalloc申请。
 		xfree(m_pbPacketBody);
 	}
 
@@ -84,13 +84,12 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 	m_PacketHead.StructToBuffer(pbPacketHead);
 
 	// 组包，不过不包括前4字节，因为HP-Socket的Pack模式，在收发数据的时候会自动添上或删去
-	DWORD dwPacketLength = PACKET_HEAD_LENGTH + dwPacketBodyLength;			// 照例不包括开头表示长度的4字节
-	m_pbPacketPlainData = (PBYTE)xmalloc(dwPacketLength);					// 整条封包明文内容
+	m_pbPacketPlainData = (PBYTE)xmalloc(m_dwPacketLength);					// 整条封包明文内容
 	memcpy(m_pbPacketPlainData, pbPacketHead, PACKET_HEAD_LENGTH);
-	memcpy(m_pbPacketPlainData + PACKET_HEAD_LENGTH, m_pbPacketBody, dwPacketBodyLength);
+	memcpy(m_pbPacketPlainData + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
 
 	// 加密封包
 	// TODO
-	m_pbPacketCipherData = (PBYTE)xmalloc(dwPacketLength);
+	m_pbPacketCipherData = (PBYTE)xmalloc(m_dwPacketLength);
 	memcpy(m_pbPacketCipherData, m_pbPacketPlainData, m_dwPacketLength);
 }

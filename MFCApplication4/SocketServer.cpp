@@ -38,14 +38,14 @@ VOID CSocketServer::StopSocketServer() {
 
 
 
-VOID CSocketServer::SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength) {
+VOID CSocketServer::SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
 	CPacket Packet = CPacket(dwConnectId);
-	Packet.PacketCombine(dwCommandId, pbPacketBody, dwLength);
-	m_Server->Send(dwConnectId, Packet.m_pbPacketCipherData, dwLength);
+	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
+	m_Server->Send(dwConnectId, Packet.m_pbPacketCipherData, Packet.m_dwPacketLength);
 }
 
 
-VOID CSocketServer::SendPacketToALLClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength) {
+VOID CSocketServer::SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength) {
 	
 }
 
@@ -105,7 +105,8 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	
 	if (pData[0] == 'A') {
 		BYTE Buffer[] = "I am iyzyi!";
-		SendPacket(dwConnID, FILE_TRANSFOR, Buffer, 11);
+		PBYTE pbData = CopyBuffer(Buffer, 11);		// 不这样多加一层，xfree(m_pPacketBody)直接崩。
+		SendPacket(dwConnID, FILE_TRANSFOR, pbData, 11);
 	}
 	return HR_OK;
 }

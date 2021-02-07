@@ -17,7 +17,7 @@ public:
 	//VOID PacketCombine();
 
 	VOID SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
-	VOID SendPacketToALLClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
+	VOID SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 
 	VOID StartSocketServer();
 	VOID StopSocketServer();
