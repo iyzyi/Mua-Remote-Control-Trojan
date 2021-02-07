@@ -1,12 +1,21 @@
 #include "pch.h"
 #include "Crypto.h"
+#include "Misc.h"
 
 
-CCrypto::CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId) {
-	switch (dwCryptoAlgorithmId) {
-		case CRYPTO_ID_AES:
-			
-			break;
+CCrypto::CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey, PBYTE pbIv) {
+	m_dwCryptoAlgorithmId = dwCryptoAlgorithmId;
+	switch (m_dwCryptoAlgorithmId) {
+
+	case PLAINTEXT:
+		break;
+
+	case AES_128_CFB:
+		m_AesEncrypt = AES(128, pbKey, pbIv);
+		m_AesDecrypt = AES(128, pbKey, pbIv);
+		break;
+		
+	// TODO: 其他加密算法，如ChaCha20-Poly1305
 	}
 }
 
@@ -16,21 +25,26 @@ CCrypto::~CCrypto() {
 }
 
 
-PBYTE CCrypto::Encrypt(PBYTE pbData, DWORD dwInLength, DWORD &pdwOutLength) {
-	/*AES aes(128);
-	unsigned char encrypted[] = { 0x3c, 0x55, 0x3d, 0x01, 0x8a, 0x52, 0xe4, 0x54, 0xec, 0x4e, 0x08, 0x22, 0xc2, 0x8d, 0x55, 0xec,
-								 0xe3, 0x5a, 0x40, 0xab, 0x30, 0x29, 0xf3, 0x0c, 0xe1, 0xdb, 0x30, 0x6c, 0xa1, 0x05, 0xcb, 0xa9 };
-	unsigned char iv[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-	unsigned char key[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-	unsigned char right[] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
-							  0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+PBYTE CCrypto::Encrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength) {
+	switch (m_dwCryptoAlgorithmId) {
+	
+	case PLAINTEXT:
+		*pdwOutLength = dwInLength;
+		return CopyBuffer(pbData, dwInLength);
 
-	unsigned char *out = aes.DecryptCFB(encrypted, BLOCK_BYTES_LENGTH * 2, key, iv);
-	ASSERT_FALSE(memcmp(right, out, BLOCK_BYTES_LENGTH * 2));
-	delete[] out;*/
+	case AES_128_CFB:
+		return m_AesEncrypt.EncryptCFB(pbData, dwInLength, pdwOutLength);
+		break;
+
+	default:
+		*pdwOutLength = 0;
+		return NULL;
+	}
+
+
 }
 
 
-PBYTE CCrypto::Decrypt(PBYTE pbData, DWORD dwInLength, DWORD &pdwOutLength) {
-
+PBYTE CCrypto::Decrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength) {
+	return NULL;
 }
