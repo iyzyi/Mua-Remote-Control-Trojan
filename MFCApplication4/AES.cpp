@@ -56,6 +56,25 @@ AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 	InitializeCriticalSection(&m_cs);			// 初始化锁
 }
 
+
+// 这里的构造函数也是要的，不能不实现，不然之后xfree(m_pbKey)崩
+// 因为如果没有通过带参的构造函数定义类对象，比如只是申请了一个
+// 指向类的指针，没有明着写出使用了哪个构造函数，此时会默认调用
+// 这个无参的构造函数。而我们没自己写这个无参构造函数，m_pbKey就
+// 不一定为NULL, 不如debug下就是0xcccccccc, 此时xfree比如崩。
+AES::AES() {
+	m_pbKey				= NULL;
+	m_pbEncryptIv		= NULL;
+	m_pbDecryptIv		= NULL;
+
+	Nb					= 0;
+	Nk					= 0;
+	Nr					= 0;
+
+	InitializeCriticalSection(&m_cs);
+}
+
+
 AES::~AES() {
 	if (m_pbKey) {
 		xfree(m_pbKey);

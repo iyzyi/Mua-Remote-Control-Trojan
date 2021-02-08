@@ -254,7 +254,7 @@ void CMFCApplication4Dlg::OnEnChangeEdit1()
 }
 
 
-// 开始监听
+// 开始监听按钮
 void CMFCApplication4Dlg::OnBnClickedButton1()
 {
 	CString csIpAddress;

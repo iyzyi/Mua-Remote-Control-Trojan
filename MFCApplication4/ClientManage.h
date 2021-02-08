@@ -20,14 +20,17 @@ public:
 	CLIENT_STATUS			m_dwClientStatus;
 	CCrypto					m_Crypto;
 
+	TCHAR					m_lpszIpAddress[20];
+	WORD					m_wPort;
+
 	// 构成双向链表，方便CClientManage管理
 	// 链表中以ConnectId做唯一标识
 	CClient*				m_pLastClient;
 	CClient*				m_pNextClient;
 
 public:
-	CClient(CONNID dwConnectId);
-
+	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort);
+	CClient();
 	~CClient();
 
 	VOID SetCryptoKey(PBYTE pbCryptoKey = NULL, PBYTE pbCryptoIv = NULL);
@@ -55,13 +58,13 @@ public:
 
 
 protected:
+
 	// Client链表的第一个结点，这个结点的所有数据都是空的，
 	// 仅用来索引链表的头部，只有m_pNextClient这个数据是非空的。
 	// m_pClientListHead->m_pNextClient存放真正的第一个Client的地址
-	CClient *m_pClientListHead = &CClient(0xffffffff);
+	CClient *m_pClientListHead;
 	
-	// 该结点指向链表最后一个结点，这个结点是有数据的结点（除非链表为空）
-	CClient *m_pClientListTail = m_pClientListHead;
-
-
+	// 该结点指向链表最后一个结点，这个结点是有数据的结点
+	//（除非链表为空，此时m_pClientListHead=m_pClientListTail）
+	CClient *m_pClientListTail;
 };

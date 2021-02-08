@@ -25,7 +25,7 @@ public:
 
 public:
 	CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey=NULL, PBYTE pbIv=NULL);
-	CCrypto() {};
+	CCrypto();
 	~CCrypto();
 
 	PBYTE Encrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength);

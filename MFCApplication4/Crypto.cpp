@@ -22,6 +22,11 @@ CCrypto::CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey, PBYTE pbI
 }
 
 
+CCrypto::CCrypto() {
+	
+}
+
+
 CCrypto::~CCrypto() {
 
 }

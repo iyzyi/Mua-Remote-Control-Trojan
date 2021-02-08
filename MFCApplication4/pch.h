@@ -32,6 +32,8 @@
 #define xmalloc(s) HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,(s))
 #define xfree(p)   HeapFree(GetProcessHeap(),0,(p))
 
+// 第三个参数是MultiByte的最大字节数
+#define myW2A(lpSrcWideCharStr, lpDestMultiByte, dwMultiBytes) WideCharToMultiByte(CP_ACP, 0, (lpSrcWideCharStr), -1, (lpDestMultiByte), (dwMultiBytes), NULL, NULL)
 
 enum COMMAND_ID {
 	CRYPTO_KEY,				// 传递通信密钥和IV

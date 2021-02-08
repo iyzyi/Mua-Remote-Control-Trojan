@@ -73,7 +73,7 @@ public:
   // 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
   // 并新增m_pbEncryptIv, m_pbDecryptIv, m_pbKey三个类成员变量
   AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv);
-  AES() {};
+  AES();
   ~AES();
 
   //unsigned char *EncryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned int &outLen);
