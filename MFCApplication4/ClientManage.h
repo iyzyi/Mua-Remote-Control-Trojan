@@ -6,7 +6,7 @@
 
 enum CLIENT_STATUS {
 	NOT_ONLINE,			// 客户端（即受控端）不在线
-	HAVE_CRYPTO_KEY,	// 主控端接收到了被控端发来的对称密钥。这阶段的包是明文的（后续可能改成RSA加密）。
+	//HAVE_CRYPTO_KEY,	// 主控端接收到了被控端发来的对称密钥。这阶段的包是明文的（后续可能改成RSA加密）。
 	WAIT_FOR_LOGIN,		// 等待上线包（使用对称加密算法加密），该包有IP，CPU，系统版本等信息。
 	LOGINED				// 已登录，（接收到通信密钥和上线包后）正式建立通信。
 };
@@ -28,6 +28,7 @@ public:
 	CClient*				m_pLastClient;
 	CClient*				m_pNextClient;
 
+	
 public:
 	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort);
 	CClient();
@@ -52,6 +53,9 @@ public:
 
 	// 返回是否删除成功（删除失败主要原因可能是链表中并没有这个Client）
 	BOOL DeleteClientFromList(CONNID dwConnectId);
+	VOID DeleteClientFromList(CClient *pClient);
+
+	VOID DeleteAllClientFromList();
 
 	// Client是否存在于链表中，存在则返回Client地址，不存在返回NULL
 	CClient* SearchClient(CONNID dwConnectId);
@@ -67,4 +71,8 @@ protected:
 	// 该结点指向链表最后一个结点，这个结点是有数据的结点
 	//（除非链表为空，此时m_pClientListHead=m_pClientListTail）
 	CClient *m_pClientListTail;
+
+	CRITICAL_SECTION m_Lock;					// 链表操作的锁
+
+	DWORD m_dwClientNum;
 };

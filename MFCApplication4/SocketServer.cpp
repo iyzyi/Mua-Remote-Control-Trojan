@@ -129,7 +129,7 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	PrintBytes((PBYTE)pData, iLength);
 	
 	CClient* pClient = m_ClientManage.SearchClient(dwConnID);
-	if (pClient == NULL) {		// 新客户端来啦
+	if (pClient == NULL) {						// 新客户端来啦
 
 		TCHAR lpszIpAddress[20];
 		int iIpAddressLen = 20;
@@ -137,13 +137,23 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 		// 通过ConnectId获取IP地址和端口
 		m_pServer->GetRemoteAddress(dwConnID, lpszIpAddress, iIpAddressLen, wPort);
 
-
 		CClient* pClientNew = new CClient(dwConnID, (LPWSTR)lpszIpAddress, wPort);
 		m_ClientManage.AddNewClientToList(pClientNew);
+	} 
+	else {
+		switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
+
+		case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
+			;
+
+		case LOGINED:									// 接收上线包后，状态变为已登录
+			;
+		}
+
 	}
 
-	
-	
+	return HR_OK;
+
 	/*CPacket Packet = CPacket(dwConnID);
 	Packet.PacketParse((PBYTE)pData, (DWORD)iLength);
 
@@ -160,12 +170,15 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	//	PBYTE pbData = CopyBuffer(Buffer, 11);		// 不这样多加一层，xfree(m_pPacketBody)直接崩。
 	//	SendPacket(dwConnID, FILE_TRANSFOR, pbData, 11);
 	//}
-	return HR_OK;
+
 }
 
 
 EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	printf("[Client %d] OnClose: \n", dwConnID);
+
+	m_ClientManage.DeleteClientFromList(dwConnID);
+
 	return HR_OK;
 }
 

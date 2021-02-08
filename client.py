@@ -5,7 +5,7 @@ HOST = '192.168.0.100'
 PORT = 5555
 #HOST = '81.70.160.41'
 #PORT = 55555
-socket_num = 1
+socket_num = 4
 rc4_key = b'\x01\x23\x45\x67\x89\xab\xcd\xef'
 
 def rc4_decrypt(cipher, key):
@@ -203,4 +203,29 @@ def test9():
         print('recv', i)
         print(len(recv_data), recv_data)'''
 
-test9()
+def test10():
+    socket_num = 5
+    ls = []
+    for i in range(socket_num):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        ls.append(s)
+        print('connect', i)
+
+    while True:
+        for i in range(socket_num):
+            s = ls[i]
+            data = 'iyzyi'
+            length = len(data) + 7
+            commandid = 0x1000
+            checksum = 0
+            splitnum = 0
+            send_data = struct.pack('<I', length) + struct.pack('<H', commandid) + b'\x00\x00\x00\x00' + b'\x00' + (data).encode()
+            print(send_data)
+            s.sendall(send_data)
+            print('send', i)
+
+        for i in range(socket_num):
+            s.recv(1024)
+
+test10()
