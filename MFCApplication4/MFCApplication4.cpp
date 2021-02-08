@@ -132,6 +132,6 @@ CMFCApplication4App::~CMFCApplication4App() {
 }
 
 
-void CALLBACK CMFCApplication4App::ManageRecvPacket(CPacket Packet) {
+void CALLBACK CMFCApplication4App::ManageRecvPacket(CPacket &Packet) {
 	printf("回调\n");
 }

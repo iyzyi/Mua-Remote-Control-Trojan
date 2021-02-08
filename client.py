@@ -1,7 +1,7 @@
 import socket, struct
 from Crypto.Cipher import ARC4
 
-HOST = '192.168.0.105'  
+HOST = '192.168.0.100'  
 PORT = 5555
 #HOST = '81.70.160.41'
 #PORT = 55555
@@ -197,10 +197,10 @@ def test9():
         s.sendall(send_data)
         print('send', i)
 
-    for i in range(socket_num):
+    '''for i in range(socket_num):
         s = ls[i]
         recv_data = s.recv(1024)
         print('recv', i)
-        print(len(recv_data), recv_data)
+        print(len(recv_data), recv_data)'''
 
 test9()

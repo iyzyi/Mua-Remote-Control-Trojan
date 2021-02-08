@@ -90,10 +90,22 @@ VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos) {
 
 // 返回拷贝好的地址
 PBYTE CopyBuffer(PBYTE pbSrc, DWORD dwLength, DWORD dwPos) {
-	PBYTE pbDest = (PBYTE)xmalloc(dwLength);
-	if (pbDest == NULL) {
-		return NULL;
+	PBYTE pbDest;
+
+	if (dwLength > 0) {
+		pbDest = (PBYTE)xmalloc(dwLength);
+		if (pbDest == NULL) {
+			return NULL;
+		}
+		memcpy(pbDest, pbSrc + dwPos, dwLength);
 	}
-	memcpy(pbDest, pbSrc+dwPos, dwLength);
+	else {
+		// 封包包体可能长度为0，此时申请长为1的缓冲区
+		pbDest = (PBYTE)xmalloc(1);
+		if (pbDest == NULL) {
+			return NULL;
+		}
+	}
+	
 	return pbDest;
 }

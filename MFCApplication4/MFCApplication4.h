@@ -36,7 +36,7 @@ public:
 
 	// 这里必须是static，不然ManageRecvPacket实参与 "NOTIFYPROC" 类型的形参不兼容。
 	// 而且static只能在声明中添加，不能在定义中添加哦。
-	static void CALLBACK ManageRecvPacket(CPacket Packet);
+	static void CALLBACK ManageRecvPacket(CPacket &Packet);
 };
 
 extern CMFCApplication4App theApp;

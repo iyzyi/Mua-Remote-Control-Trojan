@@ -6,7 +6,7 @@
 #include "DoubleLinkedList.h"
 
 
-typedef void (CALLBACK* NOTIFYPROC)(CPacket Packet);		// NOTIFYPROC: 通知程序，是回调函数
+typedef void (CALLBACK* NOTIFYPROC)(CPacket &Packet);		// NOTIFYPROC: 通知程序，是回调函数
 
 
 
