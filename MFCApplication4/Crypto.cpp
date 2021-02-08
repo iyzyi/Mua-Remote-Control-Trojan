@@ -5,6 +5,7 @@
 
 CCrypto::CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey, PBYTE pbIv) {
 	m_dwCryptoAlgorithmId = dwCryptoAlgorithmId;
+
 	switch (m_dwCryptoAlgorithmId) {
 
 	case PLAINTEXT:
@@ -16,6 +17,7 @@ CCrypto::CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey, PBYTE pbI
 		break;
 		
 	// TODO: 其他加密算法，如ChaCha20-Poly1305
+
 	}
 }
 
@@ -40,8 +42,6 @@ PBYTE CCrypto::Encrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength) {
 		*pdwOutLength = 0;
 		return NULL;
 	}
-
-
 }
 
 

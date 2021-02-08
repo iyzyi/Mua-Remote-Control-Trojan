@@ -24,7 +24,7 @@ public:
 	
 
 public:
-	CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey, PBYTE pbIv);
+	CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey=NULL, PBYTE pbIv=NULL);
 	CCrypto() {};
 	~CCrypto();
 

@@ -3,14 +3,9 @@
 #include "Crypto.h"
 
 
-//#define ADDRESS (L"0.0.0.0")
-//#define PORT ((USHORT)(5555))
-
-
 
 CSocketServer::CSocketServer() : m_Server(this) {
 	m_bIsRunning = false;
-
 	m_pfnManageRecvPacket = NULL;
 }
 
@@ -24,9 +19,10 @@ CSocketServer::~CSocketServer() {
 BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAddress, USHORT wPort) {
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
 	m_Server->SetMaxPackSize(PACKET_MAX_LENGTH);
-
-	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
-	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
+	// 设置心跳检测包发送间隔
+	m_Server->SetKeepAliveTime(60 * 1000);				
+	// 设置心跳检测重试包发送间隔
+	m_Server->SetKeepAliveInterval(20 * 1000);			
 
 	BOOL bRet = m_Server->Start(lpszIpAddress, wPort);
 	if (bRet) {
