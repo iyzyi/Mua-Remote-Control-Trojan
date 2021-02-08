@@ -187,7 +187,7 @@ def test9():
 
     for i in range(socket_num):
         s = ls[i]
-        data = ''
+        data = 'iyzyi'
         length = len(data) + 7
         commandid = 0x1000
         checksum = 0

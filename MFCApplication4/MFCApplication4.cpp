@@ -52,7 +52,7 @@ CMFCApplication4App theApp;
 BOOL CMFCApplication4App::InitInstance()
 {
 	// Socket Server的启动
-	m_Server.StartSocketServer(ManageRecvPacket);
+	//m_Server.StartSocketServer(ManageRecvPacket);
 
 
 	// 如果一个运行在 Windows XP 上的应用程序清单指定要
@@ -134,4 +134,19 @@ CMFCApplication4App::~CMFCApplication4App() {
 
 void CALLBACK CMFCApplication4App::ManageRecvPacket(CPacket &Packet) {
 	printf("回调\n");
+
+	switch (Packet.m_PacketHead.wCommandId) {
+	
+	// 远程SHELL
+	case SHELL_REMOTE:	
+		;
+
+	// 文件管理
+	case FILE_TRANSFOR:
+		;
+
+	// 屏幕监控
+	case SCREEN_MONITOR:
+		;
+	}
 }

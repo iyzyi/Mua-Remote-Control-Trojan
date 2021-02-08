@@ -19,6 +19,11 @@
 
 
 
+#define DEFAULT_ADDRESS (L"0.0.0.0")
+#define DEFAULT_PORT (L"5555")
+
+
+
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -67,6 +72,8 @@ void CMFCApplication4Dlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST2, m_ListCtrl);
+	DDX_Control(pDX, IDC_EDIT1, m_EditIpAddress);
+	DDX_Control(pDX, IDC_EDIT2, m_EditPort);
 }
 
 BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
@@ -75,6 +82,10 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDOK, &CMFCApplication4Dlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CMFCApplication4Dlg::OnBnClickedCancel)
+	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST2, &CMFCApplication4Dlg::OnLvnItemchangedList2)
+	ON_EN_CHANGE(IDC_EDIT1, &CMFCApplication4Dlg::OnEnChangeEdit1)
+	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication4Dlg::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication4Dlg::OnBnClickedButton2)
 END_MESSAGE_MAP()
 
 
@@ -147,6 +158,9 @@ BOOL CMFCApplication4Dlg::OnInitDialog()
 	// 以上是List Control
 
 
+	// 以下是文本框的初始化内容
+	m_EditIpAddress.SetWindowText(DEFAULT_ADDRESS);
+	m_EditPort.SetWindowText(DEFAULT_PORT);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -217,3 +231,47 @@ void CMFCApplication4Dlg::OnBnClickedCancel()
 }
 
 
+
+
+void CMFCApplication4Dlg::OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+	*pResult = 0;
+}
+
+
+void CMFCApplication4Dlg::OnEnChangeEdit1()
+{
+	// TODO:  如果该控件是 RICHEDIT 控件，它将不
+	// 发送此通知，除非重写 CDialogEx::OnInitDialog()
+	// 函数并调用 CRichEditCtrl().SetEventMask()，
+	// 同时将 ENM_CHANGE 标志“或”运算到掩码中。
+
+	// TODO:  在此添加控件通知处理程序代码
+}
+
+
+// 开始监听
+void CMFCApplication4Dlg::OnBnClickedButton1()
+{
+	CString csIpAddress;
+	m_EditIpAddress.GetWindowText(csIpAddress);
+	LPCTSTR lpszIpAddress = csIpAddress.AllocSysString();
+	
+	CString csPort;
+	m_EditPort.GetWindowText(csPort);
+	USHORT wPort = _ttoi(csPort);
+
+	BOOL bRet = theApp.m_Server.StartSocketServer(theApp.ManageRecvPacket, lpszIpAddress, wPort);
+	if (!bRet) {
+		MessageBox(L"启动SocketServer失败");
+	}
+}
+
+
+// 关闭监听
+void CMFCApplication4Dlg::OnBnClickedButton2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}

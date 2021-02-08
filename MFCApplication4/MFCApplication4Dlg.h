@@ -38,4 +38,10 @@ public:
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
 	CListCtrl m_ListCtrl;
+	afx_msg void OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEnChangeEdit1();
+	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButton2();
+	CEdit m_EditIpAddress;
+	CEdit m_EditPort;
 };

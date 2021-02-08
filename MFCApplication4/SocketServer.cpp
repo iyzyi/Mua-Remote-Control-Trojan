@@ -3,13 +3,15 @@
 #include "Crypto.h"
 
 
-#define ADDRESS (L"0.0.0.0")
-#define PORT ((USHORT)(5555))
+//#define ADDRESS (L"0.0.0.0")
+//#define PORT ((USHORT)(5555))
 
 
 
 CSocketServer::CSocketServer() : m_Server(this) {
+	m_bIsRunning = false;
 
+	m_pfnManageRecvPacket = NULL;
 }
 
 
@@ -19,31 +21,52 @@ CSocketServer::~CSocketServer() {
 
 
 // 初始化socket服务端
-VOID CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc) {
-
-	m_Server->Start(ADDRESS, PORT);
-
+BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAddress, USHORT wPort) {
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
 	m_Server->SetMaxPackSize(PACKET_MAX_LENGTH);
 
 	//m_Server->SetKeepAliveTime();				// 设置心跳检测包发送间隔
 	//m_Server->SetKeepAliveInterval();			// 设置心跳检测重试包发送间隔
 
-	m_pfnManageRecvPacket = pfnNotifyProc;
+	BOOL bRet = m_Server->Start(lpszIpAddress, wPort);
+	if (bRet) {
+
+#ifdef DEBUG
+		char szIP[50];
+		WideCharToMultiByte(CP_ACP, 0, lpszIpAddress, -1, szIP, 50, NULL, NULL);
+		printf("Socket服务端启动成功，IP=%s, PORT=%d\n", szIP, wPort);
+#endif
+
+		m_pfnManageRecvPacket = pfnNotifyProc;
+
+		m_bIsRunning = true;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
-VOID CSocketServer::StopSocketServer() {
-	m_Server->Stop();
+BOOL CSocketServer::StopSocketServer() {
+	BOOL bRet = m_Server->Stop();
+	if (bRet) {
+		m_bIsRunning = false;
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
 
 
-VOID CSocketServer::SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
+BOOL CSocketServer::SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
 	CPacket Packet = CPacket(dwConnectId);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
-	m_Server->Send(dwConnectId, Packet.m_pbPacketCipherData, Packet.m_dwPacketLength);
+	BOOL bRet = m_Server->Send(dwConnectId, Packet.m_pbPacketCipherData, Packet.m_dwPacketLength);
+	return bRet;
 }
 
 
@@ -65,6 +88,11 @@ VOID CSocketServer::ListAddClient(CONNID ConnectId) {
 
 VOID CSocketServer::ListDeleteClient(CONNID ConnectId) {
 	;
+}
+
+
+BOOL CSocketServer::IsRunning() {
+	return m_bIsRunning;
 }
 
 

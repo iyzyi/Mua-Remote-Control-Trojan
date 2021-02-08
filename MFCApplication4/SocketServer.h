@@ -17,22 +17,26 @@ public:
 	CSocketServer();
 	~CSocketServer();
 
-	//VOID PacketParse(PBYTE pbData, DWORD dwLength);
-	//VOID PacketCombine();
-
-	VOID SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
+	BOOL SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 	VOID SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 
-	VOID StartSocketServer(NOTIFYPROC pfnNotifyProc);
-	VOID StopSocketServer();
+	BOOL StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAddress, USHORT wPort);
+	BOOL StopSocketServer();
+
+	BOOL IsRunning();
 
 public:
 	CTcpPackServerPtr			m_Server;
 
 	NOTIFYPROC					m_pfnManageRecvPacket;	// 回调函数，接收到的封包均传给这个函数处理，
 														// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
+	
+
 
 	//doubleLinkedList<CONNID>	m_ClientList;			// 双向链表，用于记录连接中的ConnectId
+
+protected:
+	BOOL						m_bIsRunning;
 
 protected:
 	// 与管理Client连接相关
