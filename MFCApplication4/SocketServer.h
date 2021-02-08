@@ -3,7 +3,6 @@
 #include "pch.h"
 #include "Packet.h"
 #include "Misc.h"
-#include "DoubleLinkedList.h"
 
 
 typedef void (CALLBACK* NOTIFYPROC)(CPacket &Packet);		// NOTIFYPROC: 通知程序，是回调函数

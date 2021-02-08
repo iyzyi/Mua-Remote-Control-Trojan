@@ -78,9 +78,6 @@
     <ClInclude Include="Crypto.h">
       <Filter>头文件\Crypto</Filter>
     </ClInclude>
-    <ClInclude Include="DoubleLinkedList.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="RemoteShell.h">
       <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
@@ -112,9 +109,6 @@
     </ClCompile>
     <ClCompile Include="Crypto.cpp">
       <Filter>源文件\Crypto</Filter>
-    </ClCompile>
-    <ClCompile Include="DoubleLinkedList.cpp">
-      <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="RemoteShell.cpp">
       <Filter>源文件\组件-远程SHELL</Filter>
