@@ -20,8 +20,9 @@ public:
 	CLIENT_STATUS			m_dwClientStatus;
 	CCrypto					m_Crypto;
 
-	// 构成单向链表，方便CClientManage管理
+	// 构成双向链表，方便CClientManage管理
 	// 链表中以ConnectId做唯一标识
+	CClient*				m_pLastClient;
 	CClient*				m_pNextClient;
 
 public:
@@ -43,13 +44,13 @@ public:
 	~CClientManage();
 
 
-	// 单向链表，所以为了性能自然是默认将新的结点添加到链表头部了
+	// 双向链表
 	VOID AddNewClientToList(CClient *pClient);
 
 	// 返回是否删除成功（删除失败主要原因可能是链表中并没有这个Client）
-	BOOL DeleteClientFromList(CClient *pClient);
+	BOOL DeleteClientFromList(CONNID dwConnectId);
 
-	// Client是否存在
+	// Client是否存在于链表中，存在则返回Client地址，不存在返回NULL
 	CClient* SearchClient(CONNID dwConnectId);
 
 
@@ -58,6 +59,9 @@ protected:
 	// 仅用来索引链表的头部，只有m_pNextClient这个数据是非空的。
 	// m_pClientListHead->m_pNextClient存放真正的第一个Client的地址
 	CClient *m_pClientListHead = &CClient(0xffffffff);
+	
+	// 该结点指向链表最后一个结点，这个结点是有数据的结点（除非链表为空）
+	CClient *m_pClientListTail = m_pClientListHead;
 
 
 };

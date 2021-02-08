@@ -9,6 +9,8 @@
 CClient::CClient(CONNID dwConnectId) {
 	m_dwConnectId			= dwConnectId;
 	m_dwClientStatus		= HAVE_CRYPTO_KEY;
+	
+	m_pLastClient			= NULL;
 	m_pNextClient			= NULL;
 }
 
@@ -18,7 +20,7 @@ CClient::~CClient() {
 }
 
 
-VOID CClient::SetCryptoKey(PBYTE pbCryptoKey = NULL, PBYTE pbCryptoIv = NULL) {
+VOID CClient::SetCryptoKey(PBYTE pbCryptoKey, PBYTE pbCryptoIv) {
 	m_Crypto = CCrypto(AES_128_CFB, pbCryptoKey, pbCryptoIv);
 }
 
@@ -42,22 +44,27 @@ CClientManage::~CClientManage() {
 
 }
 
-// 单向链表，所以为了性能自然是默认将新的结点添加到链表头部了
+// 双向循环链表，新结点插在列表尾部
 VOID CClientManage::AddNewClientToList(CClient *pClient) {
-	if (m_pClientListHead->m_pNextClient) {		// 链表目前为空
-		m_pClientListHead->m_pNextClient = pClient;
-	}
-	else {										// 链表不为空
-		pClient->m_pNextClient = m_pClientListHead->m_pNextClient;
-		m_pClientListHead->m_pNextClient = pClient;
-	}
+		m_pClientListTail->m_pNextClient = pClient;		// 链表为空时m_pClientListTail=m_pClientListHead
+		pClient->m_pLastClient = m_pClientListTail;
+		m_pClientListTail = pClient;
 }
 
 
 // 删除Client, 返回是否删除成功（删除失败主要原因可能是链表中并没有这个Client）
-BOOL CClientManage::DeleteClientFromList(CClient *pClient) {
-	DWORD dwConnectId = pClient->m_dwConnectId;
-	CClient *pClient
+BOOL CClientManage::DeleteClientFromList(CONNID dwConnectId) {
+	CClient *pClient = SearchClient(dwConnectId);
+	if (pClient == NULL) {
+		return false;
+	}
+	else {
+		pClient->m_pLastClient->m_pNextClient = pClient->m_pNextClient;
+		pClient->m_pNextClient->m_pLastClient = pClient->m_pLastClient;
+		pClient->m_pLastClient = NULL;
+		pClient->m_pNextClient = NULL;
+		return true;
+	}
 }
 
 
