@@ -84,6 +84,9 @@
     <ClInclude Include="RemoteShell.h">
       <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
+    <ClInclude Include="ClientManage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -115,6 +118,9 @@
     </ClCompile>
     <ClCompile Include="RemoteShell.cpp">
       <Filter>源文件\组件-远程SHELL</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientManage.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

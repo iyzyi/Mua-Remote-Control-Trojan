@@ -44,4 +44,6 @@ public:
 	afx_msg void OnBnClickedButton2();
 	CEdit m_EditIpAddress;
 	CEdit m_EditPort;
+	CButton m_ButtonStartSocketServer;
+	CButton m_ButtonStopSocketServer;
 };

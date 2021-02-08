@@ -189,6 +189,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AES.h" />
+    <ClInclude Include="ClientManage.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="DoubleLinkedList.h" />
     <ClInclude Include="framework.h" />
@@ -208,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AES.cpp" />
+    <ClCompile Include="ClientManage.cpp" />
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="DoubleLinkedList.cpp" />
     <ClCompile Include="MFCApplication4.cpp" />

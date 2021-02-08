@@ -74,6 +74,8 @@ void CMFCApplication4Dlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST2, m_ListCtrl);
 	DDX_Control(pDX, IDC_EDIT1, m_EditIpAddress);
 	DDX_Control(pDX, IDC_EDIT2, m_EditPort);
+	DDX_Control(pDX, IDC_BUTTON1, m_ButtonStartSocketServer);
+	DDX_Control(pDX, IDC_BUTTON2, m_ButtonStopSocketServer);
 }
 
 BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
@@ -263,15 +265,31 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 	m_EditPort.GetWindowText(csPort);
 	USHORT wPort = _ttoi(csPort);
 
-	BOOL bRet = theApp.m_Server.StartSocketServer(theApp.ManageRecvPacket, lpszIpAddress, wPort);
-	if (!bRet) {
-		MessageBox(L"启动SocketServer失败");
+	if (!theApp.m_Server.IsRunning()) {
+		BOOL bRet = theApp.m_Server.StartSocketServer(theApp.ManageRecvPacket, lpszIpAddress, wPort);
+		if (!bRet) {
+			MessageBox(L"启动SocketServer失败");
+		}
+		else {
+			m_ButtonStartSocketServer.EnableWindow(false);		// 按钮变灰
+		}
 	}
+	//else {
+	//	MessageBox(L"SocketServer已启动，请先关闭监听，再开始监听");
+	//}
 }
 
 
 // 关闭监听
 void CMFCApplication4Dlg::OnBnClickedButton2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (theApp.m_Server.IsRunning()) {
+		BOOL bRet = theApp.m_Server.StopSocketServer();
+		if (!bRet) {
+			MessageBox(L"关闭SocketServer失败");
+		}
+		else {
+			m_ButtonStartSocketServer.EnableWindow(true);
+		}
+	}
 }
