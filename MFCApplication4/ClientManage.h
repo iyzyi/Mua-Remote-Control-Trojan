@@ -61,7 +61,7 @@ public:
 	CClient* SearchClient(CONNID dwConnectId);
 
 
-protected:
+public:
 
 	// Client链表的第一个结点，这个结点的所有数据都是空的，
 	// 仅用来索引链表的头部，只有m_pNextClient这个数据是非空的。
@@ -72,6 +72,7 @@ protected:
 	//（除非链表为空，此时m_pClientListHead=m_pClientListTail）
 	CClient *m_pClientListTail;
 
+private:
 	CRITICAL_SECTION m_Lock;					// 链表操作的锁
 
 	DWORD m_dwClientNum;

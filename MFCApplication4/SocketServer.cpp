@@ -65,15 +65,34 @@ BOOL CSocketServer::StopSocketServer() {
 
 
 BOOL CSocketServer::SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
-	CPacket Packet = CPacket(dwConnectId);
-	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
-	BOOL bRet = m_pServer->Send(dwConnectId, Packet.m_pbPacketCipherData, Packet.m_dwPacketLength);
+	BOOL bRet;
+	CClient *pClient = m_ClientManage.SearchClient(dwConnectId);
+	if (pClient != NULL) {
+		bRet = SendPacket(pClient, dwCommandId, pbPacketBody, dwPacketBodyLength);
+	} else {
+		bRet = false;
+	}
 	return bRet;
 }
 
 
-VOID CSocketServer::SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength) {
-	
+BOOL CSocketServer::SendPacket(CClient* pClient, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
+	// 发包只需要ConnectId就能发，但是通信的密钥在CClient类对象里面，
+	// CPacket的封包加密需要CClient里面的密钥，所以必须传入CClient参数。
+
+	CPacket Packet = CPacket(pClient);
+	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
+	BOOL bRet = m_pServer->Send(pClient->m_dwConnectId, Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
+	return bRet;
+}
+
+
+VOID CSocketServer::SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
+	CClient *pClientNode = m_ClientManage.m_pClientListHead;
+	while (pClientNode->m_pNextClient != NULL) {
+		SendPacket(pClientNode->m_pNextClient, dwCommandId, pbPacketBody, dwPacketBodyLength);
+		pClientNode = pClientNode->m_pNextClient;
+	}
 }
 
 
@@ -146,15 +165,12 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			m_ClientManage.AddNewClientToList(pClientNew);
 
 			// 设置该Client的密钥
-			PBYTE pbKey = CopyBuffer((PBYTE)pData, 16, 0);
-			PBYTE pbIv = CopyBuffer((PBYTE)pData, 16, 16);
+			BYTE pbKey[16];
+			BYTE pbIv[16];
+			memcpy(pbKey, pData, 16);
+			memcpy(pbIv, pData + 16, 16);
 			pClientNew->SetCryptoKey(pbKey, pbIv);
-			if (pbKey) {
-				xfree(pbKey);
-			}
-			if (pbIv) {
-				xfree(pbIv);
-			}
+
 		} // if (iLength == FIRST_PACKET_LENGTH)
 
 	} // if (pClient == NULL)

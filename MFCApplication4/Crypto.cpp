@@ -32,24 +32,59 @@ CCrypto::~CCrypto() {
 }
 
 
-PBYTE CCrypto::Encrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength) {
+// 返回密文字节数。加密后的密文写入第三个参数指向的缓冲区。
+DWORD CCrypto::Encrypt(PBYTE pbPlaintext, DWORD dwPlaintextLength, PBYTE pbCiphertext) {
+	DWORD dwCiphertextLength = 0;
+
 	switch (m_dwCryptoAlgorithmId) {
 	
 	case PLAINTEXT:
-		*pdwOutLength = dwInLength;
-		return CopyBuffer(pbData, dwInLength);
+		memcpy(pbCiphertext, pbPlaintext, dwPlaintextLength);
+		dwCiphertextLength = dwPlaintextLength;
+		return dwCiphertextLength;
 
 	case AES_128_CFB:
-		return m_AesEncrypt.EncryptCFB(pbData, dwInLength, pdwOutLength);
-		break;
+		dwCiphertextLength = m_AesEncrypt.EncryptCFB(pbPlaintext, dwPlaintextLength, pbCiphertext);
+		return dwCiphertextLength;
 
 	default:
-		*pdwOutLength = 0;
-		return NULL;
+		return 0;
 	}
 }
 
 
-PBYTE CCrypto::Decrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength) {
-	return NULL;
+// 返回明文字节数。解密后的明文写入第三个参数指向的缓冲区
+DWORD CCrypto::Decrypt(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbPlaintext) {
+	DWORD dwPlaintextLength = 0;
+
+	switch (m_dwCryptoAlgorithmId) {
+
+	case PLAINTEXT:
+		memcpy(pbPlaintext, pbCiphertext, dwCiphertextLength);
+		dwPlaintextLength = dwCiphertextLength;
+		return dwPlaintextLength;
+
+	case AES_128_CFB:
+		dwPlaintextLength = m_AesDecrypt.DecryptCFB(pbCiphertext, dwCiphertextLength, pbPlaintext);
+		return dwPlaintextLength;
+
+	default:
+		return 0;
+	}
+}
+
+
+// 不同加密算法的填充长度不同。该函数输入明文长度，返回密文长度
+DWORD CCrypto::GetCiphertextLength(DWORD dwPlaintextLength) {
+	switch (m_dwCryptoAlgorithmId) {
+	
+	case PLAINTEXT:
+		return dwPlaintextLength;
+
+	case AES_128_CFB:
+		return m_AesEncrypt.GetPaddingLength(dwPlaintextLength);
+
+	default:
+		return 0;
+	}
 }

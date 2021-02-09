@@ -1,7 +1,7 @@
 import socket, struct
 from Crypto.Cipher import ARC4
 
-HOST = '192.168.0.100'  
+HOST = '192.168.0.101'  
 PORT = 5555
 #HOST = '81.70.160.41'
 #PORT = 55555

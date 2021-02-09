@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ClientManage.h"
+#include "Packet.h"
 
 
 // 以下是CClient的命名空间
@@ -41,10 +42,6 @@ VOID CClient::SetCryptoKey(PBYTE pbCryptoKey, PBYTE pbCryptoIv) {
 VOID CClient::Login() {
 
 }
-
-
-
-
 
 
 // 以下是CClientManage的命名空间

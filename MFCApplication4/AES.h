@@ -12,14 +12,16 @@ using namespace std;
 class AES
 {
 private:
+  BYTE m_pbKey[32];		// AES-128只用前16BYTE
+  BYTE m_pbIv[16];
+
+  CRITICAL_SECTION m_cs;
+
   int Nb;
   int Nk;
   int Nr;
 
-  PBYTE m_pbKey;
-  PBYTE m_pbIv;
-
-  CRITICAL_SECTION m_cs;
+  unsigned char* PaddingPKCS7(unsigned char in[], unsigned int inLen, unsigned int alignLen);
 
   unsigned int blockBytesLen;
 
@@ -55,7 +57,7 @@ private:
 
   unsigned char* PaddingNulls(unsigned char in[], unsigned int inLen, unsigned int alignLen);
   
-  unsigned int GetPaddingLength(unsigned int len);
+  //unsigned int GetPaddingLength(unsigned int len);
 
   void KeyExpansion(unsigned char key[], unsigned char w[]);
 
@@ -66,7 +68,15 @@ private:
   void XorBlocks(unsigned char *a, unsigned char * b, unsigned char *c, unsigned int len);
 
 public:
-  //AES(int keyLen = 256);
+	// 因为要填充1~16字节，所以密文比明文长，所以加密前要先用这个函数获取密文长度，来设置密文缓冲区大小。
+	// 别觉得这很繁琐，微软的WinCrypto API也是这个处理逻辑。
+	// 要么在加密函数里new一个缓冲区，此时能够把这个函数集成到加密函数内部
+	// 但是出于性能原因，能用局部变量完成的，要尽量使用局部变量
+	// 所以在加密函数前，手动调用此函数，求出密文长度，设置局部变量缓冲区准备放密文
+	// 然后把这个地址传到加密函数内部。
+	unsigned int GetPaddingLength(unsigned int len);
+  
+	//AES(int keyLen = 256);
 
   // 原来的类不能持久化加解密，每次加解密都要额外带上key和iv，
   // 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
@@ -74,6 +84,11 @@ public:
   AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv);
   AES();
   ~AES();
+
+  unsigned int EncryptCFB(unsigned char pbPlaintext[], unsigned int dwPlaintextLength, unsigned char pbCiphertext[]);
+
+  unsigned int DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCiphertextLength, unsigned char pbPlaintext[]);
+
 
   //unsigned char *EncryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned int &outLen);
 
@@ -87,9 +102,9 @@ public:
 
   //unsigned char *DecryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv);
 
-  unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pOutLen);
+  //unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pOutLen);
   
-  void printHexArray (unsigned char a[], unsigned int n);
+  //void printHexArray (unsigned char a[], unsigned int n);
 
 
 };

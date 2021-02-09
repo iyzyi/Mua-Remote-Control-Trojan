@@ -2,6 +2,10 @@
 
 #include "pch.h"
 #include "Misc.h"
+#include "Crypto.h"
+
+
+class CClient;
 
 
 // 这里的包头长度不包含表示封包长度的那4个字节
@@ -88,7 +92,8 @@ public:
 	// 要发送的封包用这个构造函数
 	//CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
 
-	CPacket(CONNID dwConnID);
+	CPacket(CClient* pClient);
+	CPacket();
 
 	VOID PacketParse(PBYTE pbData, DWORD dwLength);
 	VOID PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
@@ -98,6 +103,7 @@ public:
 
 public:
 	CONNID				m_dwConnId;
+	CClient*			m_pClient;
 	
 	DWORD				m_dwPacketLength;			// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
 	PACKET_HEAD			m_PacketHead;				// 包头
@@ -105,6 +111,6 @@ public:
 	
 	DWORD				m_dwPacketBodyLength;		// 包体长度
 
-	PBYTE				m_pbPacketPlainData;
-	PBYTE				m_pbPacketCipherData;
+	PBYTE				m_pbPacketPlaintext;
+	PBYTE				m_pbPacketCiphertext;
 };

@@ -20,4 +20,4 @@ VOID WriteDwordToBuffer(PBYTE pbData, DWORD dwNum, DWORD dwPos = 0);
 VOID WriteWordToBuffer(PBYTE pbData, WORD wNum, DWORD dwPos = 0);
 VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos = 0);
 
-PBYTE CopyBuffer(PBYTE pbSrc, DWORD dwLength, DWORD dwPos = 0);
+//VOID MyMemcpy(PBYTE pbDest, PBYTE pbSrc, DWORD dwLength, DWORD dwPos);

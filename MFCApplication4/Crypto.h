@@ -28,6 +28,9 @@ public:
 	CCrypto();
 	~CCrypto();
 
-	PBYTE Encrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength);
-	PBYTE Decrypt(PBYTE pbData, DWORD dwInLength, DWORD *pdwOutLength);
+	DWORD Encrypt(PBYTE pbPlaintext, DWORD dwPlaintextLength, PBYTE pbCiphertext);
+	DWORD Decrypt(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbPlaintext);
+
+	// 不同加密算法的填充长度不同。该函数输入明文长度，返回密文长度
+	DWORD GetCiphertextLength(DWORD dwPlaintextLength);
 };
