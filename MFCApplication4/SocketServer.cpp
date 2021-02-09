@@ -163,22 +163,24 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	else {
 
 		CPacket Packet = CPacket(pClient);
-		Packet.PacketParse((PBYTE)pData, iLength);
+		BOOL isValidPacket = Packet.PacketParse((PBYTE)pData, iLength);
 
-		switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
+		if (isValidPacket) {								// 有效封包
 
-		case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
+			switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
 
-			if (Packet.m_PacketHead.wCommandId == LOGIN) {
-				CHAR szMsg[] = "Hello Everyone, I am the Mua Server!";
-				SendPacket(pClient, ECHO, (PBYTE)szMsg, strlen(szMsg));
+			case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
+
+				if (Packet.m_PacketHead.wCommandId == LOGIN) {
+					CHAR szMsg[] = "Hello Everyone, I am the Mua Server!";
+					SendPacket(pClient, ECHO, (PBYTE)szMsg, strlen(szMsg));
+				}
+				// 这个阶段，只要不是上线包，通通丢弃。
+
+			case LOGINED:									// 接收上线包后，状态变为已登录
+				;
 			}
-			// 这个阶段，只要不是上线包，通通丢弃。
-
-		case LOGINED:									// 接收上线包后，状态变为已登录
-			;
 		}
-
 	}
 
 	return HR_OK;

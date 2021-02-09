@@ -87,7 +87,13 @@ CPacket::~CPacket() {
 
 
 // 解析封包，不可与PacketCombine在同一个Packet对象中同时使用
-VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
+// 无效封包返回false.
+BOOL CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
+
+	if (dwPacketLength < PACKET_HEAD_LENGTH) {			// 无效封包
+		return false;
+	}
+
 	m_dwPacketLength = dwPacketLength;
 	m_dwPacketBodyLength = m_dwPacketLength - PACKET_HEAD_LENGTH;
 
@@ -100,7 +106,7 @@ VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 	m_pbPacketPlaintext = new BYTE[dwPacketLength];
 	DWORD dwPacketCiphertextLength = dwPacketLength;
 	DWORD dwPacketPlaintextLength = m_pClient->m_Crypto.Decrypt(m_pbPacketCiphertext, dwPacketCiphertextLength, m_pbPacketPlaintext);
-
+	
 	// 封包长度更新为解密后的明文封包的长度
 	m_dwPacketLength = dwPacketPlaintextLength;	
 	m_dwPacketBodyLength = m_dwPacketLength - PACKET_HEAD_LENGTH;
@@ -108,9 +114,16 @@ VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 	// 解析包头
 	m_PacketHead = PACKET_HEAD((PBYTE)m_pbPacketPlaintext);
 
-	// 拷贝包体
-	m_pbPacketBody = new BYTE[m_dwPacketBodyLength];
-	memcpy(m_pbPacketBody, m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_dwPacketBodyLength);
+	if (dwPacketPlaintextLength == PACKET_HEAD_LENGTH) {	// 包体为空
+		m_pbPacketBody = new BYTE[1];
+		m_pbPacketBody[0] = 0;
+	}
+	else {													// 包体不为空
+		// 拷贝包体
+		m_pbPacketBody = new BYTE[m_dwPacketBodyLength];
+		memcpy(m_pbPacketBody, m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_dwPacketBodyLength);
+	}
+	return true;
 }
 
 
@@ -128,14 +141,21 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 	BYTE pbPacketHead[PACKET_HEAD_LENGTH];
 	m_PacketHead.StructToBuffer(pbPacketHead);
 
-	// 拷贝包体
-	m_pbPacketBody = new BYTE[dwPacketBodyLength];
-	memcpy(m_pbPacketBody, pbPacketBody, dwPacketBodyLength);
+	if (m_dwPacketBodyLength == 0) {				// 包体为空
+		m_pbPacketBody = new BYTE[1];
+		m_pbPacketBody[0] = 0;
+	}
+	else {											// 包体不为空，则拷贝包体
+		m_pbPacketBody = new BYTE[dwPacketBodyLength];
+		memcpy(m_pbPacketBody, pbPacketBody, dwPacketBodyLength);
+	}
 
 	// 组包，不过不包括前4字节，因为HP-Socket的Pack模式，在收发数据的时候会自动添上或删去
 	m_pbPacketPlaintext = new BYTE[m_dwPacketLength];
 	memcpy(m_pbPacketPlaintext, pbPacketHead, PACKET_HEAD_LENGTH);
-	memcpy(m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
+	if (m_dwPacketBodyLength > 0) {
+		memcpy(m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
+	}
 
 	// 加密封包
 	DWORD dwPacketPlaintextLength = m_dwPacketLength;

@@ -95,7 +95,7 @@ public:
 	CPacket(CClient* pClient);
 	CPacket();
 
-	VOID PacketParse(PBYTE pbData, DWORD dwLength);
+	BOOL PacketParse(PBYTE pbData, DWORD dwLength);
 	VOID PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 
 
