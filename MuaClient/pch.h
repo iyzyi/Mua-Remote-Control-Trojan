@@ -25,6 +25,9 @@
 #endif
 
 
+#include <iostream>
+
+
 
 enum COMMAND_ID {
 	CRYPTO_KEY,				// 传递通信密钥和IV
@@ -38,6 +41,11 @@ enum COMMAND_ID {
 	SCREEN_MONITOR,			// 屏幕监控
 	MESSAGE_BOX,			// 弹窗
 };
+
+
+
+
+
 
 
 

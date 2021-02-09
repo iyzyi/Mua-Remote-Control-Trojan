@@ -36,14 +36,17 @@
     <ClCompile Include="Packet.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Misc.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Crypto.cpp">
       <Filter>源文件\Crypto</Filter>
     </ClCompile>
     <ClCompile Include="AES.cpp">
       <Filter>源文件\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Login.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +79,9 @@
     </ClInclude>
     <ClInclude Include="Crypto.h">
       <Filter>头文件\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Login.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

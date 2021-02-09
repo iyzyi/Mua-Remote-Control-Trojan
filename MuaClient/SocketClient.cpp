@@ -36,7 +36,6 @@ BOOL CSocketClient::StartSocketClient() {
 	RandomBytes(pbIv, 16);
 	m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
 
-
 	// 向主控端发送密钥
 	BYTE pbKeyAndIv[32];
 	memcpy(pbKeyAndIv, pbKey, 16);
@@ -79,6 +78,22 @@ EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const
 
 EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
+
+
+	CPacket Packet = CPacket(&m_Crypto);
+	Packet.PacketParse((PBYTE)pData, iLength);
+	
+	switch (Packet.m_PacketHead.wCommandId) {
+
+	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY封包
+
+		;
+	case LOGIN:
+		;
+	default:
+		;
+	}
+
 
 	return HR_OK;
 }
