@@ -2,11 +2,20 @@
 #include "SocketServer.h"
 
 
+// 16字节Key+16字节的IV
+#define FIRST_PACKET_LENGTH 32
 
 
 CSocketServer::CSocketServer() : m_pServer(this) {
 	m_bIsRunning = false;
 	m_pfnManageRecvPacket = NULL;
+
+	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
+	m_pServer->SetMaxPackSize(PACKET_MAX_LENGTH);
+	// 设置心跳检测包发送间隔
+	m_pServer->SetKeepAliveTime(60 * 1000);
+	// 设置心跳检测重试包发送间隔
+	m_pServer->SetKeepAliveInterval(20 * 1000);
 }
 
 
@@ -15,20 +24,14 @@ CSocketServer::~CSocketServer() {
 }
 
 
-// 初始化socket服务端
+// 启动socket服务端
 BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAddress, USHORT wPort) {
-	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
-	m_pServer->SetMaxPackSize(PACKET_MAX_LENGTH);
-	// 设置心跳检测包发送间隔
-	m_pServer->SetKeepAliveTime(60 * 1000);				
-	// 设置心跳检测重试包发送间隔
-	m_pServer->SetKeepAliveInterval(20 * 1000);			
 
 	BOOL bRet = m_pServer->Start(lpszIpAddress, wPort);
 	if (!bRet) {
 		return false;
 	} else {
-#ifdef DEBUG
+#ifdef _DEBUG
 		char szIP[50];
 		//WideCharToMultiByte(CP_ACP, 0, lpszIpAddress, -1, szIP, 50, NULL, NULL);
 		myW2A(lpszIpAddress, szIP, 50);
@@ -131,16 +134,32 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	CClient* pClient = m_ClientManage.SearchClient(dwConnID);
 	if (pClient == NULL) {						// 新客户端来啦
 
-		TCHAR lpszIpAddress[20];
-		int iIpAddressLen = 20;
-		WORD wPort = 0;
-		// 通过ConnectId获取IP地址和端口
-		m_pServer->GetRemoteAddress(dwConnID, lpszIpAddress, iIpAddressLen, wPort);
+		if (iLength == FIRST_PACKET_LENGTH) {	// 第一个封包是AES的key和iv，所以长度必须满足这个条件。否则丢弃该包，以免拒绝服务。
 
-		CClient* pClientNew = new CClient(dwConnID, (LPWSTR)lpszIpAddress, wPort);
-		m_ClientManage.AddNewClientToList(pClientNew);
-	} 
+			TCHAR lpszIpAddress[20];
+			int iIpAddressLen = 20;
+			WORD wPort = 0;
+			// 通过ConnectId获取IP地址和端口
+			m_pServer->GetRemoteAddress(dwConnID, lpszIpAddress, iIpAddressLen, wPort);
+
+			CClient* pClientNew = new CClient(dwConnID, (LPWSTR)lpszIpAddress, wPort);
+			m_ClientManage.AddNewClientToList(pClientNew);
+
+			// 设置该Client的密钥
+			PBYTE pbKey = CopyBuffer((PBYTE)pData, 16, 0);
+			PBYTE pbIv = CopyBuffer((PBYTE)pData, 16, 16);
+			pClientNew->SetCryptoKey(pbKey, pbIv);
+			if (pbKey) {
+				xfree(pbKey);
+			}
+			if (pbIv) {
+				xfree(pbIv);
+			}
+		} // if (iLength == FIRST_PACKET_LENGTH)
+
+	} // if (pClient == NULL)
 	else {
+
 		switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
 
 		case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包

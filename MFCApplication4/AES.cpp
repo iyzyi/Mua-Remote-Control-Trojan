@@ -49,9 +49,8 @@ AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 
 	blockBytesLen = 4 * this->Nb * sizeof(unsigned char);
 
-	m_pbKey			= CopyBuffer(pbKey, keyLen);
-	m_pbEncryptIv	= CopyBuffer(pbIv, 16);
-	m_pbDecryptIv	= CopyBuffer(pbIv, 16);
+	m_pbKey			= CopyBuffer(pbKey, keyLen/8);
+	m_pbIv			= CopyBuffer(pbIv, 16);
 
 	InitializeCriticalSection(&m_cs);			// 初始化锁
 }
@@ -64,8 +63,7 @@ AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 // 不一定为NULL, 不如debug下就是0xcccccccc, 此时xfree比如崩。
 AES::AES() {
 	m_pbKey				= NULL;
-	m_pbEncryptIv		= NULL;
-	m_pbDecryptIv		= NULL;
+	m_pbIv				= NULL;
 
 	Nb					= 0;
 	Nk					= 0;
@@ -80,12 +78,8 @@ AES::~AES() {
 		xfree(m_pbKey);
 	}
 
-	if (m_pbEncryptIv) {
-		xfree(m_pbEncryptIv);
-	}
-
-	if (m_pbDecryptIv) {
-		xfree(m_pbDecryptIv);
+	if (m_pbIv) {
+		xfree(m_pbIv);
 	}
 
 	DeleteCriticalSection(&m_cs);				// 删锁
@@ -210,11 +204,11 @@ unsigned char *AES::EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pO
 	for (unsigned int i = 0; i < outLen; i += blockBytesLen)
 	{
 		// 对上一分组的密文m_pbEncryptIv进行AES加密
-		EncryptBlock(m_pbEncryptIv, encryptedBlock, roundKeys);
+		EncryptBlock(m_pbIv, encryptedBlock, roundKeys);
 		// 上一个函数得到的字节流encryptedBlock与填充好的明文alignIn异或，得到本分组的密文
 		XorBlocks(alignIn + i, encryptedBlock, out + i, blockBytesLen);
 		// 保存本分组的密文，以供下一分组使用
-		memcpy(m_pbEncryptIv, out + i, blockBytesLen);
+		memcpy(m_pbIv, out + i, blockBytesLen);
 	}
 	
 	// 为了接口的一致，统一使用xmalloc和xfree来管理缓冲区，多拷贝一次吧

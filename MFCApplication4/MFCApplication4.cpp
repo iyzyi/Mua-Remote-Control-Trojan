@@ -31,7 +31,7 @@ CMFCApplication4App::CMFCApplication4App()
 	// TODO: 在此处添加构造代码，
 	// 将所有重要的初始化放置在 InitInstance 中
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	AllocConsole();
 	#pragma warning(disable : 4996)
 	freopen("CON", "r", stdin);
@@ -128,7 +128,9 @@ BOOL CMFCApplication4App::InitInstance()
 
 CMFCApplication4App::~CMFCApplication4App() {
 	// 关闭Socket服务端
-	m_Server.StopSocketServer();
+	if (m_Server.IsRunning()) {
+		m_Server.StopSocketServer();
+	}
 }
 
 

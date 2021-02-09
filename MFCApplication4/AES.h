@@ -17,8 +17,7 @@ private:
   int Nr;
 
   PBYTE m_pbKey;
-  PBYTE m_pbEncryptIv;
-  PBYTE m_pbDecryptIv;
+  PBYTE m_pbIv;
 
   CRITICAL_SECTION m_cs;
 

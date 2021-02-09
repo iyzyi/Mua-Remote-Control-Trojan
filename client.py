@@ -221,11 +221,33 @@ def test10():
             checksum = 0
             splitnum = 0
             send_data = struct.pack('<I', length) + struct.pack('<H', commandid) + b'\x00\x00\x00\x00' + b'\x00' + (data).encode()
-            print(send_data)
+            print(len(send_data), send_data)
             s.sendall(send_data)
             print('send', i)
 
         for i in range(socket_num):
             s.recv(1024)
 
-test10()
+
+
+def test11():
+    socket_num = 5
+    ls = []
+    for i in range(socket_num):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((HOST, PORT))
+        ls.append(s)
+        print('connect', i)
+
+    while True:
+        for i in range(socket_num):
+            s = ls[i]
+            send_data = struct.pack('<I', 32) + b'A'*32
+            print(len(send_data), send_data)
+            s.sendall(send_data)
+            print('send', i)
+
+        for i in range(socket_num):
+            s.recv(1024)
+
+test11()
