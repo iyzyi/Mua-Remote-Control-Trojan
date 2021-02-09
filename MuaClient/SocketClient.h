@@ -2,10 +2,6 @@
 #include "pch.h"
 #include "Crypto.h"
 
-// 这个应该在Packet.h中宏定义，暂时先放在这
-// 封包长度受HP-Socket的限制，最大为0x3FFFFF
-#define PACKET_MAX_LENGTH 0x3FFFFF
-
 
 class CSocketClient : public CTcpClientListener {
 
@@ -30,4 +26,8 @@ public:
 	virtual EnHandleResult OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
 	virtual EnHandleResult OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
 	virtual EnHandleResult OnConnect(ITcpClient* pSender, CONNID dwConnID);
+	virtual EnHandleResult OnHandShake(ITcpClient* pSender, CONNID dwConnID);
+
+
+
 };

@@ -7,18 +7,27 @@
 #include "Misc.h"
 #include "Login.h"
 
+
 int main()
 {
-	//CSocketClient Client;
-	//BOOL bRet = Client.StartSocketClient();
-	//if (bRet) {
-	//
-	//}
+	CSocketClient Client;
+	BOOL bRet = Client.StartSocketClient();
+	printf("bRet=%d\n", bRet);
 
-	BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
-	GetLoginInfo(pbLoginPacketBody);
-	PrintBytes(pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
+	while (true) {
+
+	}
+
 }
+
+
+DWORD WINAPI ThreadFunc(PVOID pvParam) {
+
+	return 0;
+}
+
+
+
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
 // 调试程序: F5 或调试 >“开始调试”菜单

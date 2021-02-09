@@ -2,6 +2,7 @@
 #include "SocketClient.h"
 #include "Misc.h"
 #include "Packet.h"
+#include "Login.h"
 
 
 #define SERVER_ADDRESS L"192.168.0.101"
@@ -29,6 +30,8 @@ BOOL CSocketClient::StartSocketClient() {
 	BOOL bRet = m_pClient->Start(lpszRemoteAddress, wPort);
 	printf("bRet = %d\n", bRet);
 
+	
+
 	// 生成随机密钥
 	BYTE pbKey[16];
 	BYTE pbIv[16];
@@ -44,8 +47,8 @@ BOOL CSocketClient::StartSocketClient() {
 	printf("bret =%d\n", bRet);
 	PrintBytes(pbKeyAndIv, 32);
 
-	CHAR szMsg[] = "I am iyzyi! I from BXS! BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLBXS";
-	SendPacket(LOGIN, (PBYTE)szMsg, strlen(szMsg));
+	//CHAR szMsg[] = "I am iyzyi! I from BXS! BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLBXS";
+	//SendPacket(LOGIN, (PBYTE)szMsg, strlen(szMsg));
 
 	return bRet;
 }
@@ -60,6 +63,17 @@ BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD
 
 
 
+
+
+
+
+// 回调函数
+
+EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
+	printf("[Client %d] OnHandShake: \n", dwConnID);
+
+	return HR_OK;
+}
 
 
 EnHandleResult CSocketClient::OnConnect(ITcpClient* pSender, CONNID dwConnID) {
@@ -85,11 +99,13 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 	
 	switch (Packet.m_PacketHead.wCommandId) {
 
-	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY封包
-
-		;
+	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY包。然后Client发出上线包
+		BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
+		GetLoginInfo(pbLoginPacketBody);
+		SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
+		
 	case LOGIN:
-		;
+		
 	default:
 		;
 	}
