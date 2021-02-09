@@ -250,4 +250,12 @@ def test11():
         for i in range(socket_num):
             s.recv(1024)
 
-test11()
+
+
+from Crypto.Cipher import AES
+
+key = b'1'*16
+iv = b'1' * 16
+plaintext = b'1'*16
+cipher = AES.new(key, AES.MODE_CFB, iv, segment_size=128)
+print(len(cipher.encrypt(plaintext)))

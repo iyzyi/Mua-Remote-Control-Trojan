@@ -98,20 +98,6 @@ VOID CSocketServer::SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacket
 
 
 
-
-
-// 与Client连接的链表
-
-VOID CSocketServer::ListAddClient(CONNID ConnectId) {
-	//m_ClientList.insertNodeByhead(ConnectId);
-}
-
-
-VOID CSocketServer::ListDeleteClient(CONNID ConnectId) {
-	;
-}
-
-
 BOOL CSocketServer::IsRunning() {
 	return m_bIsRunning;
 }
@@ -176,10 +162,18 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	} // if (pClient == NULL)
 	else {
 
+		CPacket Packet = CPacket(pClient);
+		Packet.PacketParse((PBYTE)pData, iLength);
+
 		switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
 
 		case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
-			;
+
+			if (Packet.m_PacketHead.wCommandId == LOGIN) {
+				CHAR szMsg[] = "Hello Everyone, I am the Mua Server!";
+				SendPacket(pClient, ECHO, (PBYTE)szMsg, strlen(szMsg));
+			}
+			// 这个阶段，只要不是上线包，通通丢弃。
 
 		case LOGINED:									// 接收上线包后，状态变为已登录
 			;

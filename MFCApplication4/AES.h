@@ -9,10 +9,14 @@
 
 using namespace std;
 
+
+#define AES_KEY_BUFFER_LENGTH 32
+
+
 class AES
 {
 private:
-  BYTE m_pbKey[32];		// AES-128只用前16BYTE
+  BYTE m_pbKey[AES_KEY_BUFFER_LENGTH];		// AES-128只用前16BYTE
   BYTE m_pbIv[16];
 
   CRITICAL_SECTION m_cs;

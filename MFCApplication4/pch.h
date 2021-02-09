@@ -40,6 +40,8 @@ enum COMMAND_ID {
 	
 	LOGIN,					// 上线包
 
+	ECHO,					// 测试
+
 	SHELL_REMOTE,			// 远程SHELL
 	FILE_TRANSFOR,			// 文件传输
 	SCREEN_MONITOR,			// 屏幕监控

@@ -49,6 +49,7 @@ AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 
 	blockBytesLen = 4 * this->Nb * sizeof(unsigned char);
 
+	memset(m_pbKey, 0, AES_KEY_BUFFER_LENGTH);
 	memcpy(m_pbKey, pbKey, keyLen / 8);
 	memcpy(m_pbIv, pbIv, 16);
 
