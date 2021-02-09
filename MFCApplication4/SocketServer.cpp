@@ -157,6 +157,8 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			memcpy(pbIv, pData + 16, 16);
 			pClientNew->SetCryptoKey(pbKey, pbIv);
 
+			SendPacket(pClientNew, CRYPTO_KEY, NULL, 0);
+
 		} // if (iLength == FIRST_PACKET_LENGTH)
 
 	} // if (pClient == NULL)
@@ -171,10 +173,10 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 
 			case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
 
-				if (Packet.m_PacketHead.wCommandId == LOGIN) {
+				/*if (Packet.m_PacketHead.wCommandId == LOGIN) {
 					CHAR szMsg[] = "Hello Everyone, I am the Mua Server!";
 					SendPacket(pClient, ECHO, (PBYTE)szMsg, strlen(szMsg));
-				}
+				}*/
 				// 这个阶段，只要不是上线包，通通丢弃。
 
 			case LOGINED:									// 接收上线包后，状态变为已登录
