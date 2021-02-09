@@ -21,7 +21,7 @@ public:
 
 	BOOL StartSocketClient();
 
-
+	BOOL SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 
 
 

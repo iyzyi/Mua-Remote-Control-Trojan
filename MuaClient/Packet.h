@@ -92,7 +92,7 @@ public:
 	// 要发送的封包用这个构造函数
 	//CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
 
-	CPacket(CONNID dwConnectId);
+	CPacket(CCrypto* pCrypto);
 	CPacket();
 
 	VOID PacketParse(PBYTE pbData, DWORD dwLength);
@@ -103,7 +103,8 @@ public:
 
 public:
 	CONNID				m_dwConnId;
-	CClient*			m_pClient;
+
+	CCrypto*			m_pCrypto;
 
 	DWORD				m_dwPacketLength;			// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
 	PACKET_HEAD			m_PacketHead;				// 包头

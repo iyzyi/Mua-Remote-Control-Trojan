@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Packet.h"
-#include "SocketClient.cpp"
+
 
 // 统一声明：
 // 本类中的封包包括封包包头和封包包体
@@ -23,8 +23,9 @@ CPacket::CPacket() {
 }
 
 
-CPacket::CPacket() {
+CPacket::CPacket(CCrypto* pCrypto) {
 	m_dwConnId = 0;
+	m_pCrypto = pCrypto;
 
 	m_dwPacketLength = 0;
 	m_PacketHead = PACKET_HEAD();
@@ -65,7 +66,7 @@ VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 	// 所以这里直接用密文的长度dwPacketLength就足够了
 	m_pbPacketPlaintext = new BYTE[dwPacketLength];
 	DWORD dwPacketCiphertextLength = dwPacketLength;
-	DWORD dwPacketPlaintextLength = Client.m_Crypto.Decrypt(m_pbPacketCiphertext, dwPacketCiphertextLength, m_pbPacketPlaintext);
+	DWORD dwPacketPlaintextLength = m_pCrypto->Decrypt(m_pbPacketCiphertext, dwPacketCiphertextLength, m_pbPacketPlaintext);
 
 	// 封包长度更新为解密后的明文封包的长度
 	m_dwPacketLength = dwPacketPlaintextLength;
@@ -105,9 +106,9 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 
 	// 加密封包
 	DWORD dwPacketPlaintextLength = m_dwPacketLength;
-	DWORD dwPacketCiphertextLength = Client.m_Crypto.GetCiphertextLength(dwPacketPlaintextLength);
+	DWORD dwPacketCiphertextLength = m_pCrypto->GetCiphertextLength(dwPacketPlaintextLength);
 	m_pbPacketCiphertext = new BYTE[dwPacketCiphertextLength];
-	Client.m_Crypto.Encrypt(m_pbPacketPlaintext, dwPacketPlaintextLength, m_pbPacketCiphertext);
+	m_pCrypto->Encrypt(m_pbPacketPlaintext, dwPacketPlaintextLength, m_pbPacketCiphertext);
 
 	// 封包长度更新为加密后的密文长度，此时m_dwPacketBodyLength包体长度用不到，就不更新了。
 	m_dwPacketLength = dwPacketCiphertextLength;
