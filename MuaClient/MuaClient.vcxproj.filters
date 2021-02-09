@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\HPSocket">
+      <UniqueIdentifier>{90ce8a63-fa94-47e7-8d24-ffd92eb6da85}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MuaClient.cpp">
@@ -21,10 +24,28 @@
     <ClCompile Include="pch.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SocketClient.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPSocket.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPSocket-SSL.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\HPTypeDef.h">
+      <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSocket\SocketInterface.h">
+      <Filter>头文件\HPSocket</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,4 +9,20 @@
 
 // 添加要在此处预编译的标头
 
+#include "./HPSocket/HPSocket.h"
+
+
+// 这样不行，要在工程属性-> C/C++ -> 预处理器 -> 预处理器定义 中定义预处理宏HPSOCKET_STATIC_LIB
+//#ifndef HPSOCKET_STATIC_LIB
+//	#define HPSOCKET_STATIC_LIB
+//#endif
+
+
+#ifdef _DEBUG
+	#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
+#else
+	#pragma comment(lib, "./HPSocket/HPSocket_U.lib")
+#endif
+
+
 #endif //PCH_H
