@@ -16,6 +16,12 @@
     <Filter Include="头文件\HPSocket">
       <UniqueIdentifier>{90ce8a63-fa94-47e7-8d24-ffd92eb6da85}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Crypto">
+      <UniqueIdentifier>{5419e64d-04a7-424b-9f94-733736e3063e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Crypto">
+      <UniqueIdentifier>{4cd312dc-20e7-4b84-800f-cf5b054a41d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MuaClient.cpp">
@@ -26,6 +32,18 @@
     </ClCompile>
     <ClCompile Include="SocketClient.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Crypto.cpp">
+      <Filter>源文件\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="AES.cpp">
+      <Filter>源文件\Crypto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +64,18 @@
     </ClInclude>
     <ClInclude Include="HPSocket\SocketInterface.h">
       <Filter>头文件\HPSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AES.h">
+      <Filter>头文件\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto.h">
+      <Filter>头文件\Crypto</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

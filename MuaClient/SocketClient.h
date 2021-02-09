@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "Crypto.h"
 
 // 这个应该在Packet.h中宏定义，暂时先放在这
 // 封包长度受HP-Socket的限制，最大为0x3FFFFF
@@ -11,12 +12,16 @@ class CSocketClient : public CTcpClientListener {
 public:
 	CTcpPackClientPtr		m_pClient;
 
+	CCrypto					m_Crypto;
+
 public:
 
 	CSocketClient();
 	~CSocketClient();
 
 	BOOL StartSocketClient();
+
+
 
 
 

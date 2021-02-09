@@ -25,4 +25,21 @@
 #endif
 
 
+
+enum COMMAND_ID {
+	CRYPTO_KEY,				// 传递通信密钥和IV
+
+	LOGIN,					// 上线包
+
+	ECHO,					// 测试
+
+	SHELL_REMOTE,			// 远程SHELL
+	FILE_TRANSFOR,			// 文件传输
+	SCREEN_MONITOR,			// 屏幕监控
+	MESSAGE_BOX,			// 弹窗
+};
+
+
+
+
 #endif //PCH_H

@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "SocketClient.h"
+#include "Misc.h"
 
 
-#define SERVER_ADDRESS L"192.168.1.100"
+#define SERVER_ADDRESS L"192.168.1.101"
 #define SERVER_PORT 5555;
 
 
@@ -25,6 +26,21 @@ BOOL CSocketClient::StartSocketClient() {
 	LPCTSTR lpszRemoteAddress = SERVER_ADDRESS;
 	WORD wPort = SERVER_PORT;
 	BOOL bRet = m_pClient->Start(lpszRemoteAddress, wPort);
+
+	// 生成随机密钥
+	BYTE pbKey[16];
+	BYTE pbIv[16];
+	RandomBytes(pbKey, 16);
+	RandomBytes(pbIv, 16);
+	m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
+
+
+	// 向主控端发送密钥
+	BYTE pbKeyAndIv[32];
+	memcpy(pbKeyAndIv, pbKey, 16);
+	memcpy(pbKeyAndIv + 16, pbIv, 16);
+	m_pClient->Send(pbKeyAndIv, 32);
+
 	return bRet;
 }
 
@@ -42,7 +58,6 @@ EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const
 
 
 EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-
 
 	return HR_OK;
 }

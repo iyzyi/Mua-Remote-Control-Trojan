@@ -153,7 +153,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AES.cpp" />
+    <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="Misc.cpp" />
     <ClCompile Include="MuaClient.cpp" />
+    <ClCompile Include="Packet.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -163,10 +167,14 @@
     <ClCompile Include="SocketClient.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AES.h" />
+    <ClInclude Include="Crypto.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
+    <ClInclude Include="Misc.h" />
+    <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SocketClient.h" />
   </ItemGroup>

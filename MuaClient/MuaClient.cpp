@@ -4,14 +4,25 @@
 #include "pch.h"
 #include <iostream>
 #include "SocketClient.h"
+#include "Misc.h"
 
 int main()
 {
-
 	CSocketClient Client;
 	BOOL bRet = Client.StartSocketClient();
 	if (bRet) {
-		printf("启动成功");
+
+		//// 生成随机密钥
+		//BYTE pbKey[16];
+		//BYTE pbIv[16];
+		//RandomBytes(pbKey, 16);
+		//RandomBytes(pbIv, 16);
+		//Client.m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
+
+		//BYTE pbKeyAndIv[32];
+		//memcpy(pbKeyAndIv, pbKey, 16);
+		//memcpy(pbKeyAndIv + 16, pbIv, 16);
+		//Client.m_pClient->Send(pbKeyAndIv, 32);		
 	}
 	
 }
