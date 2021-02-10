@@ -123,6 +123,8 @@ BOOL CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 		m_pbPacketBody = new BYTE[m_dwPacketBodyLength];
 		memcpy(m_pbPacketBody, m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_dwPacketBodyLength);
 	}
+
+	// TODO 通过dwCheckSum校验包是否有效
 	return true;
 }
 

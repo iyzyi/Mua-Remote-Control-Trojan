@@ -88,6 +88,8 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT1, &CMFCApplication4Dlg::OnEnChangeEdit1)
 	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication4Dlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication4Dlg::OnBnClickedButton2)
+
+	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
 END_MESSAGE_MAP()
 
 
@@ -266,7 +268,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 	USHORT wPort = _ttoi(csPort);
 
 	if (!theApp.m_Server.IsRunning()) {
-		BOOL bRet = theApp.m_Server.StartSocketServer(theApp.ManageRecvPacket, lpszIpAddress, wPort);
+		BOOL bRet = theApp.m_Server.StartSocketServer(ManageRecvPacket, lpszIpAddress, wPort);
 		if (!bRet) {
 			MessageBox(L"启动SocketServer失败");
 		}
@@ -292,4 +294,60 @@ void CMFCApplication4Dlg::OnBnClickedButton2()
 			m_ButtonStartSocketServer.EnableWindow(true);
 		}
 	}
+}
+
+
+
+
+// 接收到上线包后触发的消息处理函数
+// 封包的有效性由触发点处的代码判断，能传进来的就是有效的
+afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lParam) {
+
+	CPacket* pPacket = (CPacket*)lParam;
+	LOGIN_INFO LoginInfo(pPacket->m_pbPacketBody);
+	
+
+	return 0;
+}
+
+
+
+// 接收到有效封包时回调此函数
+void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
+	printf("回调\n");
+
+	switch (pPacket->m_pClient->m_dwClientStatus) {			// 客户端的不同状态
+
+	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
+			
+		// 这个阶段，只要不是上线包，通通丢弃。
+		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
+			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
+		}
+
+
+
+	case LOGINED:									// 接收上线包后，状态变为已登录。开始正常通信。
+		;
+	}
+
+
+
+
+
+
+	//switch (pPacket.m_PacketHead.wCommandId) {
+
+	//	// 远程SHELL
+	//case SHELL_REMOTE:
+	//	;
+
+	//	// 文件管理
+	//case FILE_TRANSFOR:
+	//	;
+
+	//	// 屏幕监控
+	//case SCREEN_MONITOR:
+	//	;
+	//}
 }

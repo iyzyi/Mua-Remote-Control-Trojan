@@ -161,49 +161,22 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 
 		} // if (iLength == FIRST_PACKET_LENGTH)
 
-	} // if (pClient == NULL)
+	} // if (pClient == NULL) 新客户端
 	else {
 
-		CPacket Packet = CPacket(pClient);
-		BOOL isValidPacket = Packet.PacketParse((PBYTE)pData, iLength);
+		CPacket* pPacket = new CPacket(pClient);
+		BOOL isValidPacket = pPacket->PacketParse((PBYTE)pData, iLength);
 
 		if (isValidPacket) {								// 有效封包
 
-			switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
+			m_pfnManageRecvPacket(pPacket);					// 回调函数
 
-			case WAIT_FOR_LOGIN:							// 服务端已经接收了客户端发来的密钥了，等待上线包
-
-				/*if (Packet.m_PacketHead.wCommandId == LOGIN) {
-					CHAR szMsg[] = "Hello Everyone, I am the Mua Server!";
-					SendPacket(pClient, ECHO, (PBYTE)szMsg, strlen(szMsg));
-				}*/
-				// 这个阶段，只要不是上线包，通通丢弃。
-
-			case LOGINED:									// 接收上线包后，状态变为已登录
-				;
-			}
 		}
+
+		// TODO： 丢弃的包达到一定次数即判定为拒绝服务
 	}
 
 	return HR_OK;
-
-	/*CPacket Packet = CPacket(dwConnID);
-	Packet.PacketParse((PBYTE)pData, (DWORD)iLength);
-
-	m_pfnManageRecvPacket(Packet);
-*/
-
-
-	//PacketParse((PBYTE)pData, iLength);
-	//BOOL bRet = m_pServer->Send(dwConnID, pData, iLength);
-	//return bRet ? HR_OK : HR_ERROR;
-	
-	//if (pData[0] == 'A') {
-	//	BYTE Buffer[] = "I am iyzyi!";
-	//	PBYTE pbData = CopyBuffer(Buffer, 11);		// 不这样多加一层，xfree(m_pPacketBody)直接崩。
-	//	SendPacket(dwConnID, FILE_TRANSFOR, pbData, 11);
-	//}
-
 }
 
 

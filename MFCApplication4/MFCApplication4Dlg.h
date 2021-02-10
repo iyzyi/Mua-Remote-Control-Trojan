@@ -6,6 +6,9 @@
 
 
 
+#define WM_RECV_LOGIN_PACKET (WM_USER+100) 
+
+
 
 // CMFCApplication4Dlg 对话框
 class CMFCApplication4Dlg : public CDialogEx
@@ -46,4 +49,13 @@ public:
 	CEdit m_EditPort;
 	CButton m_ButtonStartSocketServer;
 	CButton m_ButtonStopSocketServer;
+
+
+public:
+	// 这里必须是static，不然ManageRecvPacket实参与 "NOTIFYPROC" 类型的形参不兼容。
+	// 而且static只能在声明中添加，不能在定义中添加哦。
+	static void CALLBACK ManageRecvPacket(CPacket *Packet);
+
+protected:
+	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
 };

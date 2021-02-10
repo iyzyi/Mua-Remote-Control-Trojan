@@ -132,23 +132,3 @@ CMFCApplication4App::~CMFCApplication4App() {
 		m_Server.StopSocketServer();
 	}
 }
-
-
-void CALLBACK CMFCApplication4App::ManageRecvPacket(CPacket &Packet) {
-	printf("回调\n");
-
-	switch (Packet.m_PacketHead.wCommandId) {
-	
-	// 远程SHELL
-	case SHELL_REMOTE:	
-		;
-
-	// 文件管理
-	case FILE_TRANSFOR:
-		;
-
-	// 屏幕监控
-	case SCREEN_MONITOR:
-		;
-	}
-}

@@ -7,7 +7,7 @@
 #include "ClientManage.h"
 
 
-typedef void (CALLBACK* NOTIFYPROC)(CPacket &Packet);		// NOTIFYPROC: 通知程序，是回调函数
+typedef void (CALLBACK* NOTIFYPROC)(CPacket *Packet);		// NOTIFYPROC: 通知程序，是回调函数
 
 
 
@@ -30,7 +30,7 @@ public:
 public:
 	CTcpPackServerPtr			m_pServer;
 
-	NOTIFYPROC					m_pfnManageRecvPacket;	// 回调函数，接收到的封包均传给这个函数处理，
+	NOTIFYPROC					m_pfnManageRecvPacket;	// 回调函数，接收到的有效封包均传给这个函数处理，
 														// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
 
 	CClientManage				m_ClientManage;
@@ -39,9 +39,6 @@ protected:
 	BOOL						m_bIsRunning;
 
 protected:
-	// 与管理Client连接相关
-	VOID ListAddClient(CONNID ConnectId);
-	VOID ListDeleteClient(CONNID ConnectId);
 
 	// CTcpServerListener的抽象函数（用于回调）全都得实现，不然会报错：不能实例化抽象类
 	virtual EnHandleResult OnPrepareListen(ITcpServer* pSender, SOCKET soListen);

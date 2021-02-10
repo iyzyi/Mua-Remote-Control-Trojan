@@ -40,6 +40,37 @@ VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen) {
 }
 
 
+VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen)
+{
+	DWORD dwRow = 0, dwColumn = 0;
+	for (dwRow = 0; dwRow < dwDataLen / 16 + 1; dwRow++) {
+		for (dwColumn = 0; (dwRow * 16 + dwColumn < dwDataLen) && (dwColumn < 16); dwColumn++) {
+			printf("0x%02x ", pbPrintData[dwRow * 16 + dwColumn]);
+		}
+
+		if (dwColumn != 16) {
+			while (dwColumn < 16) {
+				printf("     ");
+				dwColumn++;
+			}
+		}
+		printf("\t");
+
+		for (dwColumn = 0; (dwRow * 16 + dwColumn < dwDataLen) && (dwColumn < 16); dwColumn++) {
+			DWORD dwIndex = dwRow * 16 + dwColumn;
+			if (pbPrintData[dwIndex] >= 32 && pbPrintData[dwIndex] <= 126) {
+				printf("%c", pbPrintData[dwIndex]);
+			}
+			else {
+				printf(".");
+			}
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
+
+
 BOOL IsLittleEndding() {
 	int i = 1;
 	char c = *(char *)&i;
