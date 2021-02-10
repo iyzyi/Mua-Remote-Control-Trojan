@@ -5,7 +5,7 @@
 #include "Login.h"
 
 
-#define SERVER_ADDRESS L"192.168.0.101"
+#define SERVER_ADDRESS L"192.168.0.103"
 //#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
