@@ -7,6 +7,7 @@
 
 
 #define WM_RECV_LOGIN_PACKET (WM_USER+100) 
+#define WM_CLIENT_DISCONNECT (WM_USER+101)
 
 
 
@@ -58,4 +59,5 @@ public:
 
 protected:
 	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnClientDisconnect(WPARAM wParam, LPARAM lParam);
 };

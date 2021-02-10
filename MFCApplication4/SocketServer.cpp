@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "SocketServer.h"
+#include "MFCApplication4.h"
+#include "MFCApplication4Dlg.h"
 
 
 // 16字节Key+16字节的IV
@@ -134,7 +136,7 @@ EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const
 
 EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
-	PrintBytes((PBYTE)pData, iLength);
+	PrintData((PBYTE)pData, iLength);
 	
 	CClient* pClient = m_ClientManage.SearchClient(dwConnID);
 	if (pClient == NULL) {						// 新客户端来啦
@@ -183,7 +185,9 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	printf("[Client %d] OnClose: \n", dwConnID);
 
-	m_ClientManage.DeleteClientFromList(dwConnID);
+	//m_ClientManage.DeleteClientFromList(dwConnID);
+
+	theApp.m_pMainWnd->PostMessage(WM_CLIENT_DISCONNECT, dwConnID, NULL);
 
 	return HR_OK;
 }

