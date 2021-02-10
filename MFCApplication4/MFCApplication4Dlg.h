@@ -62,4 +62,6 @@ protected:
 public:
 	void OnOK();
 	BOOL PreTranslateMessage(MSG* pMsg);
+	afx_msg void OnRClickMenu(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnTouchDisconnectClient();
 };

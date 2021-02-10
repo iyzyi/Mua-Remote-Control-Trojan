@@ -89,10 +89,15 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT1, &CMFCApplication4Dlg::OnEnChangeEdit1)
 	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication4Dlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication4Dlg::OnBnClickedButton2)
+	ON_NOTIFY(NM_RCLICK, IDC_LIST2, &CMFCApplication4Dlg::OnRClickMenu)		// 右键菜单
 
 	// 我自己添加的消息处理
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
 	ON_MESSAGE(WM_CLIENT_DISCONNECT, OnClientDisconnect)
+
+	// 右键菜单
+	ON_COMMAND(ID_32771, OnTouchDisconnectClient)
+
 END_MESSAGE_MAP()
 
 
@@ -364,18 +369,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 
 	CONNID dwConnectId = (CONNID)wParam;
 
-	
-
-	CHAR szConnectId[15];
-	//USES_CONVERSION;
-	//_itoa_s(wConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
-	//m_ListCtrl.DeleteItem(A2W(szConnectId));
-	//for (int i = 0; i < nCol; i++)
-	//{
-	//	m_ListCtrl.DeleteColumn(0);
-	//}
-
-
 	CClient* pClient = NULL;
 	DWORD dwIndex;
 
@@ -437,4 +430,62 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 		}
 	}
 
+}
+
+
+// 按下右键时触发，选择客户端时显示右键菜单
+void CMFCApplication4Dlg::OnRClickMenu(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: 在此添加控件通知处理程序代码
+
+	// 选中了客户端后，才显示右键菜单
+	if (m_ListCtrl.GetSelectedCount() <= 0) {
+		*pResult = 0;
+		return;
+	}
+
+	CMenu menu;
+	POINT pt = { 0 };
+	GetCursorPos(&pt);												//得到鼠标点击位置
+	menu.LoadMenu(IDR_MENU1);										//菜单资源ID
+
+	// menu.GetSubMenu(0)->TrackPopupMenu(0, pt.x, pt.y, &m_ListCtrl);
+	// 上面的写法能搞出右键菜单出来，但是死活触发不了右键菜单里的菜单事件
+	// 搞了好久，最后参见https://blog.csdn.net/qq_36568418/article/details/90513390
+	menu.GetSubMenu(0)->TrackPopupMenu(0, pt.x, pt.y, this);		// 显示右键菜单
+
+	*pResult = 0;
+}
+
+
+// 右键菜单：断开连接
+// 淦，ON_COMMAND的映射函数不能放参数
+afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
+
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
+
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
+	{
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+			printf("select = %d\n", nItem);
+			
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+			if (pClient != NULL) {
+				theApp.m_Server.m_pServer->Disconnect(pClient->m_dwConnectId);
+			}
+		}
+	}
 }
