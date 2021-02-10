@@ -17,6 +17,8 @@ CSocketClient::CSocketClient() : m_pClient(this) {
 	m_pClient->SetKeepAliveTime(60 * 1000);
 	// 设置心跳检测重试包发送间隔
 	m_pClient->SetKeepAliveInterval(20 * 1000);
+
+	m_dwClientStatus = NOT_ONLINE;
 }
 
 
@@ -113,16 +115,28 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 	switch (Packet.m_PacketHead.wCommandId) {
 
 	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY包。然后Client发出上线包
+
+		m_dwClientStatus = WAIT_FOR_LOGIN;
+
 		BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
 		GetLoginInfo(pbLoginPacketBody);
 		SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
-		
-	case LOGIN:
-		
-	default:
-		;
-	}
 
+		break;
+	case LOGIN:
+
+		m_dwClientStatus = LOGINED;
+
+		break;
+
+	case ECHO:
+		printf("接收到ECHO测试包，明文内容如下：\n");
+		PrintData(Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
+
+		// 再把这个明文发回给服务端，以完成ECHO测试
+		SendPacket(ECHO, Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
+		break;
+	}
 
 	return HR_OK;
 }

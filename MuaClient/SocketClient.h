@@ -10,6 +10,8 @@ public:
 
 	CCrypto					m_Crypto;
 
+	CLIENT_STATUS			m_dwClientStatus;
+
 public:
 
 	CSocketClient();
