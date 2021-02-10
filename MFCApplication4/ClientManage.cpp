@@ -76,9 +76,8 @@ VOID CClientManage::AddNewClientToList(CClient *pClient) {
 	m_dwClientNum++;
 		
 #ifdef _DEBUG
-	CHAR szIP[20];
-	myW2A(pClient->m_lpszIpAddress, szIP, 20);
-	printf("[上线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", szIP, pClient->m_wPort, m_dwClientNum);
+	USES_CONVERSION;
+	printf("[上线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum);
 #endif
 
 	LeaveCriticalSection(&m_Lock);

@@ -291,7 +291,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 		return;
 	}
 
-	USHORT wPort = dwTemp;
+	USHORT wPort = (USHORT)dwTemp;
 	if (!theApp.m_Server.IsRunning()) {
 		BOOL bRet = theApp.m_Server.StartSocketServer(ManageRecvPacket, lpszIpAddress, wPort);
 		if (!bRet) {
