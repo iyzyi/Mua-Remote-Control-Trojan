@@ -33,11 +33,10 @@ BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAd
 	if (!bRet) {
 		return false;
 	} else {
+
 #ifdef _DEBUG
-		char szIP[50];
-		//WideCharToMultiByte(CP_ACP, 0, lpszIpAddress, -1, szIP, 50, NULL, NULL);
-		myW2A(lpszIpAddress, szIP, 50);
-		printf("Socket服务端启动成功，IP=%s, PORT=%d\n", szIP, wPort);
+		USES_CONVERSION;									// 使用A2W之前先声明这个
+		printf("Socket服务端启动成功，IP=%s, PORT=%d\n", W2A(lpszIpAddress), wPort);
 #endif
 
 		// 设置回调函数
@@ -195,5 +194,6 @@ EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSo
 
 EnHandleResult CSocketServer::OnShutdown(ITcpServer* pSender) {
 	printf("OnShutdown: \n");
+	printf("Socket服务端关闭成功\n");
 	return HR_OK;
 }

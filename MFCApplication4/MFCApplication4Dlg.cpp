@@ -127,12 +127,15 @@ BOOL CMFCApplication4Dlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 
+	// 窗口标题
+	this->SetWindowText(L"Mua远控木马主控端    By iyzyi@BXS");
+
 	// 以下是List Control
 	//标题所需字段
-	CString head[] = { TEXT("ConnectId"),TEXT("IP"), TEXT("端口"), TEXT("计算机名"), TEXT("操作系统"), TEXT("CPU"), TEXT("内存"), TEXT("摄像头")};
+	CString head[] = { TEXT(""),TEXT("IP"), TEXT("端口"), TEXT("计算机名"), TEXT("操作系统"), TEXT("CPU"), TEXT("内存"), TEXT("摄像头")};
 
 	//插入列标题
-	m_ListCtrl.InsertColumn(0, head[0], LVCFMT_LEFT, 10);			// ConnectId仅用于标识，长度设为0，不在图像界面的列表中显示
+	m_ListCtrl.InsertColumn(0, head[0], LVCFMT_LEFT, 0);			// 仅用于创建本行，长度设为0，不在图像界面的列表中显示
 	m_ListCtrl.InsertColumn(1, head[1], LVCFMT_LEFT, 110);
 	m_ListCtrl.InsertColumn(2, head[2], LVCFMT_LEFT, 50);
 	m_ListCtrl.InsertColumn(3, head[3], LVCFMT_LEFT, 150);
@@ -299,6 +302,8 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	CHAR szPort[10];
 	_itoa_s(pPacket->m_pClient->m_wPort, szPort, 10);
 
+	USES_CONVERSION;									// 使用A2W之前先声明这个
+
 	DWORD dwInsertIndex = m_ListCtrl.GetItemCount();	// 插入到列表尾部
 
 	LV_ITEM   lvitemData = {0};
@@ -306,10 +311,8 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	lvitemData.iItem = dwInsertIndex;
 	lvitemData.lParam = (LPARAM)(pPacket->m_pClient);	// 额外的信息，这里用于保存本行对应的pClient
 
-	USES_CONVERSION;									// 使用A2W之前先声明这个
-
-	m_ListCtrl.InsertItem(&lvitemData);
-	//m_ListCtrl.InsertItem(0, A2W(szConnectId));								// 第一列，ID。第一个参数0是指在第0行处插入这一行
+	m_ListCtrl.InsertItem(&lvitemData);					// 第一列，ID。
+	//m_ListCtrl.InsertItem(0, A2W(szConnectId));								
 	m_ListCtrl.SetItemText(dwInsertIndex, 1, pPacket->m_pClient->m_lpszIpAddress);		// IP
 	m_ListCtrl.SetItemText(dwInsertIndex, 2, A2W(szPort));								// 端口
 	m_ListCtrl.SetItemText(dwInsertIndex, 3, A2W(LoginInfo.szHostName));				// 计算机名
