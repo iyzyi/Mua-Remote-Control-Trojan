@@ -58,9 +58,12 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
+
+
+
+
+
 // CMFCApplication4Dlg 对话框
-
-
 
 CMFCApplication4Dlg::CMFCApplication4Dlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MFCAPPLICATION4_DIALOG, pParent)
@@ -89,6 +92,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication4Dlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMFCApplication4Dlg::OnBnClickedButton2)
 
+	// 我自己添加的消息处理
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
 	ON_MESSAGE(WM_CLIENT_DISCONNECT, OnClientDisconnect)
 END_MESSAGE_MAP()
@@ -252,15 +256,21 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 	CString csIpAddress;
 	m_EditIpAddress.GetWindowText(csIpAddress);
 	LPCTSTR lpszIpAddress = csIpAddress.AllocSysString();
-	
+
 	CString csPort;
 	m_EditPort.GetWindowText(csPort);
-	USHORT wPort = _ttoi(csPort);
 
+	DWORD dwTemp = _ttoi(csPort);
+	if (!(csPort.GetAllocLength() <= 5 && dwTemp <= 65535)){		// 判断字符串长度，是为了防止_ttoi整数溢出
+		MessageBox(L"监听端口格式错误", L"启动SocketServer失败");
+		return;
+	}
+
+	USHORT wPort = dwTemp;
 	if (!theApp.m_Server.IsRunning()) {
 		BOOL bRet = theApp.m_Server.StartSocketServer(ManageRecvPacket, lpszIpAddress, wPort);
 		if (!bRet) {
-			MessageBox(L"启动SocketServer失败");
+			MessageBox(theApp.m_Server.m_pServer->GetLastErrorDesc(), L"启动SocketServer失败");
 		}
 		else {
 			m_ButtonStartSocketServer.EnableWindow(false);		// 按钮变灰
@@ -285,8 +295,6 @@ void CMFCApplication4Dlg::OnBnClickedButton2()
 		}
 	}
 }
-
-
 
 
 // 接收到上线包后触发的消息处理函数
