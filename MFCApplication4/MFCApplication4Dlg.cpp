@@ -99,6 +99,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_COMMAND(ID_32771, OnTouchDisconnectClient)
 
 	ON_COMMAND(ID_32772, &CMFCApplication4Dlg::OnOpenRemoteShell)
+	ON_COMMAND(ID_32773, &CMFCApplication4Dlg::OnTouchTestEcho)
 END_MESSAGE_MAP()
 
 
@@ -411,6 +412,7 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
 			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
 			pPacket->m_pClient->m_dwClientStatus = LOGINED;
+			theApp.m_Server.SendPacket(pPacket->m_pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
 		}
 
 	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
@@ -419,15 +421,22 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 
 		// 远程SHELL
 		case SHELL_REMOTE:
-			;
+			break;
 
 		// 文件管理
 		case FILE_TRANSFOR:
-			;
+			break;
 
 		// 屏幕监控
 		case SCREEN_MONITOR:
-			;
+			
+			break;
+
+		case ECHO:
+			printf("接收到ECHO回显包，明文内容如下：\n");
+			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+
+			break;
 		}
 	}
 
@@ -514,7 +523,7 @@ void CMFCApplication4Dlg::OnOpenRemoteShell()
 			if (pClient != NULL) {
 				
 				// 打开远程SHELL窗口
-				CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);
+				CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);			// TODO 这里什么时候delete是个问题
 				ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());
 
 				int const arraysize = 50;
@@ -525,6 +534,44 @@ void CMFCApplication4Dlg::OnOpenRemoteShell()
 
 				ShellRemoteDlg->SetWindowText(pszTitle);
 				ShellRemoteDlg->ShowWindow(SW_SHOW);
+			}
+		}
+	}
+}
+
+void CMFCApplication4Dlg::OnTouchTestEcho()
+{
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
+
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
+	{
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+			if (pClient != NULL) {
+
+				// 测试ECHO
+				CHAR pszText[] = \
+					"To me, you are still nothing more than a little boy who is just like \
+					a hundred thousand other little boys. And I have no need of you. And you\
+					, on your part, have no need of me. To you, I am nothing more than a fox\
+					 like a hundred thousand other foxes. But if you tame me, then we shall \
+					need each other. To me, you will be unique in all the world. To you, I \
+					shall be unique in all the world.";
+
+				theApp.m_Server.SendPacket(pClient, ECHO, (PBYTE)pszText, strlen(pszText));
 			}
 		}
 	}

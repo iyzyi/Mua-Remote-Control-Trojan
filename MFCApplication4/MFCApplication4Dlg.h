@@ -65,4 +65,5 @@ public:
 	afx_msg void OnRClickMenu(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnTouchDisconnectClient();
 	afx_msg void OnOpenRemoteShell();
+	afx_msg void OnTouchTestEcho();
 };
