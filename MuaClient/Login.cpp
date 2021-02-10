@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Login.h"
-
+#include "Misc.h"
 
 VOID GetLoginInfo(PBYTE pbLoginPacketBody) {
 	LOGIN_INFO LoginInfo;
@@ -70,7 +70,7 @@ VOID GetCpuType(CHAR* lpszCpuType, DWORD dwBufferSize)
 		memcpy(cpuType + 16 * t + 12, &dedx, 4);
 	}
 
-	strcpy_s(lpszCpuType, dwBufferSize, cpuType);
+	strcpy_s(lpszCpuType, strlen(cpuType) + 1, cpuType);
 }
 
 
@@ -92,30 +92,29 @@ VOID GetOSVersion(CHAR* lpszOsVersion, DWORD dwBufferSize)
 	}
 	Build = 0;
 
-
 	if (Major == 5 && Minor == 0) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 2000");
+		strcpy_s(lpszOsVersion, strlen("Windows 2000")+1, "Windows 2000");
 	}
 	else if (Major == 5 && Minor == 1){
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows XP");
+		strcpy_s(lpszOsVersion, strlen("Windows XP") + 1, "Windows XP");
 	}
 	else if (Major == 5 && Minor == 2) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 2003");
+		strcpy_s(lpszOsVersion, strlen("Windows 2003") + 1, "Windows 2003");
 	}
 	else if (Major == 6 && Minor == 0) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows Vista");
+		strcpy_s(lpszOsVersion, strlen("Windows Vista") + 1, "Windows Vista");
 	}
 	else if (Major == 6 && Minor == 1) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 7");
+		strcpy_s(lpszOsVersion, strlen("Windows 7") + 1, "Windows 7");
 	}
 	else if (Major == 6 && Minor == 2) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 8");
+		strcpy_s(lpszOsVersion, strlen("Windows 8") + 1, "Windows 8");
 	}
 	else if (Major == 6 && Minor == 3) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 8.1");
+		strcpy_s(lpszOsVersion, strlen("Windows 8.1") + 1, "Windows 8.1");
 	}
 	else if (Major == 10 && Minor == 0) {
-		strcpy_s(lpszOsVersion, dwBufferSize, "Windows 10");
+		strcpy_s(lpszOsVersion, strlen("Windows 10") + 1, "Windows 10");
 	}
 
 	// 5.0 Windows 2000";
@@ -158,6 +157,7 @@ VOID GetMemoryInfo(CHAR* lpszMemoryInfo, size_t dwBufferSize)
 		decimal_total += (double)total;
 		decimal_avl += (double)avl;
 		
-		sprintf_s(lpszMemoryInfo, dwBufferSize, "%.2fGB/%.2fGB", decimal_avl, decimal_total);
+		int length = sprintf_s(lpszMemoryInfo, dwBufferSize, "%.2fGB/%.2fGB", decimal_avl, decimal_total);
+		memset(lpszMemoryInfo + length + 1, 0, dwBufferSize - (length + 1));
 	}
 }

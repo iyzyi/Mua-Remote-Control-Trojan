@@ -10,6 +10,8 @@ VOID PrintBytes(LPBYTE pbPrintData, DWORD dwDataLen);
 
 VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen);
 
+VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen);
+
 BOOL IsLittleEndding();
 
 DWORD GetDwordFromBuffer(PBYTE pbData, DWORD dwPos = 0);
