@@ -7,7 +7,7 @@
 #include "MFCApplication4.h"
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
-#include "RemoteShell.h"
+#include "ShellRemote.h"
 #include "resource.h"
 
 #include "Misc.h"
@@ -98,6 +98,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	// 右键菜单
 	ON_COMMAND(ID_32771, OnTouchDisconnectClient)
 
+	ON_COMMAND(ID_32772, &CMFCApplication4Dlg::OnOpenRemoteShell)
 END_MESSAGE_MAP()
 
 
@@ -474,7 +475,6 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 		{
 			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
 			ASSERT(nItem != -1);
-			printf("select = %d\n", nItem);
 			
 			LV_ITEM  lvitemData = { 0 };
 			lvitemData.mask = LVIF_PARAM;
@@ -485,6 +485,46 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 			if (pClient != NULL) {
 				theApp.m_Server.m_pServer->Disconnect(pClient->m_dwConnectId);
+			}
+		}
+	}
+}
+
+void CMFCApplication4Dlg::OnOpenRemoteShell()
+{
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
+
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
+	{
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+			if (pClient != NULL) {
+				
+				// 打开远程SHELL窗口
+				CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);
+				ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());
+
+				int const arraysize = 50;
+				WCHAR pszTitle[arraysize];
+				size_t cbDest = arraysize * sizeof(WCHAR);
+				LPCTSTR pszFormat = L"远程SHELL    %s:%d\n";
+				HRESULT hr = StringCbPrintf(pszTitle, cbDest, pszFormat, pClient->m_lpszIpAddress, pClient->m_wPort);
+
+				ShellRemoteDlg->SetWindowText(pszTitle);
+				ShellRemoteDlg->ShowWindow(SW_SHOW);
 			}
 		}
 	}

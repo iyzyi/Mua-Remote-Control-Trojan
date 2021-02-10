@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "./HPSocket/HPSocket.h"
+#include <afxcontrolbars.h>
 
 #ifdef _WIN64
 	#ifdef _DEBUG
@@ -86,7 +87,7 @@ typedef struct _LOGIN_INFO {
 
 
 
-
+#include <strsafe.h>
 
 
 #endif //PCH_H

@@ -78,11 +78,11 @@
     <ClInclude Include="Crypto.h">
       <Filter>头文件\Crypto</Filter>
     </ClInclude>
-    <ClInclude Include="RemoteShell.h">
-      <Filter>头文件\组件-远程SHELL</Filter>
-    </ClInclude>
     <ClInclude Include="ClientManage.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellRemote.h">
+      <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -110,11 +110,11 @@
     <ClCompile Include="Crypto.cpp">
       <Filter>源文件\Crypto</Filter>
     </ClCompile>
-    <ClCompile Include="RemoteShell.cpp">
-      <Filter>源文件\组件-远程SHELL</Filter>
-    </ClCompile>
     <ClCompile Include="ClientManage.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellRemote.cpp">
+      <Filter>源文件\组件-远程SHELL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
