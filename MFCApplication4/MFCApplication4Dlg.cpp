@@ -299,15 +299,14 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	CHAR szPort[10];
 	_itoa_s(pPacket->m_pClient->m_wPort, szPort, 10);
 
-	USES_CONVERSION;				// 使用A2W之前先声明这个
-
-
 	DWORD dwInsertIndex = m_ListCtrl.GetItemCount();	// 插入到列表尾部
 
 	LV_ITEM   lvitemData = {0};
 	lvitemData.mask = LVIF_PARAM;
 	lvitemData.iItem = dwInsertIndex;
 	lvitemData.lParam = (LPARAM)(pPacket->m_pClient);	// 额外的信息，这里用于保存本行对应的pClient
+
+	USES_CONVERSION;									// 使用A2W之前先声明这个
 
 	m_ListCtrl.InsertItem(&lvitemData);
 	//m_ListCtrl.InsertItem(0, A2W(szConnectId));								// 第一列，ID。第一个参数0是指在第0行处插入这一行
@@ -355,7 +354,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 		// 确定要删除的那行的索引，并删除这一行
 		if (dwConnectId == pClient->m_dwConnectId) {
 			m_ListCtrl.DeleteItem(dwIndex);
-			MessageBox(L"下线！");
+			//MessageBox(L"下线！");
 			break;
 		}
 	}

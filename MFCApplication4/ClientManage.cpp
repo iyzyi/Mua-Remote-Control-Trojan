@@ -113,13 +113,12 @@ VOID CClientManage::DeleteClientFromList(CClient *pClient) {
 	}
 	m_dwClientNum--;
 
-	delete pClient;				// Client在这里释放内存
-
 #ifdef _DEBUG
-	CHAR szIP[20];
-	myW2A(pClient->m_lpszIpAddress, szIP, 20);
-	printf("[下线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", szIP, pClient->m_wPort, m_dwClientNum);
+	USES_CONVERSION;			// 使用A2W之前先声明这个
+	printf("[下线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum);
 #endif
+
+	delete pClient;				// Client在这里释放内存
 
 	LeaveCriticalSection(&m_Lock);
 }

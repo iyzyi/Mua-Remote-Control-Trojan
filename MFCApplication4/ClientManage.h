@@ -20,7 +20,7 @@ public:
 	CLIENT_STATUS			m_dwClientStatus;
 	CCrypto					m_Crypto;
 
-	TCHAR					m_lpszIpAddress[20];
+	WCHAR					m_lpszIpAddress[20];
 	WORD					m_wPort;
 
 	// 构成双向链表，方便CClientManage管理
