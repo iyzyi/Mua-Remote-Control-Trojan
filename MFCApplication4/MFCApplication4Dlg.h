@@ -39,8 +39,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
-	afx_msg void OnBnClickedOk();
-	afx_msg void OnBnClickedCancel();
 	CListCtrl m_ListCtrl;
 	afx_msg void OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEnChangeEdit1();
@@ -60,4 +58,8 @@ public:
 protected:
 	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnClientDisconnect(WPARAM wParam, LPARAM lParam);
+
+public:
+	void OnOK();
+	BOOL PreTranslateMessage(MSG* pMsg);
 };
