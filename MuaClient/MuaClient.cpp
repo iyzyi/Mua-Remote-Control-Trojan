@@ -12,10 +12,12 @@ int main()
 {
 	CSocketClient Client;
 	BOOL bRet = Client.StartSocketClient();
-	printf("bRet=%d\n", bRet);
 
 	while (true) {
-
+		if (!Client.m_pClient->IsConnected()) {
+			printf("正在重连服务端.....\n");
+			Client.StartSocketClient();
+		}
 	}
 
 }

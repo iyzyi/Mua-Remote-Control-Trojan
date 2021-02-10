@@ -6,6 +6,7 @@
 
 
 #define SERVER_ADDRESS L"192.168.0.101"
+//#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
 
@@ -25,12 +26,17 @@ CSocketClient::~CSocketClient() {
 
 
 BOOL CSocketClient::StartSocketClient() {
+
 	LPCTSTR lpszRemoteAddress = SERVER_ADDRESS;
 	WORD wPort = SERVER_PORT;
-	BOOL bRet = m_pClient->Start(lpszRemoteAddress, wPort);
-	printf("bRet = %d\n", bRet);
+	BOOL bRet;
 
-	
+	if (!(m_pClient->IsConnected())) {
+		bRet = m_pClient->Start(lpszRemoteAddress, wPort, 0);		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
+		if (!bRet) {
+			return false;
+		}
+	}	
 
 	// 生成随机密钥
 	BYTE pbKey[16];
@@ -44,11 +50,10 @@ BOOL CSocketClient::StartSocketClient() {
 	memcpy(pbKeyAndIv, pbKey, 16);
 	memcpy(pbKeyAndIv + 16, pbIv, 16);
 	bRet = m_pClient->Send(pbKeyAndIv, 32);
-	printf("bret =%d\n", bRet);
-	PrintBytes(pbKeyAndIv, 32);
-
-	//CHAR szMsg[] = "I am iyzyi! I from BXS! BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLBXS";
-	//SendPacket(LOGIN, (PBYTE)szMsg, strlen(szMsg));
+	if (bRet) {
+		printf("成功向服务器发送通信密钥:\n");
+		PrintData(pbKeyAndIv, 32);
+	}
 
 	return bRet;
 }
@@ -69,8 +74,8 @@ BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD
 
 // 回调函数
 
-EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
-	printf("[Client %d] OnHandShake: \n", dwConnID);
+EnHandleResult CSocketClient::OnPrepareConnect(ITcpClient* pSender, CONNID dwConnID, SOCKET socket) {
+	printf("[Client %d] OnPrepareConnect: \n", dwConnID);
 
 	return HR_OK;
 }
@@ -78,6 +83,13 @@ EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) 
 
 EnHandleResult CSocketClient::OnConnect(ITcpClient* pSender, CONNID dwConnID) {
 	printf("[Client %d] OnConnect: \n", dwConnID);
+
+	return HR_OK;
+}
+
+
+EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
+	printf("[Client %d] OnHandShake: \n", dwConnID);
 
 	return HR_OK;
 }
@@ -93,6 +105,7 @@ EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const
 EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnReceive: \n", dwConnID);
 
+	PrintData((PBYTE)pData, iLength);
 
 	CPacket Packet = CPacket(&m_Crypto);
 	Packet.PacketParse((PBYTE)pData, iLength);

