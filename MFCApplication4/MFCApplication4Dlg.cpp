@@ -85,8 +85,6 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDOK, &CMFCApplication4Dlg::OnBnClickedOk)
-	ON_BN_CLICKED(IDCANCEL, &CMFCApplication4Dlg::OnBnClickedCancel)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST2, &CMFCApplication4Dlg::OnLvnItemchangedList2)
 	ON_EN_CHANGE(IDC_EDIT1, &CMFCApplication4Dlg::OnEnChangeEdit1)
 	ON_BN_CLICKED(IDC_BUTTON1, &CMFCApplication4Dlg::OnBnClickedButton1)
@@ -213,20 +211,20 @@ HCURSOR CMFCApplication4Dlg::OnQueryDragIcon()
 }
 
 
-// 按下远程Shell按钮
-void CMFCApplication4Dlg::OnBnClickedOk()
-{
-	RemoteShell *dlg = new RemoteShell();
-	dlg->Create(IDD_DIALOG1, GetDesktopWindow());
-	dlg->ShowWindow(SW_SHOW);
-}
-
-
-// 按下取消按钮
-void CMFCApplication4Dlg::OnBnClickedCancel()
-{
-	//m_Server.StopSocketServer();
-}
+//// 按下远程Shell按钮
+//void CMFCApplication4Dlg::OnBnClickedOk()
+//{
+//	RemoteShell *dlg = new RemoteShell();
+//	dlg->Create(IDD_DIALOG1, GetDesktopWindow());
+//	dlg->ShowWindow(SW_SHOW);
+//}
+//
+//
+//// 按下取消按钮
+//void CMFCApplication4Dlg::OnBnClickedCancel()
+//{
+//	
+//}
 
 
 
