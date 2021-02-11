@@ -13,6 +13,8 @@ enum CLIENT_STATUS {
 
 
 
+
+
 // 单个客户端
 class CClient {
 public:
@@ -22,6 +24,10 @@ public:
 
 	WCHAR					m_lpszIpAddress[20];
 	WORD					m_wPort;
+	
+	BOOL					m_bIsMainSocketServer;
+
+
 
 	// 构成双向链表，方便CClientManage管理
 	// 链表中以ConnectId做唯一标识
@@ -30,13 +36,12 @@ public:
 
 	
 public:
-	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort);
+	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL isMainSocketServer);
 	CClient();
 	~CClient();
 
 	VOID SetCryptoKey(PBYTE pbCryptoKey = NULL, PBYTE pbCryptoIv = NULL);
 
-	VOID Login();
 };
 
 
@@ -76,4 +81,6 @@ private:
 	CRITICAL_SECTION m_Lock;					// 链表操作的锁
 
 	DWORD m_dwClientNum;
+	DWORD m_dwMainSocketClientNum;
+	DWORD m_dwChildSocketClientNum;
 };

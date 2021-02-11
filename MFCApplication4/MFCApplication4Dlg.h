@@ -53,7 +53,8 @@ public:
 public:
 	// 这里必须是static，不然ManageRecvPacket实参与 "NOTIFYPROC" 类型的形参不兼容。
 	// 而且static只能在声明中添加，不能在定义中添加哦。
-	static void CALLBACK ManageRecvPacket(CPacket *Packet);
+	static void CALLBACK MainSocketRecvPacket(CPacket *Packet);
+	static void CALLBACK ChildSocketRecvPacket(CPacket *Packet);
 
 protected:
 	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
@@ -66,4 +67,7 @@ public:
 	afx_msg void OnTouchDisconnectClient();
 	afx_msg void OnOpenRemoteShell();
 	afx_msg void OnTouchTestEcho();
+
+
+	void ProcessRClickSelectCommand(COMMAND_ID Command);
 };

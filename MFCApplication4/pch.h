@@ -43,7 +43,7 @@ enum COMMAND_ID {
 	ECHO,					// 测试
 
 	// 远程SHELL
-	SHELL_OPEN,				// 打开SHELL
+	SHELL_CONNECT,			// 被控端新建一条子socket用于远程SHELL
 	SHELL_EXECUTE,			// 执行SHELL
 	SHELL_CLOSE,			// 关闭SHELL
 
@@ -93,6 +93,25 @@ typedef struct _LOGIN_INFO {
 
 
 #include <strsafe.h>
+
+
+
+enum DIALOG_TYPE {
+	SHELL_REMOTE_DLG,
+	FILE_TRANSFOR_DLG
+};
+
+
+typedef struct _DIALOG_INFO {
+	DIALOG_TYPE		eType;
+	HANDLE			hHandle;
+}DIALOG_INFO, *PDIALOG_INFO;
+
+
+
+#define CRYPTO_KEY_PACKET_LENGTH 33
+#define CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET (0xAB)
+#define CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET (0xCD)
 
 
 #endif //PCH_H

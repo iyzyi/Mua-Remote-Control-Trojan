@@ -6,10 +6,11 @@
 // 以下是CClient的命名空间
 
 
-CClient::CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort) {
+CClient::CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL bIsMainSocketServer) {
 	m_dwConnectId			= dwConnectId;
 	wcscpy_s(m_lpszIpAddress, lpszAddress);
 	m_wPort					= usPort;
+	m_bIsMainSocketServer = bIsMainSocketServer;
 
 	// 目前先暂定被控端发来的第一个包是传递密钥的封包,接收密钥后，状态就是等待上线包
 	m_dwClientStatus		= WAIT_FOR_LOGIN;
@@ -23,6 +24,7 @@ CClient::CClient() {
 	m_dwConnectId			= 0;
 	ZeroMemory(&m_lpszIpAddress, 20);
 	m_wPort					= 0;
+	m_bIsMainSocketServer	= false;
 	m_dwClientStatus		= NOT_ONLINE;
 	m_pLastClient			= NULL;
 	m_pNextClient			= NULL;
@@ -39,10 +41,6 @@ VOID CClient::SetCryptoKey(PBYTE pbCryptoKey, PBYTE pbCryptoIv) {
 }
 
 
-VOID CClient::Login() {
-
-}
-
 
 // 以下是CClientManage的命名空间
 CClientManage::CClientManage() {
@@ -56,6 +54,8 @@ CClientManage::CClientManage() {
 	m_pClientListTail = m_pClientListHead;
 
 	m_dwClientNum = 0;
+	m_dwMainSocketClientNum = 0;
+	m_dwChildSocketClientNum = 0;
 
 	InitializeCriticalSection(&m_Lock);
 }
@@ -73,11 +73,19 @@ VOID CClientManage::AddNewClientToList(CClient *pClient) {
 	m_pClientListTail->m_pNextClient = pClient;		// 链表为空时m_pClientListTail=m_pClientListHead
 	pClient->m_pLastClient = m_pClientListTail;
 	m_pClientListTail = pClient;
+
 	m_dwClientNum++;
+	if (pClient->m_bIsMainSocketServer) {
+		m_dwMainSocketClientNum++;
+	}
+	else {
+		m_dwChildSocketClientNum++;
+	}
 		
 #ifdef _DEBUG
 	USES_CONVERSION;
-	printf("[上线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum);
+	printf("[上线] IP=%s, PORT=%d, 当前共%d个socket连接：%d条主socket连接，%d条子socket连接\n", 
+		W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum, m_dwMainSocketClientNum, m_dwChildSocketClientNum);
 #endif
 
 	LeaveCriticalSection(&m_Lock);
@@ -110,11 +118,19 @@ VOID CClientManage::DeleteClientFromList(CClient *pClient) {
 		pClient->m_pLastClient = NULL;
 		pClient->m_pNextClient = NULL;
 	}
+
 	m_dwClientNum--;
+	if (pClient->m_bIsMainSocketServer) {
+		m_dwMainSocketClientNum--;
+	}
+	else {
+		m_dwChildSocketClientNum--;
+	}
 
 #ifdef _DEBUG
 	USES_CONVERSION;			// 使用A2W之前先声明这个
-	printf("[下线] IP=%s, PORT=%d, 当前共%d个客户端在线\n", W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum);
+	printf("[下线] IP=%s, PORT=%d, 当前共%d个socket连接：%d条主socket连接，%d条子socket连接\n", 
+		W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum, m_dwMainSocketClientNum, m_dwChildSocketClientNum);
 #endif
 
 	delete pClient;				// Client在这里释放内存

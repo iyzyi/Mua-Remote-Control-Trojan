@@ -300,7 +300,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 
 	USHORT wPort = (USHORT)dwTemp;
 	if (!theApp.m_Server.IsRunning()) {
-		BOOL bRet = theApp.m_Server.StartSocketServer(ManageRecvPacket, lpszIpAddress, wPort);
+		BOOL bRet = theApp.m_Server.StartSocketServer(MainSocketRecvPacket, ChildSocketRecvPacket, lpszIpAddress, wPort);
 		if (!bRet) {
 			MessageBox(theApp.m_Server.m_pServer->GetLastErrorDesc(), L"启动SocketServer失败");
 		}
@@ -400,9 +400,9 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 
 
 
-// 接收到有效封包时回调此函数
-void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
-	printf("回调\n");
+// 主socket接收到有效封包时回调此函数
+void CALLBACK CMFCApplication4Dlg::MainSocketRecvPacket(CPacket *pPacket) {
+	printf("回调MainSocketRecvPacket\n");
 
 	switch (pPacket->m_pClient->m_dwClientStatus) {			// 客户端的不同状态
 
@@ -419,27 +419,35 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 		
 		switch (pPacket->m_PacketHead.wCommandId) {
 
-		//// 远程SHELL
-		//case SHELL_EXECUTE:
-		//	break;
-
-		// 文件管理
-		case FILE_TRANSFOR:
-			break;
-
-		// 屏幕监控
-		case SCREEN_MONITOR:
-			
-			break;
-
 		case ECHO:
 			printf("接收到ECHO回显包，明文内容如下：\n");
 			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+			break;
 
+		default:
 			break;
 		}
 	}
 
+}
+
+
+// 子socket接收到有效封包时回调此函数
+void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
+	printf("回调ChildSocketRecvPacket\n");
+
+	switch (pPacket->m_PacketHead.wCommandId) {
+		
+	case SHELL_CONNECT:
+	case SHELL_EXECUTE:
+	case SHELL_CLOSE:
+
+		break;
+
+
+	default:
+		break;
+	}
 }
 
 
@@ -503,42 +511,46 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 // 右键菜单-远程SHELL
 void CMFCApplication4Dlg::OnOpenRemoteShell()
 {
-	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
-	int  nItem = -1;
+	ProcessRClickSelectCommand(SHELL_CONNECT);
 
-	CClient* pClient = NULL;
+	//UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	//int  nItem = -1;
 
-	if (uSelectedCount > 0)
-	{
-		for (i = 0; i < uSelectedCount; i++)
-		{
-			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
-			ASSERT(nItem != -1);
+	//CClient* pClient = NULL;
 
-			LV_ITEM  lvitemData = { 0 };
-			lvitemData.mask = LVIF_PARAM;
-			lvitemData.iItem = nItem;
-			m_ListCtrl.GetItem(&lvitemData);
-			pClient = (CClient*)lvitemData.lParam;
+	//if (uSelectedCount > 0)
+	//{
+	//	for (i = 0; i < uSelectedCount; i++)
+	//	{
+	//		nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+	//		ASSERT(nItem != -1);
 
-			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
-			if (pClient != NULL) {
-				
-				// 打开远程SHELL窗口
-				CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);			// TODO 这里什么时候delete是个问题
-				ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());			// 父窗口为桌面
+	//		LV_ITEM  lvitemData = { 0 };
+	//		lvitemData.mask = LVIF_PARAM;
+	//		lvitemData.iItem = nItem;
+	//		m_ListCtrl.GetItem(&lvitemData);
+	//		pClient = (CClient*)lvitemData.lParam;
 
-				int const arraysize = 50;
-				WCHAR pszTitle[arraysize];
-				size_t cbDest = arraysize * sizeof(WCHAR);
-				LPCTSTR pszFormat = L"远程SHELL    %s:%d\n";
-				HRESULT hr = StringCbPrintf(pszTitle, cbDest, pszFormat, pClient->m_lpszIpAddress, pClient->m_wPort);
+	//		ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+	//		if (pClient != NULL) {
+	//			
+	//			theApp.m_Server.SendPacket(pClient, SHELL_CONNECT, NULL, 0);
 
-				ShellRemoteDlg->SetWindowText(pszTitle);
-				ShellRemoteDlg->ShowWindow(SW_SHOW);
-			}
-		}
-	}
+	//			//// 打开远程SHELL窗口
+	//			//CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);			// TODO 这里什么时候delete是个问题
+	//			//ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());			// 父窗口为桌面
+
+	//			//int const arraysize = 50;
+	//			//WCHAR pszTitle[arraysize];
+	//			//size_t cbDest = arraysize * sizeof(WCHAR);
+	//			//LPCTSTR pszFormat = L"远程SHELL    %s:%d\n";
+	//			//HRESULT hr = StringCbPrintf(pszTitle, cbDest, pszFormat, pClient->m_lpszIpAddress, pClient->m_wPort);
+
+	//			//ShellRemoteDlg->SetWindowText(pszTitle);
+	//			//ShellRemoteDlg->ShowWindow(SW_SHOW);
+	//		}
+	//	}
+	//}
 }
 
 
@@ -576,6 +588,35 @@ void CMFCApplication4Dlg::OnTouchTestEcho()
 					"shall be unique in all the world.";
 
 				theApp.m_Server.SendPacket(pClient, ECHO, (PBYTE)pszText, strlen(pszText));
+			}
+		}
+	}
+}
+
+
+// 向被控端(支持多选被控端)发送右键菜单中选择的命令，如远程SHELL
+void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command) {
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
+
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
+	{
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+			if (pClient != NULL) {
+				theApp.m_Server.SendPacket(pClient, Command, NULL, 0);		// 发送命令包（只有包头没有包体）
 			}
 		}
 	}

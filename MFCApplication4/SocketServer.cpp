@@ -4,13 +4,10 @@
 #include "MFCApplication4Dlg.h"
 
 
-// 16字节Key+16字节的IV
-#define FIRST_PACKET_LENGTH 32
-
 
 CSocketServer::CSocketServer() : m_pServer(this) {
 	m_bIsRunning = false;
-	m_pfnManageRecvPacket = NULL;
+	m_pfnMainSocketRecvPacket = NULL;
 
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
 	m_pServer->SetMaxPackSize(PACKET_MAX_LENGTH);
@@ -27,7 +24,7 @@ CSocketServer::~CSocketServer() {
 
 
 // 启动socket服务端
-BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAddress, USHORT wPort) {
+BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnMainSocketRecvPacket, NOTIFYPROC pfnChildSocketRecvPacket, LPCTSTR lpszIpAddress, USHORT wPort) {
 
 	BOOL bRet = m_pServer->Start(lpszIpAddress, wPort);
 	if (!bRet) {
@@ -40,7 +37,8 @@ BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnNotifyProc, LPCTSTR lpszIpAd
 #endif
 
 		// 设置回调函数
-		m_pfnManageRecvPacket = pfnNotifyProc;
+		m_pfnMainSocketRecvPacket = pfnMainSocketRecvPacket;
+		m_pfnChildSocketRecvPacket = pfnChildSocketRecvPacket;
 
 		// 初始化ClientManage的Client链表
 		m_ClientManage = CClientManage();
@@ -140,7 +138,10 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	CClient* pClient = m_ClientManage.SearchClient(dwConnID);
 	if (pClient == NULL) {						// 新客户端来啦
 
-		if (iLength == FIRST_PACKET_LENGTH) {	// 第一个封包是AES的key和iv，所以长度必须满足这个条件。否则丢弃该包，以免拒绝服务。
+		// 第一个封包是AES的key和iv，所以长度必须满足条件。否则丢弃该包，以免拒绝服务。
+		if (iLength == CRYPTO_KEY_PACKET_LENGTH 
+			&& (pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET 
+			|| pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET) ) {	
 
 			TCHAR lpszIpAddress[20];
 			int iIpAddressLen = 20;
@@ -148,14 +149,15 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			// 通过ConnectId获取IP地址和端口
 			m_pServer->GetRemoteAddress(dwConnID, lpszIpAddress, iIpAddressLen, wPort);
 
-			CClient* pClientNew = new CClient(dwConnID, (LPWSTR)lpszIpAddress, wPort);
+			BOOL bIsMainSocketServer = (pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET) ? true : false;
+			CClient* pClientNew = new CClient(dwConnID, (LPWSTR)lpszIpAddress, wPort, bIsMainSocketServer);
 			m_ClientManage.AddNewClientToList(pClientNew);
 
 			// 设置该Client的密钥
 			BYTE pbKey[16];
 			BYTE pbIv[16];
-			memcpy(pbKey, pData, 16);
-			memcpy(pbIv, pData + 16, 16);
+			memcpy(pbKey, pData + 1, 16);
+			memcpy(pbIv, pData + 17, 16);
 			pClientNew->SetCryptoKey(pbKey, pbIv);
 
 			SendPacket(pClientNew, CRYPTO_KEY, NULL, 0);
@@ -170,8 +172,12 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 
 		if (isValidPacket) {								// 有效封包
 
-			m_pfnManageRecvPacket(pPacket);					// 回调函数
-
+			if (pClient->m_bIsMainSocketServer) {
+				m_pfnMainSocketRecvPacket(pPacket);				// 处理主socket封包的回调函数
+			}
+			else {
+				m_pfnChildSocketRecvPacket(pPacket);
+			}
 		}
 
 		// TODO： 丢弃的包达到一定次数即判定为拒绝服务
