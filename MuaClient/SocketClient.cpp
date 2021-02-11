@@ -5,7 +5,7 @@
 #include "Login.h"
 
 
-#define SERVER_ADDRESS L"192.168.0.103"
+#define SERVER_ADDRESS L"192.168.0.105"
 //#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
@@ -133,10 +133,12 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 		printf("接收到ECHO测试包，明文内容如下：\n");
 		PrintData(Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
 
-		// 再把这个明文发回给服务端，以完成ECHO测试
+		// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
 		SendPacket(ECHO, Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
 		break;
 	}
+
+	 
 
 	return HR_OK;
 }

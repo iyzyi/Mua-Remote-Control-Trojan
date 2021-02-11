@@ -36,12 +36,16 @@ enum COMMAND_ID {
 
 	ECHO,					// 测试
 
-	SHELL_REMOTE,			// 远程SHELL
+	// 远程SHELL
+	SHELL_OPEN,				// 打开SHELL
+	SHELL_EXECUTE,			// 执行SHELL
+	SHELL_CLOSE,			// 关闭SHELL
+
+
 	FILE_TRANSFOR,			// 文件传输
 	SCREEN_MONITOR,			// 屏幕监控
 	MESSAGE_BOX,			// 弹窗
 };
-
 
 
 enum CLIENT_STATUS {
@@ -55,7 +59,7 @@ enum CLIENT_STATUS {
 
 
 
-
+#include  "strsafe.h"
 
 
 #endif //PCH_H

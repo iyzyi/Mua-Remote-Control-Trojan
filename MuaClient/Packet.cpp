@@ -95,14 +95,18 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 	BYTE pbPacketHead[PACKET_HEAD_LENGTH];
 	m_PacketHead.StructToBuffer(pbPacketHead);
 
-	// 拷贝包体
-	m_pbPacketBody = new BYTE[dwPacketBodyLength];
-	memcpy(m_pbPacketBody, pbPacketBody, dwPacketBodyLength);
+	if (m_dwPacketBodyLength > 0) {
+		// 拷贝包体
+		m_pbPacketBody = new BYTE[dwPacketBodyLength];
+		memcpy(m_pbPacketBody, pbPacketBody, dwPacketBodyLength);
+	}
 
 	// 组包，不过不包括前4字节，因为HP-Socket的Pack模式，在收发数据的时候会自动添上或删去
 	m_pbPacketPlaintext = new BYTE[m_dwPacketLength];
 	memcpy(m_pbPacketPlaintext, pbPacketHead, PACKET_HEAD_LENGTH);
-	memcpy(m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
+	if (m_dwPacketBodyLength > 0) {
+		memcpy(m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_pbPacketBody, m_dwPacketBodyLength);
+	}
 
 	// 加密封包
 	DWORD dwPacketPlaintextLength = m_dwPacketLength;
