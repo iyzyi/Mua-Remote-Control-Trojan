@@ -419,9 +419,9 @@ void CALLBACK CMFCApplication4Dlg::ManageRecvPacket(CPacket *pPacket) {
 		
 		switch (pPacket->m_PacketHead.wCommandId) {
 
-		// 远程SHELL
-		case SHELL_REMOTE:
-			break;
+		//// 远程SHELL
+		//case SHELL_EXECUTE:
+		//	break;
 
 		// 文件管理
 		case FILE_TRANSFOR:
@@ -499,6 +499,8 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 	}
 }
 
+
+// 右键菜单-远程SHELL
 void CMFCApplication4Dlg::OnOpenRemoteShell()
 {
 	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
@@ -524,7 +526,7 @@ void CMFCApplication4Dlg::OnOpenRemoteShell()
 				
 				// 打开远程SHELL窗口
 				CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);			// TODO 这里什么时候delete是个问题
-				ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());
+				ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());			// 父窗口为桌面
 
 				int const arraysize = 50;
 				WCHAR pszTitle[arraysize];
@@ -539,6 +541,8 @@ void CMFCApplication4Dlg::OnOpenRemoteShell()
 	}
 }
 
+
+// 右键菜单-测试发包
 void CMFCApplication4Dlg::OnTouchTestEcho()
 {
 	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();

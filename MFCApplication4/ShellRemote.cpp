@@ -5,6 +5,7 @@
 #include "ShellRemote.h"
 #include "afxdialogex.h"
 #include "resource.h"
+#include "MFCApplication4.h"
 
 
 // CShellRemote 对话框
@@ -32,3 +33,8 @@ END_MESSAGE_MAP()
 
 
 // CShellRemote 消息处理程序
+
+
+VOID CShellRemote::ShellOpen() {
+	//theApp.m_Server.SendPacket(pClient, SHELL_OPEN, NULL, 0);
+}
