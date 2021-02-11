@@ -3,9 +3,11 @@
 #include "pch.h"
 #include "Misc.h"
 #include "Crypto.h"
+#include "SocketClient.h"
 
 
 class CClient;
+class CSocketClient;
 
 
 // 这里的包头长度不包含表示封包长度的那4个字节
@@ -92,7 +94,7 @@ public:
 	// 要发送的封包用这个构造函数
 	//CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
 
-	CPacket(CCrypto* pCrypto);
+	CPacket(CSocketClient* pSocletClient);
 	CPacket();
 
 	VOID PacketParse(PBYTE pbData, DWORD dwLength);
@@ -103,6 +105,7 @@ public:
 
 public:
 	CONNID				m_dwConnId;
+	CSocketClient*		m_pSocketClient;
 
 	CCrypto*			m_pCrypto;
 

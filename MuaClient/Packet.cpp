@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Packet.h"
+#include "SocketClient.h"
 
 
 // Í³Ò»ÉùÃ÷£º
@@ -23,9 +24,10 @@ CPacket::CPacket() {
 }
 
 
-CPacket::CPacket(CCrypto* pCrypto) {
+CPacket::CPacket(CSocketClient* pSocketClient) {
 	m_dwConnId = 0;
-	m_pCrypto = pCrypto;
+	m_pSocketClient = pSocketClient;
+	m_pCrypto = &(m_pSocketClient->m_Crypto);
 
 	m_dwPacketLength = 0;
 	m_PacketHead = PACKET_HEAD();

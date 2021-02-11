@@ -30,14 +30,14 @@
 
 
 enum COMMAND_ID {
-	CRYPTO_KEY,				// 传递通信密钥和IV
+	CRYPTO_KEY,				// 仅用于主控端收到被控端传来的通信密钥和IV时，发此包告知被控端已接收密钥
 
 	LOGIN,					// 上线包
 
 	ECHO,					// 测试
 
 	// 远程SHELL
-	SHELL_OPEN,				// 打开SHELL
+	SHELL_CONNECT,			// 被控端新建一条子socket用于远程SHELL
 	SHELL_EXECUTE,			// 执行SHELL
 	SHELL_CLOSE,			// 关闭SHELL
 
@@ -61,5 +61,9 @@ enum CLIENT_STATUS {
 
 #include  "strsafe.h"
 
+
+#define CRYPTO_KEY_PACKET_LENGTH 33
+#define CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET (0xAB)
+#define CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET (0xCD)
 
 #endif //PCH_H
