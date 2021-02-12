@@ -29,6 +29,19 @@ class CSocketClient;
 
 
 
+class CModule {
+public:
+	CModule();
+	~CModule();
+
+	void OnRecvivePacket(CPacket* pPacket);
+};
+
+
+
+
+
+
 class CModuleManage {
 
 public:

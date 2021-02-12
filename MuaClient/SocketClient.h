@@ -26,9 +26,11 @@ public:
 
 	HANDLE					m_hChildSocketClientExitEvent;
 
+	CModule					m_Module;						// 仅针对子socket。一个子socket最多对应一个组件。
+
 public:
 
-	CSocketClient(CSocketClient* pMainSocketClient = nullptr);
+	CSocketClient(CSocketClient* pMainSocketClient = nullptr, CModule* Module = nullptr);
 	~CSocketClient();
 
 	BOOL StartSocketClient();
@@ -36,6 +38,7 @@ public:
 	BOOL SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 
 	void WaitForExitEvent();			// 直到收到退出事件时，子socket才退出。
+	void DisconnectChildSocketClient();	// 设置退出事件
 
 
 	// 重写回调函数

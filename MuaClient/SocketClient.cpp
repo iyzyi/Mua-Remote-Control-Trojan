@@ -47,7 +47,7 @@ BOOL CSocketClient::StartSocketClient() {
 		}
 	}
 
-	m_hChildSocketClientExitEvent = CreateEvent(NULL, true, false, NULL);
+	m_hChildSocketClientExitEvent = CreateEvent(NULL, true, false, NULL);	// 第二个参数为true时表示手动重置事件
 
 	// 组件管理对象
 	if (m_bIsMainSocketClient) {
@@ -92,7 +92,9 @@ void CSocketClient::WaitForExitEvent() {
 	WaitForSingleObject(m_hChildSocketClientExitEvent, INFINITE);
 }
 
-
+void CSocketClient::DisconnectChildSocketClient() {
+	SetEvent(m_hChildSocketClientExitEvent);
+}
 
 
 
@@ -167,8 +169,11 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 		break;
 
 
-	default:					// 剩下的封包都是组件相关的封包，传个CModuleManage对象
-		m_pModuleManage->OnReceivePacket(pPacket);
+	default:					// 剩下的封包如果来自子socket，那就是组件相关的封包，传个CModuleManage对象
+
+		if (!m_bIsMainSocketClient) {
+			m_pModuleManage->OnReceivePacket(pPacket);
+		}
 		break;
 	}
 
@@ -181,6 +186,10 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 EnHandleResult CSocketClient::OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	printf("[Client %d] OnClose: \n", dwConnID);
+
+	if (!m_bIsMainSocketClient) {
+		DisconnectChildSocketClient();
+	}
 
 	return HR_OK;
 }

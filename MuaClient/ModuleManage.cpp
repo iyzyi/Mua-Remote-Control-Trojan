@@ -28,8 +28,25 @@ void CModuleManage::OnReceivePacket(CPacket* pPacket) {
 		break;
 
 	default:
-		break;
+		pPacket->
 	}
+
+
+
+	//CPacket* pPacketCopy = new CPacket(*pPacket);
+
+	//switch (pPacket->m_PacketHead.wCommandId) {
+	//case SHELL_CONNECT:
+	//	m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleShellRemote, (LPVOID)pPacketCopy, 0, NULL);
+	//	break;
+
+	//case SHELL_EXECUTE:
+	//	break;
+	//default:
+	//	break;
+	//}
+
+
 }
 
 
@@ -42,14 +59,11 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	printf("CONNECT packet\n");
 	pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
 
-	//pChildSocketClient->
 
 
 
+	pChildSocketClient->WaitForExitEvent();
 
-	//CShellManager	manager(&socketClient);
-
-	//socketClient.run_event_loop();
-
+	printf("ÍË³öÏß³Ì\n");
 	return 0;
 }
