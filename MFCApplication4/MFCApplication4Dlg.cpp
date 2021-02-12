@@ -293,7 +293,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 	m_EditPort.GetWindowText(csPort);
 
 	DWORD dwTemp = _ttoi(csPort);
-	if (!(csPort.GetAllocLength() <= 5 && dwTemp <= 65535)){		// 判断字符串长度，是为了防止_ttoi整数溢出
+	if (!(csPort.GetAllocLength() <= 5 && dwTemp <= 65535)) {		// 判断字符串长度，是为了防止_ttoi整数溢出
 		MessageBox(L"监听端口格式错误", L"启动SocketServer失败");
 		return;
 	}
@@ -346,7 +346,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 
 	DWORD dwInsertIndex = m_ListCtrl.GetItemCount();	// 插入到列表尾部
 
-	LV_ITEM   lvitemData = {0};
+	LV_ITEM   lvitemData = { 0 };
 	lvitemData.mask = LVIF_PARAM;
 	lvitemData.iItem = dwInsertIndex;
 	lvitemData.lParam = (LPARAM)(pPacket->m_pClient);	// 额外的信息，这里用于保存本行对应的pClient
@@ -371,28 +371,35 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 
 	CONNID dwConnectId = (CONNID)wParam;
 
-	CClient* pClient = NULL;
-	DWORD dwIndex;
+	// 找到该ConnectId对应的Client对象
+	CClient* pClient = theApp.m_Server.m_ClientManage.SearchClient(dwConnectId);
+	ASSERT(pClient != NULL);			// pClient肯定不为NULL
 
-	for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
-		// 获取所枚举的这一行的额外信息，pClient
-		LV_ITEM  lvitemData = { 0 };
-		lvitemData.mask = LVIF_PARAM;
-		lvitemData.iItem = dwIndex;
-		m_ListCtrl.GetItem(&lvitemData);
-		pClient = (CClient*)lvitemData.lParam;
+	CClient* pClientTemp = NULL;
 
-		// 确定要删除的那行的索引，并删除这一行
-		if (dwConnectId == pClient->m_dwConnectId) {
-			m_ListCtrl.DeleteItem(dwIndex);
-			//MessageBox(L"下线！");
-			break;
+	// 如果是主socket，那么从ListCtrl列表中删掉该客户端的信息
+	if (pClient->m_bIsMainSocketServer){
+		DWORD dwIndex;
+		for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
+			// 获取所枚举的这一行的额外信息，pClient
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = dwIndex;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClientTemp = (CClient*)lvitemData.lParam;
+
+			// 确定要删除的那行的索引，并删除这一行
+			if (dwConnectId == pClientTemp->m_dwConnectId) {
+				m_ListCtrl.DeleteItem(dwIndex);
+				//MessageBox(L"下线！");
+				break;
+			}
 		}
 	}
+	
+	// 从Client链表中删掉这个Client，包括delete之类的清理工作
+	theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
 
-	if (pClient != NULL) {		// 这里必须不为NULL，如果这里为NULL，说明我程序一定有逻辑问题。
-		theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
-	}
 	
 	return 0;
 }
