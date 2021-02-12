@@ -126,7 +126,7 @@ EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) 
 
 EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnSend: \n", dwConnID);
-	//PrintBytes((LPBYTE)pData, iLength);
+	PrintBytes((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 
@@ -136,12 +136,12 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 	PrintData((PBYTE)pData, iLength);
 	
 	CClient* pClient = m_ClientManage.SearchClient(dwConnID);
-	if (pClient == NULL) {						// 新客户端来啦
+	if (pClient == NULL) {						// 新客户端来啦(可能是新的主socket，也可能是已知客户端的新的子socket)
 
 		// 第一个封包是AES的key和iv，所以长度必须满足条件。否则丢弃该包，以免拒绝服务。
 		if (iLength == CRYPTO_KEY_PACKET_LENGTH 
 			&& (pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET 
-			|| pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET) ) {	
+			|| pData[0] == CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET) ) {
 
 			TCHAR lpszIpAddress[20];
 			int iIpAddressLen = 20;
@@ -160,6 +160,7 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			memcpy(pbIv, pData + 17, 16);
 			pClientNew->SetCryptoKey(pbKey, pbIv);
 
+			// 告知客户端，我服务端这边已经接收到宁的密钥了
 			SendPacket(pClientNew, CRYPTO_KEY, NULL, 0);
 
 		} // if (iLength == FIRST_PACKET_LENGTH)

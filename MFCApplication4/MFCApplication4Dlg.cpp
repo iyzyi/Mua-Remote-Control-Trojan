@@ -441,7 +441,7 @@ void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
 	case SHELL_CONNECT:
 	case SHELL_EXECUTE:
 	case SHELL_CLOSE:
-
+		printf("HELLO\n");
 		break;
 
 
