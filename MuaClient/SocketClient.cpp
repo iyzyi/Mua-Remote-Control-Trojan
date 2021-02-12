@@ -5,7 +5,7 @@
 #include "Login.h"
 
 
-#define SERVER_ADDRESS L"192.168.0.105"
+#define SERVER_ADDRESS L"192.168.0.100"
 //#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
@@ -122,6 +122,7 @@ EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) 
 
 EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnSend: \n", dwConnID);
+	PrintData((PBYTE)pData, iLength);
 
 	return HR_OK;
 }
@@ -137,13 +138,18 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
 
-	case CRYPTO_KEY:		// Server接收到Client发出的密钥后，给Client响应一个CRYPTO_KEY包。然后Client发出上线包
+	case CRYPTO_KEY:		// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
+							// 如果是Client的主socket发来的，那么Client发出上线包
+		if (m_bIsMainSocketClient) {
+			m_dwClientStatus = WAIT_FOR_LOGIN;
 
-		m_dwClientStatus = WAIT_FOR_LOGIN;
-
-		BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
-		GetLoginInfo(pbLoginPacketBody);
-		SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
+			BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
+			GetLoginInfo(pbLoginPacketBody);
+			SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
+		}
+		else {
+			m_dwClientStatus = LOGINED;				// 子socket不需要发上线包，直接就算登录
+		}
 
 		break;
 	case LOGIN:
