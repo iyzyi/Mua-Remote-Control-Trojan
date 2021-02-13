@@ -199,10 +199,11 @@
     <ClInclude Include="MFCApplication4.h" />
     <ClInclude Include="MFCApplication4Dlg.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="ModuleManage.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="ShellRemote.h" />
+    <ClInclude Include="ModuleShellRemote.h" />
     <ClInclude Include="SocketServer.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -213,6 +214,7 @@
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="ModuleManage.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -220,7 +222,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ShellRemote.cpp" />
+    <ClCompile Include="ModuleShellRemote.cpp" />
     <ClCompile Include="SocketServer.cpp" />
   </ItemGroup>
   <ItemGroup>

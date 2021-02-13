@@ -7,7 +7,7 @@
 
 CSocketServer::CSocketServer() : m_pServer(this) {
 	m_bIsRunning = false;
-	m_pfnMainSocketRecvPacket = NULL;
+	//m_pfnMainSocketRecvPacket = NULL;
 
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
 	m_pServer->SetMaxPackSize(PACKET_MAX_LENGTH);
@@ -24,7 +24,7 @@ CSocketServer::~CSocketServer() {
 
 
 // 启动socket服务端
-BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnMainSocketRecvPacket, NOTIFYPROC pfnChildSocketRecvPacket, LPCTSTR lpszIpAddress, USHORT wPort) {
+BOOL CSocketServer::StartSocketServer(LPCTSTR lpszIpAddress, USHORT wPort) {
 
 	BOOL bRet = m_pServer->Start(lpszIpAddress, wPort);
 	if (!bRet) {
@@ -37,8 +37,8 @@ BOOL CSocketServer::StartSocketServer(NOTIFYPROC pfnMainSocketRecvPacket, NOTIFY
 #endif
 
 		// 设置回调函数
-		m_pfnMainSocketRecvPacket = pfnMainSocketRecvPacket;
-		m_pfnChildSocketRecvPacket = pfnChildSocketRecvPacket;
+		//m_pfnMainSocketRecvPacket = pfnMainSocketRecvPacket;
+		//m_pfnChildSocketRecvPacket = pfnChildSocketRecvPacket;
 
 		// 初始化ClientManage的Client链表
 		m_ClientManage = CClientManage();
@@ -174,10 +174,12 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 		if (isValidPacket) {								// 有效封包
 
 			if (pClient->m_bIsMainSocketServer) {
-				m_pfnMainSocketRecvPacket(pPacket);				// 处理主socket封包的回调函数
+				//m_pfnMainSocketRecvPacket(pPacket);				// 处理主socket封包的回调函数
+				PostMessage(theApp.m_pMainWnd->m_hWnd, WM_RECV_MAIN_SOCKET_CLIENT_PACKET, NULL, (LPARAM)pPacket);
 			}
 			else {
-				m_pfnChildSocketRecvPacket(pPacket);
+				//m_pfnChildSocketRecvPacket(pPacket);
+				PostMessage(theApp.m_pMainWnd->m_hWnd, WM_RECV_CHILD_SOCKET_CLIENT_PACKET, NULL, (LPARAM)pPacket);
 			}
 		}
 

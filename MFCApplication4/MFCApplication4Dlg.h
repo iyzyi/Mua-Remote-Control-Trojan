@@ -4,11 +4,20 @@
 
 #pragma once
 
+#include "Packet.h"
 
 
 #define WM_RECV_LOGIN_PACKET (WM_USER+100) 
 #define WM_CLIENT_DISCONNECT (WM_USER+101)
 
+#define WM_RECV_SHELL_CONNECT_PACKET (WM_USER+200)
+
+
+#define WM_RECV_CHILD_SOCKET_CLIENT_PACKET (WM_USER+250)
+#define WM_RECV_MAIN_SOCKET_CLIENT_PACKET (WM_USER+251)
+
+
+//class CPacket;
 
 
 // CMFCApplication4Dlg 对话框
@@ -59,6 +68,17 @@ public:
 protected:
 	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnClientDisconnect(WPARAM wParam, LPARAM lParam);
+
+	//afx_msg LRESULT OnRecvShellConnectPacket(WPARAM wParam, LPARAM lParam);		// 收到SHELL_CONNECT封包时创建相应的对话框
+public:
+	afx_msg LRESULT OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam);
+
+
+	BOOL ProcessConnectPacket(CPacket* pPacket);
+
+
+
 
 public:
 	void OnOK();

@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "ClientManage.h"
 #include "Packet.h"
+#include "ModuleManage.h"
+
 
 
 // 以下是CClient的命名空间
 
 
-CClient::CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL bIsMainSocketServer) {
+CClient::CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL bIsMainSocketServer, CModule* pModule) {
 	m_dwConnectId			= dwConnectId;
 	wcscpy_s(m_lpszIpAddress, lpszAddress);
 	m_wPort					= usPort;

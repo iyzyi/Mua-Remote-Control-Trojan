@@ -7,8 +7,9 @@
 #include "MFCApplication4.h"
 #include "MFCApplication4Dlg.h"
 #include "afxdialogex.h"
-#include "ShellRemote.h"
+#include "ModuleShellRemote.h"
 #include "resource.h"
+#include "ModuleManage.h"
 
 #include "Misc.h"
 
@@ -94,6 +95,11 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	// 我自己添加的消息处理
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
 	ON_MESSAGE(WM_CLIENT_DISCONNECT, OnClientDisconnect)
+
+//	ON_MESSAGE(WM_RECV_SHELL_CONNECT_PACKET, OnRecvShellConnectPacket)
+
+	ON_MESSAGE(WM_RECV_CHILD_SOCKET_CLIENT_PACKET, OnPostMsgRecvChildSocketClientPacket)
+	ON_MESSAGE(WM_RECV_MAIN_SOCKET_CLIENT_PACKET, OnPostMsgRecvMainSocketClientPacket)
 
 	// 右键菜单
 	ON_COMMAND(ID_32771, OnTouchDisconnectClient)
@@ -300,7 +306,8 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 
 	USHORT wPort = (USHORT)dwTemp;
 	if (!theApp.m_Server.IsRunning()) {
-		BOOL bRet = theApp.m_Server.StartSocketServer(MainSocketRecvPacket, ChildSocketRecvPacket, lpszIpAddress, wPort);
+		//BOOL bRet = theApp.m_Server.StartSocketServer(MainSocketRecvPacket, ChildSocketRecvPacket, lpszIpAddress, wPort);
+		BOOL bRet = theApp.m_Server.StartSocketServer(lpszIpAddress, wPort);
 		if (!bRet) {
 			MessageBox(theApp.m_Server.m_pServer->GetLastErrorDesc(), L"启动SocketServer失败");
 		}
@@ -399,62 +406,73 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 	
 	// 从Client链表中删掉这个Client，包括delete之类的清理工作
 	theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
-
 	
 	return 0;
 }
 
 
+//// 收到SHELL_CONNECT封包时创建相应的对话框
+//afx_msg LRESULT CMFCApplication4Dlg::OnRecvShellConnectPacket(WPARAM wParam, LPARAM lParam) {
+//	//CClient* pClient = (CClient*)lParam;
+//	//CShellRemote* pDlg = new CShellRemote(nullptr, pClient);				// 创建对话框
+//	//pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };		// TODO 句柄不知道有木有问题，记得回来检查
+//	return 0;
+//}
+//
+
+
+
 
 
 // 主socket接收到有效封包时回调此函数
-void CALLBACK CMFCApplication4Dlg::MainSocketRecvPacket(CPacket *pPacket) {
-	printf("回调MainSocketRecvPacket\n");
-
-	switch (pPacket->m_pClient->m_dwClientStatus) {			// 客户端的不同状态
-
-	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
-			
-		// 这个阶段，只要不是上线包，通通丢弃。
-		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
-			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
-			pPacket->m_pClient->m_dwClientStatus = LOGINED;
-			theApp.m_Server.SendPacket(pPacket->m_pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
-		}
-
-	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
-		
-		switch (pPacket->m_PacketHead.wCommandId) {
-
-		case ECHO:
-			printf("接收到ECHO回显包，明文内容如下：\n");
-			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
-			break;
-
-		default:
-			break;
-		}
-	}
-
-}
+//void CALLBACK CMFCApplication4Dlg::MainSocketRecvPacket(CPacket *pPacket) {
+//	printf("回调MainSocketRecvPacket\n");
+//
+//	switch (pPacket->m_pClient->m_dwClientStatus) {			// 客户端的不同状态
+//
+//	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
+//			
+//		// 这个阶段，只要不是上线包，通通丢弃。
+//		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
+//			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
+//			pPacket->m_pClient->m_dwClientStatus = LOGINED;
+//			theApp.m_Server.SendPacket(pPacket->m_pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
+//		}
+//
+//	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
+//		
+//		switch (pPacket->m_PacketHead.wCommandId) {
+//
+//		case ECHO:
+//			printf("接收到ECHO回显包，明文内容如下：\n");
+//			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+//			break;
+//
+//		default:
+//			break;
+//		}
+//	}
+//
+//}
 
 
 // 子socket接收到有效封包时回调此函数
 void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
-	printf("回调ChildSocketRecvPacket\n");
+	//printf("回调ChildSocketRecvPacket\n");
 
-	switch (pPacket->m_PacketHead.wCommandId) {
-		
-	case SHELL_CONNECT:
-	case SHELL_EXECUTE:
-	case SHELL_CLOSE:
-		printf("HELLO\n");
-		break;
+	//switch (pPacket->m_PacketHead.wCommandId) {
+	//	
+	//case SHELL_CONNECT:
+	//case SHELL_EXECUTE:
+	//case SHELL_CLOSE:
+	//	//printf("HELLO\n");
+	//	OnRecvShellRemotePacket(pPacket);
+	//	break;
 
 
-	default:
-		break;
-	}
+	//default:
+	//	break;
+	//}
 }
 
 
@@ -518,6 +536,10 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 // 右键菜单-远程SHELL
 void CMFCApplication4Dlg::OnOpenRemoteShell()
 {
+	//CShellRemote* pDlg = new CShellRemote(nullptr, theApp.m_Server.m_ClientManage.m_pClientListTail);// pPacket->m_pClient);
+	//pDlg->Create(IDD_DIALOG2, GetDesktopWindow());
+	//pDlg->ShowWindow(SW_SHOW);
+
 	ProcessRClickSelectCommand(SHELL_CONNECT);
 
 	//UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
@@ -627,4 +649,86 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command) {
 			}
 		}
 	}
+}
+
+
+
+
+
+
+// 主socket收到packet时，通过PostMessage传递消息后调用
+afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam) {
+	printf("OnPostMsgRecvMainSocketClientPacket\n");
+	CPacket* pPacket = (CPacket*)lParam;
+	CClient* pClient = pPacket->m_pClient;
+
+
+	switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
+
+	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
+
+		// 这个阶段，只要不是上线包，通通丢弃。
+		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
+			PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
+			pClient->m_dwClientStatus = LOGINED;
+			theApp.m_Server.SendPacket(pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
+		}
+		
+		break;
+
+	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
+
+		switch (pPacket->m_PacketHead.wCommandId) {
+
+		case ECHO:
+			printf("接收到ECHO回显包，明文内容如下：\n");
+			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+			break;
+
+
+
+		default:
+			break;
+		}
+
+	default:
+		break;
+	}
+	return 0;
+}
+
+
+// 处理子socket发来的第一个封包，比如SHELL_CONNECT包，返回是否处理了该包
+BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
+	CClient* pClient = pPacket->m_pClient;
+	CModule* pModule = pClient->m_pModule;
+
+	switch (pPacket->m_PacketHead.wCommandId) {
+
+	case SHELL_CONNECT:
+		RunShellRemote(pClient);
+		break;
+
+	default:
+		return false;
+	}
+	return true;
+}
+
+
+// 子socket收到packet时，通过PostMessage传递消息后调用
+afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam) {
+	printf("OnPostMsgRecvChildSocketClientPacket\n");
+	CPacket* pPacket = (CPacket*)lParam;
+	CClient* pClient = pPacket->m_pClient;
+	CModule* pModule = pClient->m_pModule;
+
+	BOOL bRet = ProcessConnectPacket(pPacket);				// CONNECT包。因为涉及初始化，所以必须单独拿出来处理
+	
+	if (!bRet) {
+		ASSERT(pModule != nullptr);	
+		pModule->OnRecvChildSocketClientPacket(pPacket);	// 非CONNECT包
+	}
+
+	return 0;
 }

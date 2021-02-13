@@ -22,7 +22,7 @@ public:
 	BOOL SendPacket(CClient* pClient, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 	VOID SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 
-	BOOL StartSocketServer(NOTIFYPROC pfnNotifyProcForMainSocket, NOTIFYPROC pfnNotifyProcForChildSocket, LPCTSTR lpszIpAddress, USHORT wPort);
+	BOOL StartSocketServer(LPCTSTR lpszIpAddress, USHORT wPort);
 	BOOL StopSocketServer();
 
 	BOOL IsRunning();
@@ -30,10 +30,10 @@ public:
 public:
 	CTcpPackServerPtr			m_pServer;
 
-	NOTIFYPROC					m_pfnMainSocketRecvPacket;	// 回调函数，主socket接收到的有效封包均传给这个函数处理，
+	//NOTIFYPROC					m_pfnMainSocketRecvPacket;	// 回调函数，主socket接收到的有效封包均传给这个函数处理，
 															// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
 
-	NOTIFYPROC					m_pfnChildSocketRecvPacket;	// 处理子函数接收到的有效封包
+	//NOTIFYPROC					m_pfnChildSocketRecvPacket;	// 处理子函数接收到的有效封包
 
 	CClientManage				m_ClientManage;
 

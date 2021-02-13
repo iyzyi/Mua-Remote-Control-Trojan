@@ -96,6 +96,8 @@ typedef struct _LOGIN_INFO {
 
 
 
+
+
 enum DIALOG_TYPE {
 	SHELL_REMOTE_DLG,
 	FILE_TRANSFOR_DLG
@@ -103,8 +105,9 @@ enum DIALOG_TYPE {
 
 
 typedef struct _DIALOG_INFO {
-	DIALOG_TYPE		eType;
-	HANDLE			hHandle;
+	DIALOG_TYPE eType;			// 对话框的类型，比如远程SHELL的对话框，文件传输的对话框
+	HANDLE hHandle;				// 所打开的对话框的句柄
+	LPVOID lpClassAddress;		// 比如这个对话框是CShellRemote创建的，那么这项就放对应CShellRemote对象的地址，用于delete
 }DIALOG_INFO, *PDIALOG_INFO;
 
 

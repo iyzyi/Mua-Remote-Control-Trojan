@@ -81,7 +81,10 @@
     <ClInclude Include="ClientManage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ShellRemote.h">
+    <ClInclude Include="ModuleManage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleShellRemote.h">
       <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
   </ItemGroup>
@@ -113,7 +116,10 @@
     <ClCompile Include="ClientManage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ShellRemote.cpp">
+    <ClCompile Include="ModuleManage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleShellRemote.cpp">
       <Filter>源文件\组件-远程SHELL</Filter>
     </ClCompile>
   </ItemGroup>

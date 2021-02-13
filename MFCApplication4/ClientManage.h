@@ -2,6 +2,10 @@
 
 #include "pch.h"
 #include "Crypto.h"
+#include "ModuleManage.h"
+
+
+class CModule;
 
 
 enum CLIENT_STATUS {
@@ -10,8 +14,6 @@ enum CLIENT_STATUS {
 	WAIT_FOR_LOGIN,		// 等待上线包（使用对称加密算法加密），该包有IP，CPU，系统版本等信息。
 	LOGINED				// 已登录，（接收到通信密钥和上线包后）正式建立通信。
 };
-
-
 
 
 
@@ -27,6 +29,9 @@ public:
 	
 	BOOL					m_bIsMainSocketServer;
 
+	DIALOG_INFO				m_DialogInfo;			// 仅针对子socket。一个子socket最多可以有一个对应的窗口，如远程shell
+	CModule*				m_pModule;				// 针对子socket
+
 
 
 	// 构成双向链表，方便CClientManage管理
@@ -36,7 +41,7 @@ public:
 
 	
 public:
-	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL isMainSocketServer);
+	CClient(CONNID dwConnectId, LPWSTR lpszAddress, WORD usPort, BOOL isMainSocketServer, CModule* pModule = nullptr);
 	CClient();
 	~CClient();
 
