@@ -168,6 +168,7 @@
     </ClCompile>
     <ClCompile Include="ModuleShellRemote.cpp" />
     <ClCompile Include="SocketClient.cpp" />
+    <ClCompile Include="SocketClientManage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AES.h" />
@@ -179,10 +180,12 @@
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModuleManage.h" />
+    <ClInclude Include="MuaClient.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ModuleShellRemote.h" />
     <ClInclude Include="SocketClient.h" />
+    <ClInclude Include="SocketClientManage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

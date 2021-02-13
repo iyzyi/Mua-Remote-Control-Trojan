@@ -6,26 +6,34 @@
 #include "SocketClient.h"
 #include "Misc.h"
 #include "Login.h"
+#include "SocketClientManage.h"
+#include "MuaClient.h"
 
+
+CSocketClientManage* g_pSocketClientManage;			// 要放到全局里面定义，我之前一直放在函数里面。。。。就一直错
 
 int main()
 {
-	CSocketClient Client;
-	BOOL bRet = Client.StartSocketClient();
+	g_pSocketClientManage = new CSocketClientManage();
+
+	CSocketClient MainSocketClient;
+	BOOL bRet = MainSocketClient.StartSocketClient();
+
+	g_pSocketClientManage->AddNewSocketClientToList(&MainSocketClient);
 
 	while (true) {
-		if (!Client.m_pTcpPackClient->IsConnected()) {
+		if (!MainSocketClient.m_pTcpPackClient->IsConnected()) {
 			printf("正在重连服务端.....\n");
-			Client.StartSocketClient();
+			MainSocketClient.StartSocketClient();
 		}
 	}
 }
 
-
-DWORD WINAPI ThreadFunc(PVOID pvParam) {
-
-	return 0;
-}
+//
+//DWORD WINAPI ThreadFunc(PVOID pvParam) {
+//
+//	return 0;
+//}
 
 
 

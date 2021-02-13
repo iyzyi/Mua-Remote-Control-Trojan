@@ -31,10 +31,14 @@ class CSocketClient;
 
 class CModule {
 public:
+	CSocketClient*		m_pChildSocketClient;
+
+public:
+	CModule(CSocketClient* pChildSocketClient);
 	CModule();
 	~CModule();
 
-	void OnRecvivePacket(CPacket* pPacket);
+	virtual void OnRecvivePacket(CPacket* pPacket);
 };
 
 
@@ -55,7 +59,7 @@ public:
 	CModuleManage(CSocketClient* m_pMainSocketClient);
 	~CModuleManage();
 
-	void OnReceivePacket(CPacket* pPacket);
+	BOOL OnReceiveConnectPacket(CPacket* pPacket);
 
 };
 

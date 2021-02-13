@@ -5,13 +5,18 @@
 #include "Login.h"
 
 
-#define SERVER_ADDRESS L"192.168.0.100"
+
+#define SERVER_ADDRESS L"192.168.0.101"
 //#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
 
 CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : m_pTcpPackClient(this) {
 	
+	//m_dwConnectId = m_pTcpPackClient->GetConnectionID();//怎么一直是0？
+	m_pLastSocketClient = NULL;
+	m_pNextSocketClient = NULL;
+
 	m_dwClientStatus = NOT_ONLINE;
 
 	m_bIsMainSocketClient = (pMainSocketClient == nullptr) ? true : false;
@@ -31,6 +36,7 @@ CSocketClient::~CSocketClient() {
 	if (m_bIsMainSocketClient) {
 		delete m_pModuleManage;
 	}
+	CloseHandle(m_hChildSocketClientExitEvent);
 }
 
 
@@ -75,6 +81,7 @@ BOOL CSocketClient::StartSocketClient() {
 		PrintData(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	}
 
+	m_dwConnectId = m_pTcpPackClient->GetConnectionID();			// 不可以在构造函数里GetConnectionID，一直会是0.估计start之后才有的CONNID吧
 	return bRet;
 }
 
@@ -83,6 +90,7 @@ BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD
 	CPacket Packet = CPacket(this);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
 	BOOL bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
+	printf("connected = %d\n", m_pTcpPackClient->IsConnected());
 	return bRet;
 }
 
@@ -117,7 +125,6 @@ EnHandleResult CSocketClient::OnConnect(ITcpClient* pSender, CONNID dwConnID) {
 
 EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
 	printf("[Client %d] OnHandShake: \n", dwConnID);
-
 	return HR_OK;
 }
 
@@ -139,7 +146,7 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 	pPacket->PacketParse((PBYTE)pData, iLength);
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
-
+	// 处理主socket以及和子socket共有部分
 	case CRYPTO_KEY:		// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
 							// 如果是Client的主socket发来的，那么Client发出上线包
 		if (m_bIsMainSocketClient) {
@@ -170,9 +177,14 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 
 	default:					// 剩下的封包如果来自子socket，那就是组件相关的封包，传个CModuleManage对象
-
-		if (!m_bIsMainSocketClient) {
-			m_pModuleManage->OnReceivePacket(pPacket);
+		if (m_dwClientStatus == LOGINED) {			// 对于子socket，必须收到主控端发来的CRYPTO_KEY包后，才是LOGINED状态。只有确认主控端收到密钥后才能解析下面的包。
+			if (m_bIsMainSocketClient) {
+				m_pModuleManage->OnReceiveConnectPacket(pPacket);			// 处理控件socket的CONNECT包，CONNECT包都来自主socket哦
+			}
+			else {
+				assert(m_pModule != NULL);
+				m_pModule->OnRecvivePacket(pPacket);			// 剩下的封包交给相关的组件处理（CModule是基类，派生出不同的组件类）
+			}
 		}
 		break;
 	}

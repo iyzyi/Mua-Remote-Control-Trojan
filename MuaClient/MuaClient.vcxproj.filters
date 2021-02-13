@@ -60,6 +60,9 @@
     <ClCompile Include="ModuleShellRemote.cpp">
       <Filter>源文件\组件-远程SHELL</Filter>
     </ClCompile>
+    <ClCompile Include="SocketClientManage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -100,6 +103,12 @@
     </ClInclude>
     <ClInclude Include="ModuleShellRemote.h">
       <Filter>头文件\组件-远程SHELL</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketClientManage.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MuaClient.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
