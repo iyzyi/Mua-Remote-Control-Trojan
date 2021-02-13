@@ -73,11 +73,33 @@ void CShellRemote::OnBnClickedButton1()
 	//MessageBox(pbCommand);
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
 	theApp.m_Server.SendPacket(m_pClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
+
+	printf("IsConnected = %d\n", theApp.m_Server.m_pServer->IsConnected(m_pClient->m_dwConnectId));
 }
 
 
 
 
-void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 
+// 重写虚函数
+void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
+	CClient* pClient = pPacket->m_pClient;
+	
+	switch (pPacket->m_PacketHead.wCommandId) {
+
+	case SHELL_EXECUTE:
+		MessageBox((WCHAR*)pPacket->m_pbPacketBody);
+
+		//CString strText = _T("");
+		////获得当前文本
+		//m_EditResult.GetWindowText(strText);
+		//strText += _T("ABC1");
+		////设置追加后的文本
+		//m_EditResult.SetWindowText();
+		break;
+
+	case SHELL_CLOSE:
+
+		break;
+	}
 }
