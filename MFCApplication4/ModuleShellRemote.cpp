@@ -87,16 +87,21 @@ void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
 
-	case SHELL_EXECUTE:
-		MessageBox((WCHAR*)pPacket->m_pbPacketBody);
+	case SHELL_EXECUTE: {
+		//MessageBox((WCHAR*)pPacket->m_pbPacketBody);
+
 
 		//CString strText = _T("");
 		////获得当前文本
 		//m_EditResult.GetWindowText(strText);
 		//strText += _T("ABC1");
 		////设置追加后的文本
-		//m_EditResult.SetWindowText();
+
+		USES_CONVERSION;			// 注意CMD用的是多字符集，不是unicode.
+		m_EditResult.SetWindowText(A2W((CHAR*)pPacket->m_pbPacketBody));
 		break;
+	}
+		
 
 	case SHELL_CLOSE:
 
