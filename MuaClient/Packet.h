@@ -97,6 +97,9 @@ public:
 	CPacket(CSocketClient* pSocletClient);
 	CPacket();
 
+	// øΩ±¥ππ‘Ï
+	CPacket(const CPacket& Packet);
+
 	VOID PacketParse(PBYTE pbData, DWORD dwLength);
 	VOID PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 
@@ -117,4 +120,7 @@ public:
 
 	PBYTE				m_pbPacketPlaintext;
 	PBYTE				m_pbPacketCiphertext;
+
+	DWORD				m_dwPacketPlaintextLength;
+	DWORD				m_dwPacketCiphertextLength;
 };

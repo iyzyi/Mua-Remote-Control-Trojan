@@ -59,8 +59,12 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 	default:
 		//pPacket->
+		delete pPacket;
+		pPacket = NULL;
 		return false;
 	}
+	delete pPacket;
+	pPacket = NULL;
 	return true;
 
 	//CPacket* pPacketCopy = new CPacket(*pPacket);
@@ -104,6 +108,8 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 		//printf("%d\n", pChildSocketClient->m_pTcpPackClient->IsConnected());
 	}
 
+	delete pPacket;
+	pPacket = NULL;
 	printf("ÍË³öÏß³Ì\n");
 	return 0;
 }

@@ -15,5 +15,9 @@ public:
 	// ÖØÐ´Ðéº¯Êý
 	void OnRecvivePacket(CPacket* pPacket);
 
-	DWORD ExecuteShell(WCHAR* pszCommand);
+
 };
+
+
+
+DWORD WINAPI ExecuteShell(LPVOID lparam);

@@ -35,6 +35,7 @@ CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : 
 CSocketClient::~CSocketClient() {
 	if (m_bIsMainSocketClient) {
 		delete m_pModuleManage;
+		m_pModuleManage = NULL;
 	}
 	CloseHandle(m_hChildSocketClientExitEvent);
 }
@@ -159,12 +160,14 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 		else {
 			m_dwClientStatus = LOGINED;				// 子socket不需要发上线包，直接就算登录
 		}
-
+		delete pPacket;
+		pPacket = NULL;
 		break;
 	case LOGIN:
 
 		m_dwClientStatus = LOGINED;
-
+		delete pPacket;
+		pPacket = NULL;
 		break;
 
 	case ECHO:
@@ -173,6 +176,8 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 		// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
 		SendPacket(ECHO, pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+		delete pPacket;
+		pPacket = NULL;
 		break;
 
 
@@ -191,7 +196,7 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 
 	delete pPacket;
-
+	pPacket = NULL;
 	return HR_OK;
 }
 

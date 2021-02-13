@@ -247,6 +247,10 @@ unsigned int AES::EncryptCFB(unsigned char pbPlaintext[], unsigned int dwPlainte
 	delete[] pbPlaintextWithPadding;
 	delete[] pbRoundKeys;
 
+	pbEncryptedBlock = NULL;
+	pbPlaintextWithPadding = NULL;
+	pbRoundKeys = NULL;
+
 	LeaveCriticalSection(&m_cs);			// ½âËø
 
 	return dwCiphertextLength;
@@ -276,6 +280,10 @@ unsigned int AES::DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCipher
 
 	delete[] pbEncryptedBlock;
 	delete[] pbRoundKeys;
+
+	pbEncryptedBlock = NULL;
+	pbRoundKeys = NULL;
+
 
 	LeaveCriticalSection(&m_cs);			// ½âËø
 	return dwPlaintextLength;

