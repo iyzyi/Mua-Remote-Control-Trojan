@@ -20,7 +20,9 @@ CModule::CModule() {
 }
 
 CModule::~CModule() {
-
+	if (m_pChildSocketClient != nullptr) {
+		m_pChildSocketClient = nullptr;
+	}
 }
 
 
@@ -104,10 +106,11 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 		pChildSocketClient = nullptr;
 	}
 
-	if (pModule != nullptr) {
-		delete pModule;
-		pModule = nullptr;
-	}
+	// 一直崩在这里，哪里的析构出了问题？？
+	//if (pModule != nullptr) {
+	//	delete pModule;
+	//	pModule = nullptr;
+	//}
 
 	printf("退出线程\n");
 	return 0;

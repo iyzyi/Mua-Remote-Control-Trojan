@@ -58,6 +58,12 @@ CSocketClient::~CSocketClient() {
 			CloseHandle(m_hChildSocketClientExitEvent);
 		}
 	}
+
+	m_pMainSocketClient = nullptr;
+	m_pModuleManage = nullptr;
+	m_pModule = nullptr;
+	m_pLastSocketClient = nullptr;
+	m_pNextSocketClient = nullptr;
 }
 
 

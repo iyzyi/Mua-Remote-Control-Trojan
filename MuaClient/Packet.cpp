@@ -79,8 +79,8 @@ CPacket::CPacket(const CPacket& Packet) {
 	m_dwPacketLength = Packet.m_dwPacketLength;
 
 	m_PacketHead.wCommandId = Packet.m_PacketHead.wCommandId;
-	m_PacketHead.wCommandId = Packet.m_PacketHead.wCommandId;
-	m_PacketHead.wCommandId = Packet.m_PacketHead.wCommandId;
+	m_PacketHead.dwCheckSum = Packet.m_PacketHead.dwCheckSum;
+	m_PacketHead.bySplitNum = Packet.m_PacketHead.bySplitNum;
 
 	if (Packet.m_dwPacketBodyLength == 0) {
 		m_pbPacketBody = new BYTE[1];
