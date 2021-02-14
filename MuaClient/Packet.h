@@ -17,7 +17,7 @@ class CSocketClient;
 // 封包长度受HP-Socket的限制，最大为0x3FFFFF
 #define PACKET_MAX_LENGTH 0x3FFFFF
 
-// 包体最大长度
+// 包体最大长度。最后减去的DWORD是开头的4字节封包长度
 #define PACKET_BODY_MAX_LENGTH ((PACKET_MAX_LENGTH) - (PACKET_HEAD_LENGTH) - sizeof(DWORD))
 
 

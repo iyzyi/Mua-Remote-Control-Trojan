@@ -59,12 +59,10 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 	default:
 		//pPacket->
-		delete pPacket;
-		pPacket = NULL;
+
 		return false;
 	}
-	delete pPacket;
-	pPacket = NULL;
+
 	return true;
 
 	//CPacket* pPacketCopy = new CPacket(*pPacket);

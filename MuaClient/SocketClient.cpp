@@ -13,15 +13,25 @@
 
 CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : m_pTcpPackClient(this) {
 	
-	//m_dwConnectId = m_pTcpPackClient->GetConnectionID();//怎么一直是0？
-	m_pLastSocketClient = NULL;
-	m_pNextSocketClient = NULL;
-
-	m_dwClientStatus = NOT_ONLINE;
-
 	m_bIsMainSocketClient = (pMainSocketClient == nullptr) ? true : false;
 
 	m_pMainSocketClient = m_bIsMainSocketClient ? this : pMainSocketClient;
+
+	m_pModuleManage = nullptr;
+	
+	m_dwClientStatus = NOT_ONLINE;
+
+	m_hChildSocketClientExitEvent = nullptr;
+
+	m_pModule = nullptr;
+
+	m_dwConnectId = 0;
+
+	//m_dwConnectId = m_pTcpPackClient->GetConnectionID();	// 这项要start之后才能获取
+
+	m_pLastSocketClient = nullptr;
+	m_pNextSocketClient = nullptr;
+
 
 	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
 	m_pTcpPackClient->SetMaxPackSize(PACKET_MAX_LENGTH);
@@ -33,11 +43,21 @@ CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : 
 
 
 CSocketClient::~CSocketClient() {
-	if (m_bIsMainSocketClient) {
-		delete m_pModuleManage;
-		m_pModuleManage = NULL;
+	if (!m_bIsMainSocketClient) {
+		if (m_pModuleManage != nullptr) {
+			delete m_pModuleManage;
+			m_pModuleManage = nullptr;
+		}
+
+		if (m_pModule != nullptr) {
+			delete m_pModule;
+			m_pModule = nullptr;
+		}
+
+		if (m_hChildSocketClientExitEvent != nullptr) {
+			CloseHandle(m_hChildSocketClientExitEvent);
+		}
 	}
-	CloseHandle(m_hChildSocketClientExitEvent);
 }
 
 
@@ -48,13 +68,17 @@ BOOL CSocketClient::StartSocketClient() {
 	BOOL bRet;
 
 	if (!(m_pTcpPackClient->IsConnected())) {
-		bRet = m_pTcpPackClient->Start(lpszRemoteAddress, wPort, 0);		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
+		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
+		bRet = m_pTcpPackClient->Start(lpszRemoteAddress, wPort, 0);		
 		if (!bRet) {
 			return false;
 		}
 	}
 
-	m_hChildSocketClientExitEvent = CreateEvent(NULL, true, false, NULL);	// 第二个参数为true时表示手动重置事件
+	if (!m_bIsMainSocketClient) {
+		// 第二个参数为true时表示手动重置事件
+		m_hChildSocketClientExitEvent = CreateEvent(NULL, true, false, NULL);	
+	}
 
 	// 组件管理对象
 	if (m_bIsMainSocketClient) {
@@ -67,7 +91,6 @@ BOOL CSocketClient::StartSocketClient() {
 	RandomBytes(pbKey, 16);
 	RandomBytes(pbIv, 16);
 	m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
-
 
 	BYTE pbKeyAndIv[CRYPTO_KEY_PACKET_LENGTH];
 	// 第一个字节表示是主socket的密钥还是子socket的密钥
@@ -82,7 +105,8 @@ BOOL CSocketClient::StartSocketClient() {
 		PrintData(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	}
 
-	m_dwConnectId = m_pTcpPackClient->GetConnectionID();			// 不可以在构造函数里GetConnectionID，一直会是0.估计start之后才有的CONNID吧
+	// 不可以在构造函数里GetConnectionID，一直会是0.估计start之后才有的CONNID吧
+	m_dwConnectId = m_pTcpPackClient->GetConnectionID();			
 	return bRet;
 }
 
@@ -126,6 +150,7 @@ EnHandleResult CSocketClient::OnConnect(ITcpClient* pSender, CONNID dwConnID) {
 
 EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
 	printf("[Client %d] OnHandShake: \n", dwConnID);
+
 	return HR_OK;
 }
 
@@ -143,62 +168,87 @@ EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, co
 
 	PrintData((PBYTE)pData, iLength);
 
-	CPacket* pPacket = new CPacket(this);				// TODO 还没找到好的delete的时机
+	CPacket* pPacket = new CPacket(this);
 	pPacket->PacketParse((PBYTE)pData, iLength);
 	
-	switch (pPacket->m_PacketHead.wCommandId) {
-	// 处理主socket以及和子socket共有部分
-	case CRYPTO_KEY:		// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
-							// 如果是Client的主socket发来的，那么Client发出上线包
-		if (m_bIsMainSocketClient) {
-			m_dwClientStatus = WAIT_FOR_LOGIN;
+	ReceiveFunc(pPacket);				// C2712: 无法再要求对象展开的函数中使用__try
+										// SEH不能在有类对象构造之类的函数内，所以单独拎出来放到一个函数内。
 
-			BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
-			GetLoginInfo(pbLoginPacketBody);
-			SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
-		}
-		else {
-			m_dwClientStatus = LOGINED;				// 子socket不需要发上线包，直接就算登录
-		}
-		delete pPacket;
-		pPacket = NULL;
-		break;
-	case LOGIN:
-
-		m_dwClientStatus = LOGINED;
-		delete pPacket;
-		pPacket = NULL;
-		break;
-
-	case ECHO:
-		printf("接收到ECHO测试包，明文内容如下：\n");
-		PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
-
-		// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
-		SendPacket(ECHO, pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
-		delete pPacket;
-		pPacket = NULL;
-		break;
-
-
-	default:					// 剩下的封包如果来自子socket，那就是组件相关的封包，传个CModuleManage对象
-		if (m_dwClientStatus == LOGINED) {			// 对于子socket，必须收到主控端发来的CRYPTO_KEY包后，才是LOGINED状态。只有确认主控端收到密钥后才能解析下面的包。
-			if (m_bIsMainSocketClient) {
-				m_pModuleManage->OnReceiveConnectPacket(pPacket);			// 处理控件socket的CONNECT包，CONNECT包都来自主socket哦
-			}
-			else {
-				assert(m_pModule != NULL);
-				m_pModule->OnRecvivePacket(pPacket);			// 剩下的封包交给相关的组件处理（CModule是基类，派生出不同的组件类）
-			}
-		}
-		break;
-	}
-
-
-	delete pPacket;
-	pPacket = NULL;
 	return HR_OK;
 }
+
+
+VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
+	__try {
+		// 处理主socket以及和子socket共有部分，主要是登录相关的包
+		switch (pPacket->m_PacketHead.wCommandId) {
+
+			// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
+		case CRYPTO_KEY:
+
+			if (m_bIsMainSocketClient) {				// 如果是Client的主socket发来的，那么Client发出上线包
+				m_dwClientStatus = WAIT_FOR_LOGIN;
+
+				BYTE pbLoginPacketBody[LOGIN_PACKET_BODY_LENGTH];
+				GetLoginInfo(pbLoginPacketBody);
+				SendPacket(LOGIN, pbLoginPacketBody, LOGIN_PACKET_BODY_LENGTH);
+			}
+			else {
+				m_dwClientStatus = LOGINED;				// 子socket不需要发上线包，直接就算登录
+			}
+			__leave;
+
+		case LOGIN:
+			m_dwClientStatus = LOGINED;
+			__leave;
+
+			// 这里一定不要写default, 不然后面的代码就不继续走下去了。
+
+		} // switch (pPacket->m_PacketHead.wCommandId)
+
+
+		// 如果还不是LOGINED状态，就不可以处理下面的这些包
+		// 主socket: 收到上线包后进入LOGINED状态。子socket: 收到密钥后进入LOGINED状态。
+		if (m_dwClientStatus != LOGINED) {
+			__leave;
+		}
+
+
+		// 处理主socket特有的包
+		if (m_bIsMainSocketClient) {
+
+			// 处理组件的CONNECT包。CONNECT包都来自主socket哦
+			BOOL bHaveProcess = m_pModuleManage->OnReceiveConnectPacket(pPacket);
+
+			// 处理主socket中 不是 组件的CONNECT包 的包
+			if (!bHaveProcess) {
+				switch (pPacket->m_PacketHead.wCommandId) {
+				case ECHO:
+					printf("接收到ECHO测试包，明文内容如下：\n");
+					PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+
+					// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
+					SendPacket(ECHO, pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+					__leave;
+				}
+			}
+		}
+
+		// 子socket
+		else {
+			assert(m_pModule != NULL);
+			m_pModule->OnRecvivePacket(pPacket);				// 剩下的封包交给相关的组件处理（CModule是基类，派生出不同的组件类）
+		}
+	}
+
+	__finally {
+		if (pPacket) {
+			delete pPacket;
+			pPacket = NULL;
+		}
+	}
+}
+
 
 
 EnHandleResult CSocketClient::OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {

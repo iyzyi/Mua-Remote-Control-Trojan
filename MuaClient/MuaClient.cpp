@@ -26,6 +26,6 @@ int main()
 			printf("正在重连服务端.....\n");
 			MainSocketClient.StartSocketClient();
 		}
-		Sleep(10000);			// 若未在线，则3秒重试一次。
+		Sleep(3000);			// 若未在线，则3秒重试一次。
 	}
 }

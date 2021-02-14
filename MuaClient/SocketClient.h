@@ -2,10 +2,12 @@
 #include "pch.h"
 #include "Crypto.h"
 #include "ModuleManage.h"
+#include "Packet.h"
 
 
 class CModuleManage;			// 头文件相互包含，不提前声明这个类的和，会报错C3646: 未知重写说明符
 class CModule;
+class CPacket;
 
 
 class CSocketClient : public CTcpClientListener {
@@ -27,7 +29,7 @@ public:
 
 	HANDLE					m_hChildSocketClientExitEvent;
 
-	CModule*				m_pModule;						// 仅针对子socket。一个子socket最多对应一个组件。
+	CModule*				m_pModule;						// 仅针对子socket。一个子socket最多对应一个组件。由CModule的构造函数传进来该值。
 
 	CONNID					m_dwConnectId;
 
@@ -54,4 +56,7 @@ public:
 	virtual EnHandleResult OnSend(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
 	virtual EnHandleResult OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
 	virtual EnHandleResult OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
+
+public:
+	VOID ReceiveFunc(CPacket* pPacket);	
 };

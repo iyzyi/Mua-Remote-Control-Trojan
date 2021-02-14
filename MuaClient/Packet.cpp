@@ -13,14 +13,14 @@
 
 CPacket::CPacket() {
 
-	m_dwPacketLength = 0;				// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
-	m_PacketHead = PACKET_HEAD();	// 包头
-	m_pbPacketBody = NULL;				// 包体
+	m_dwPacketLength = 0;					// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
+	m_PacketHead = PACKET_HEAD();			// 包头
+	m_pbPacketBody = nullptr;				// 包体
 
 	m_dwPacketBodyLength = 0;				// 包体长度
 
-	m_pbPacketPlaintext = NULL;				// 封包明文数据（照例不包括开头表示长度的4字节）
-	m_pbPacketCiphertext = NULL;				// 封包密文数据（照例不包括开头表示长度的4字节）
+	m_pbPacketPlaintext = nullptr;			// 封包明文数据（照例不包括开头表示长度的4字节）
+	m_pbPacketCiphertext = nullptr;			// 封包密文数据（照例不包括开头表示长度的4字节）
 
 	m_dwPacketPlaintextLength = 0;
 	m_dwPacketCiphertextLength = 0;
@@ -34,12 +34,12 @@ CPacket::CPacket(CSocketClient* pSocketClient) {
 
 	m_dwPacketLength = 0;
 	m_PacketHead = PACKET_HEAD();
-	m_pbPacketBody = NULL;
+	m_pbPacketBody = nullptr;
 
 	m_dwPacketBodyLength = 0;
 
-	m_pbPacketPlaintext = NULL;
-	m_pbPacketCiphertext = NULL;
+	m_pbPacketPlaintext = nullptr;
+	m_pbPacketCiphertext = nullptr;
 
 	m_dwPacketPlaintextLength = 0;
 	m_dwPacketCiphertextLength = 0;
@@ -47,30 +47,34 @@ CPacket::CPacket(CSocketClient* pSocketClient) {
 
 
 CPacket::~CPacket() {
-	if (m_pbPacketBody) {		// 如果这里不是用xmalloc，而是直接用栈，那这里free必然崩溃。还在想怎么改。暂时先不允许栈吧，PacketBody都得xmalloc申请。// 现在改成new和delete
+	if (m_pbPacketBody) {			// 如果这里不是用xmalloc，而是直接用栈，那这里free必然崩溃。还在想怎么改。暂时先不允许栈吧，PacketBody都得xmalloc申请。// 现在改成new和delete
 		delete[] m_pbPacketBody;
-		m_pbPacketBody = NULL;
+		m_pbPacketBody = nullptr;
 	}								// 0xdddddddd多半是有指针悬空的锅。
 
 	if (m_pbPacketPlaintext) {
 		delete[] m_pbPacketPlaintext;
-		m_pbPacketPlaintext = NULL;
+		m_pbPacketPlaintext = nullptr;
 	}
 
 	if (m_pbPacketCiphertext) {
 		delete[] m_pbPacketCiphertext;
-		m_pbPacketCiphertext = NULL;
+		m_pbPacketCiphertext = nullptr;
 	}
 }
 
 
-// 拷贝构造，用于接收到的数据解析成封包后，传到其他线程里。如果是组包而来的packet，别用这个拷贝构造,因为没拷贝Crypto.
+// 拷贝构造，用于接收到的数据解析成封包后，传到其他线程里。
+// 反正只有封包加密完或者解密完后，才能用这个拷贝构造，因为m_pCrypto没有深拷贝。
+// 当然深拷贝也没用，m_pCrypto里面的加解密IV一直变。
 CPacket::CPacket(const CPacket& Packet) {
 	m_dwConnId = Packet.m_dwConnId;
 
 	m_pSocketClient = Packet.m_pSocketClient;
 
-	m_pCrypto = Packet.m_pCrypto;			// 因为拷贝封包主要是用于传到其他线程里，主要是传包体，所以用不到这项，这里就不拷贝了。
+	m_pCrypto = nullptr;
+	// 因为拷贝封包主要是用于传到其他线程里，主要是传包体，所以用不到这项，这里就拷贝了。
+	// 而且深拷贝也没用，m_pCrypto里面的加解密IV一直变，必须接收到封包的第一时间就解密，这样才能和Server端同步。
 
 	m_dwPacketLength = Packet.m_dwPacketLength;
 
@@ -78,9 +82,15 @@ CPacket::CPacket(const CPacket& Packet) {
 	m_PacketHead.wCommandId = Packet.m_PacketHead.wCommandId;
 	m_PacketHead.wCommandId = Packet.m_PacketHead.wCommandId;
 
-	m_pbPacketBody = new BYTE[Packet.m_dwPacketBodyLength];
-	memcpy(m_pbPacketBody, Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
-
+	if (Packet.m_dwPacketBodyLength == 0) {
+		m_pbPacketBody = new BYTE[1];
+		m_pbPacketBody[0] = 0;
+	}
+	else {
+		m_pbPacketBody = new BYTE[Packet.m_dwPacketBodyLength];
+		memcpy(m_pbPacketBody, Packet.m_pbPacketBody, Packet.m_dwPacketBodyLength);
+	}
+	
 	m_dwPacketBodyLength = Packet.m_dwPacketBodyLength;
 
 	m_pbPacketPlaintext = new BYTE[Packet.m_dwPacketPlaintextLength];
@@ -116,8 +126,14 @@ VOID CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 	m_PacketHead = PACKET_HEAD((PBYTE)m_pbPacketPlaintext);
 
 	// 拷贝包体
-	m_pbPacketBody = new BYTE[m_dwPacketBodyLength];
-	memcpy(m_pbPacketBody, m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_dwPacketBodyLength);
+	if (m_dwPacketBodyLength == 0) {
+		m_pbPacketBody = new BYTE[1];
+		m_pbPacketBody[0] = 0;
+	}
+	else {
+		m_pbPacketBody = new BYTE[m_dwPacketBodyLength];
+		memcpy(m_pbPacketBody, m_pbPacketPlaintext + PACKET_HEAD_LENGTH, m_dwPacketBodyLength);
+	}
 }
 
 
