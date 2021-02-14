@@ -23,12 +23,12 @@ CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : 
 
 	m_pMainSocketClient = m_bIsMainSocketClient ? this : pMainSocketClient;
 
-	//// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
-	//m_pTcpPackClient->SetMaxPackSize(PACKET_MAX_LENGTH);
-	//// 设置心跳检测包发送间隔
-	//m_pTcpPackClient->SetKeepAliveTime(60 * 1000);
-	//// 设置心跳检测重试包发送间隔
-	//m_pTcpPackClient->SetKeepAliveInterval(20 * 1000);
+	// 设置数据包最大长度（有效数据包最大长度不能超过0x3FFFFF字节(4MB-1B)，默认：262144/0x40000 (256KB)
+	m_pTcpPackClient->SetMaxPackSize(PACKET_MAX_LENGTH);
+	// 设置心跳检测包发送间隔
+	m_pTcpPackClient->SetKeepAliveTime(60 * 1000);
+	// 设置心跳检测重试包发送间隔
+	m_pTcpPackClient->SetKeepAliveInterval(20 * 1000);
 }
 
 

@@ -83,7 +83,7 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 }
 
-extern CSocketClientManage* g_pSocketClientManage;
+//extern CSocketClientManage* g_pSocketClientManage;
 //extern CSocketClient* g_pMainSocketClient;
 
 DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
@@ -96,7 +96,7 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	CModuleShellRemote* pModule = new CModuleShellRemote(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
 
 
-	g_pSocketClientManage->AddNewSocketClientToList(pChildSocketClient);			// 向SocketClient链表中添加新的socket连接
+	//g_pSocketClientManage->AddNewSocketClientToList(pChildSocketClient);			// 向SocketClient链表中添加新的socket连接
 
 	pChildSocketClient->StartSocketClient();
 	printf("CONNECT packet\n");
@@ -113,5 +113,3 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	printf("退出线程\n");
 	return 0;
 }
-
-
