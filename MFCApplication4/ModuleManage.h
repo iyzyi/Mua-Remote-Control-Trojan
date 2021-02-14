@@ -7,10 +7,10 @@
 
 class CModule {
 public:
-	CClient*		m_pClient;
+	CClient*		m_pSocketClient;
 
 public:
-	CModule(CClient* pClient);
+	CModule(CClient* pSocketClient);
 	~CModule();
 
 	virtual void OnRecvChildSocketClientPacket(CPacket* pPacket);

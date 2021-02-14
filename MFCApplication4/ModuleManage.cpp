@@ -6,9 +6,9 @@
 
 #include "Packet.h"
 
-CModule::CModule(CClient* pClient) {
-	m_pClient = pClient;
-	pClient->m_pModule = this;
+CModule::CModule(CClient* pSocketClient) {
+	m_pSocketClient = pSocketClient;
+	pSocketClient->m_pModule = this;
 }
 
 

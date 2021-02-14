@@ -463,23 +463,23 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 
 
 // 子socket接收到有效封包时回调此函数
-void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
-	//printf("回调ChildSocketRecvPacket\n");
-
-	//switch (pPacket->m_PacketHead.wCommandId) {
-	//	
-	//case SHELL_CONNECT:
-	//case SHELL_EXECUTE:
-	//case SHELL_CLOSE:
-	//	//printf("HELLO\n");
-	//	OnRecvShellRemotePacket(pPacket);
-	//	break;
-
-
-	//default:
-	//	break;
-	//}
-}
+//void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
+//	//printf("回调ChildSocketRecvPacket\n");
+//
+//	//switch (pPacket->m_PacketHead.wCommandId) {
+//	//	
+//	//case SHELL_CONNECT:
+//	//case SHELL_EXECUTE:
+//	//case SHELL_CLOSE:
+//	//	//printf("HELLO\n");
+//	//	OnRecvShellRemotePacket(pPacket);
+//	//	break;
+//
+//
+//	//default:
+//	//	break;
+//	//}
+//}
 
 
 // 按下右键时触发，选择客户端时显示右键菜单
@@ -542,50 +542,7 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 // 右键菜单-远程SHELL
 void CMFCApplication4Dlg::OnOpenRemoteShell()
 {
-	//CShellRemote* pDlg = new CShellRemote(nullptr, theApp.m_Server.m_ClientManage.m_pClientListTail);// pPacket->m_pClient);
-	//pDlg->Create(IDD_DIALOG2, GetDesktopWindow());
-	//pDlg->ShowWindow(SW_SHOW);
-
 	ProcessRClickSelectCommand(SHELL_CONNECT);
-
-	//UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
-	//int  nItem = -1;
-
-	//CClient* pClient = NULL;
-
-	//if (uSelectedCount > 0)
-	//{
-	//	for (i = 0; i < uSelectedCount; i++)
-	//	{
-	//		nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
-	//		ASSERT(nItem != -1);
-
-	//		LV_ITEM  lvitemData = { 0 };
-	//		lvitemData.mask = LVIF_PARAM;
-	//		lvitemData.iItem = nItem;
-	//		m_ListCtrl.GetItem(&lvitemData);
-	//		pClient = (CClient*)lvitemData.lParam;
-
-	//		ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
-	//		if (pClient != NULL) {
-	//			
-	//			theApp.m_Server.SendPacket(pClient, SHELL_CONNECT, NULL, 0);
-
-	//			//// 打开远程SHELL窗口
-	//			//CShellRemote *ShellRemoteDlg = new CShellRemote(this, pClient);			// TODO 这里什么时候delete是个问题
-	//			//ShellRemoteDlg->Create(IDD_DIALOG2, GetDesktopWindow());			// 父窗口为桌面
-
-	//			//int const arraysize = 50;
-	//			//WCHAR pszTitle[arraysize];
-	//			//size_t cbDest = arraysize * sizeof(WCHAR);
-	//			//LPCTSTR pszFormat = L"远程SHELL    %s:%d\n";
-	//			//HRESULT hr = StringCbPrintf(pszTitle, cbDest, pszFormat, pClient->m_lpszIpAddress, pClient->m_wPort);
-
-	//			//ShellRemoteDlg->SetWindowText(pszTitle);
-	//			//ShellRemoteDlg->ShowWindow(SW_SHOW);
-	//		}
-	//	}
-	//}
 }
 
 

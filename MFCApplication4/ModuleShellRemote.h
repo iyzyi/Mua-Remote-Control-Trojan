@@ -3,6 +3,11 @@
 #include "ClientManage.h"
 #include "ModuleManage.h"
 
+
+#define COMMAND_RESULT_BUFFER_LENGTH 8096
+
+
+
 // CShellRemote 对话框
 
 class CShellRemote : public CDialogEx, public CModule
@@ -27,12 +32,21 @@ protected:
 public:
 	//CClient*		m_pClient;			基类有这个成员了
 
+
+	DWORD			m_dwBufferTail;
+	WCHAR			m_pszWideChar[COMMAND_RESULT_BUFFER_LENGTH+1];
+
+
 public:
 	// 重写虚函数
 	void OnRecvChildSocketClientPacket(CPacket* pPacket);
 
+	void OnOK();
+	BOOL PreTranslateMessage(MSG* pMsg);
+	void OnClose();
+
 public:
-	VOID ShellOpen();
+	//VOID ShellOpen();
 	afx_msg void OnEnChangeEdit1();
 
 	//void Start();
@@ -40,6 +54,3 @@ public:
 	CEdit m_EditCommand;
 	afx_msg void OnBnClickedButton1();
 };
-
-
-
