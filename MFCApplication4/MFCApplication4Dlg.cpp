@@ -536,9 +536,6 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 				theApp.m_Server.m_ClientManage.DeleteAllChildClientByOneIP(pClient);
 				// 再删掉这个选中的主socket
 				theApp.m_Server.m_pServer->Disconnect(pClient->m_dwConnectId);
-
-				
-
 			}
 		}
 	}
