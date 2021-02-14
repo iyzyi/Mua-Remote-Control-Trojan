@@ -97,8 +97,11 @@ void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 		//strText += _T("ABC1");
 		////设置追加后的文本
 
+		WCHAR pszCmdResult[8096];
+		MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, -1, pszCmdResult, 8096);
+
 		USES_CONVERSION;			// 注意CMD用的是多字符集，不是unicode.
-		m_EditResult.SetWindowText(A2W((CHAR*)pPacket->m_pbPacketBody));
+		m_EditResult.SetWindowText(pszCmdResult);
 		break;
 	}
 		

@@ -375,7 +375,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 }
 
 
-// 与客户端的连接中断
+// 与客户端(包括主socket和子socket)的连接中断
 afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lParam) {
 
 	CONNID dwConnectId = (CONNID)wParam;
@@ -404,6 +404,10 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 				break;
 			}
 		}
+	}
+	// 如果是子socket，则关闭相应的打开的对话框。
+	else {
+		((CDialogEx*)(pClient->m_DialogInfo.pClassAddress))->SendMessage(WM_CLOSE);
 	}
 	
 	// 从Client链表中删掉这个Client，包括delete之类的清理工作

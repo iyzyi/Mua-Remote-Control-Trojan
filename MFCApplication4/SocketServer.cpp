@@ -193,8 +193,6 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	printf("[Client %d] OnClose: \n", dwConnID);
 
-	//m_ClientManage.DeleteClientFromList(dwConnID);
-
 	theApp.m_pMainWnd->PostMessage(WM_CLIENT_DISCONNECT, dwConnID, NULL);
 
 	return HR_OK;
