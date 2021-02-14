@@ -7,25 +7,34 @@
 #include "Misc.h"
 #include "Login.h"
 #include "SocketClientManage.h"
-#include "MuaClient.h"
 
+void MainFunc(CSocketClient* pMainSocketClient);
 
-//CSocketClientManage* g_pSocketClientManage;			// 要放到全局里面定义，我之前一直放在函数里面。。。。就一直错
 
 int main()
 {
-	//g_pSocketClientManage = new CSocketClientManage();
 
 	CSocketClient MainSocketClient;
 	MainSocketClient.StartSocketClient();
-
-	//g_pSocketClientManage->AddNewSocketClientToList(&MainSocketClient);
-
+	
 	while (true) {
-		if (!MainSocketClient.m_pTcpPackClient->IsConnected()) {
+		MainFunc(&MainSocketClient);
+	}
+}
+
+
+// SEH所在函数不能有对象展开，所以单独放到一个函数里
+void MainFunc(CSocketClient* pMainSocketClient) {
+	__try {
+		if (!pMainSocketClient->m_pTcpPackClient->IsConnected()) {
 			printf("正在重连服务端.....\n");
-			MainSocketClient.StartSocketClient();
+			pMainSocketClient->StartSocketClient();
 		}
-		//Sleep(3000);			// 若未在线，则3秒重试一次。
+		Sleep(1000);			// 若未在线，则3秒重试一次。
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER){
+		pMainSocketClient->m_pTcpPackClient->Stop();
+		MessageBox(0, L"无视异常，重连服务端", L"无视异常，重连服务端", 0);
+		printf("无视异常，重连服务端\n");				// TODO：之后可以改成重启此程序
 	}
 }

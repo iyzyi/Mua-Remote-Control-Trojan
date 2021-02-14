@@ -107,8 +107,5 @@
     <ClInclude Include="SocketClientManage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MuaClient.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

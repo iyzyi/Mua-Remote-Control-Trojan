@@ -13,6 +13,8 @@
 
 CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : m_pTcpPackClient(this) {
 	
+	m_bIsRunning = false;
+
 	m_bIsMainSocketClient = (pMainSocketClient == nullptr) ? true : false;
 
 	m_pMainSocketClient = m_bIsMainSocketClient ? this : pMainSocketClient;
@@ -64,6 +66,8 @@ CSocketClient::~CSocketClient() {
 	m_pModule = nullptr;
 	m_pLastSocketClient = nullptr;
 	m_pNextSocketClient = nullptr;
+
+	m_bIsRunning = false;
 }
 
 
@@ -80,6 +84,8 @@ BOOL CSocketClient::StartSocketClient() {
 			return false;
 		}
 	}
+
+	m_bIsRunning = true;
 
 	if (!m_bIsMainSocketClient) {
 		// 第二个参数为true时表示手动重置事件
@@ -120,8 +126,15 @@ BOOL CSocketClient::StartSocketClient() {
 BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
 	CPacket Packet = CPacket(this);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
-	BOOL bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
-	printf("connected = %d\n", m_pTcpPackClient->IsConnected());
+	BOOL bRet;
+	// 鬼知道怎么析构的，明明析构的时候将m_bIsRunning设为false了，为啥debug时居然是0xdddddddd
+	if (m_bIsRunning!=false && m_bIsRunning!=0xdddddddd) {
+		bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
+	}
+	else {
+		bRet = false;
+	}
+	
 	return bRet;
 }
 

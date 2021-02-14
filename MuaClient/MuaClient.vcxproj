@@ -180,7 +180,6 @@
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModuleManage.h" />
-    <ClInclude Include="MuaClient.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ModuleShellRemote.h" />

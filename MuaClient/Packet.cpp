@@ -94,9 +94,12 @@ CPacket::CPacket(const CPacket& Packet) {
 	m_dwPacketBodyLength = Packet.m_dwPacketBodyLength;
 
 	m_pbPacketPlaintext = new BYTE[Packet.m_dwPacketPlaintextLength];
-	m_pbPacketCiphertext = new BYTE[Packet.m_dwPacketCiphertextLength];
 	memcpy(m_pbPacketPlaintext, Packet.m_pbPacketPlaintext, Packet.m_dwPacketPlaintextLength);
-	memcpy(m_pbPacketPlaintext, Packet.m_pbPacketCiphertext, Packet.m_dwPacketCiphertextLength);
+
+	m_pbPacketCiphertext = new BYTE[Packet.m_dwPacketCiphertextLength];
+	memcpy(m_pbPacketCiphertext, Packet.m_pbPacketCiphertext, Packet.m_dwPacketCiphertextLength);		
+	// 草，第一个参数写成了m_pbPacketPlaintext，一直堆损坏，查错查了两小时。明文长度比密文长度短，肯定溢出啊啊啊啊啊，而且逻辑也不对。
+	// 写完这个项目我就打算转golang了，指针这东西不是我这种菜鸡玩得起来的。
 
 	m_dwPacketPlaintextLength = Packet.m_dwPacketPlaintextLength;
 	m_dwPacketCiphertextLength = Packet.m_dwPacketCiphertextLength;

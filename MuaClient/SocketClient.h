@@ -23,6 +23,8 @@ public:
 
 	CTcpPackClientPtr		m_pTcpPackClient;
 
+	BOOL					m_bIsRunning;
+
 	CCrypto					m_Crypto;
 
 	CLIENT_STATUS			m_dwClientStatus;

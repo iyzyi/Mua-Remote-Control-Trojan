@@ -3,7 +3,6 @@
 #include "Packet.h"
 #include "SocketClient.h"
 #include "SocketClientManage.h"
-#include "MuaClient.h"
 #include "ModuleShellRemote.h"
 
 
@@ -51,7 +50,7 @@ CModuleManage::~CModuleManage() {
 
 // 返回是否处理该包
 BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
-	CPacket* pPacketCopy = new CPacket(*pPacket);
+	CPacket* pPacketCopy = new CPacket(*pPacket);			// 记得在各个线程里delete这个包。
 
 	switch (pPacket->m_PacketHead.wCommandId) {
 
@@ -67,24 +66,10 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 	return true;
 
-	//CPacket* pPacketCopy = new CPacket(*pPacket);
-
-	//switch (pPacket->m_PacketHead.wCommandId) {
-	//case SHELL_CONNECT:
-	//	m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleShellRemote, (LPVOID)pPacketCopy, 0, NULL);
-	//	break;
-
-	//case SHELL_EXECUTE:
-	//	break;
-	//default:
-	//	break;
-	//}
-
 
 }
 
-//extern CSocketClientManage* g_pSocketClientManage;
-//extern CSocketClient* g_pMainSocketClient;
+
 
 DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 {
@@ -95,11 +80,6 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
 
 	pChildSocketClient->WaitForExitEvent();
-
-	//if (pPacket != nullptr) {
-	//	delete pPacket;
-	//	pPacket = nullptr;
-	//}
 
 	if (pChildSocketClient != nullptr) {
 		delete pChildSocketClient;
@@ -112,6 +92,12 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	//	pModule = nullptr;
 	//}
 
+	if (pPacket != nullptr) {
+		delete pPacket;
+		pPacket = nullptr;
+	}
+
+	Sleep(500);
 	printf("退出线程\n");
 	return 0;
 }
