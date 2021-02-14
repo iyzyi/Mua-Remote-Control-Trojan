@@ -125,6 +125,7 @@ void CSocketClient::WaitForExitEvent() {
 	WaitForSingleObject(m_hChildSocketClientExitEvent, INFINITE);
 }
 
+
 void CSocketClient::DisconnectChildSocketClient() {
 	SetEvent(m_hChildSocketClientExitEvent);
 }

