@@ -532,7 +532,13 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 			if (pClient != NULL) {
+				// 先删掉与之IP相同的子socket
+				theApp.m_Server.m_ClientManage.DeleteAllChildClientByOneIP(pClient);
+				// 再删掉这个选中的主socket
 				theApp.m_Server.m_pServer->Disconnect(pClient->m_dwConnectId);
+
+				
+
 			}
 		}
 	}
@@ -619,6 +625,8 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command) {
 
 
 
+
+
 // 主socket收到packet时，通过PostMessage传递消息后调用
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam) {
 	printf("OnPostMsgRecvMainSocketClientPacket\n");
@@ -659,6 +667,11 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM 
 	}
 	return 0;
 }
+
+
+
+
+
 
 
 // 处理子socket发来的第一个封包，比如SHELL_CONNECT包，返回是否处理了该包

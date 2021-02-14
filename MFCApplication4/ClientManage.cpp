@@ -2,6 +2,7 @@
 #include "ClientManage.h"
 #include "Packet.h"
 #include "ModuleManage.h"
+#include "MFCApplication4.h"
 
 
 
@@ -159,4 +160,21 @@ CClient* CClientManage::SearchClient(CONNID dwConnectId) {
 		pClientNode = pClientNode->m_pNextClient;
 	}
 	return NULL;
+}
+
+
+// 删除一个主socket对应的全部子socket
+// 在Client链表中搜索与之相同IP的其他client, 如果不是主socket，那么就认定为是这个主socket的子socket, 一同断开连接
+// 这里假定一个IP只上线一个主socket, 不然其他的子socket实在无法区分所属的主socket.
+VOID CClientManage::DeleteAllChildClientByOneIP(CClient *pClient) {
+	CClient *pClientNode = m_pClientListHead;
+	while (pClientNode->m_pNextClient != NULL) {
+		if (!pClientNode->m_pNextClient->m_bIsMainSocketServer) {		// 子socket
+			DWORD bRet = wcscmp(pClient->m_lpszIpAddress, pClientNode->m_pNextClient->m_lpszIpAddress);
+			if (bRet == 0) {// IP相同
+				theApp.m_Server.m_pServer->Disconnect(pClientNode->m_pNextClient->m_dwConnectId);
+			}
+		}
+		pClientNode = pClientNode->m_pNextClient;
+	}
 }

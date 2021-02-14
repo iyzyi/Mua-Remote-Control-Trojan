@@ -70,6 +70,11 @@ public:
 	// Client是否存在于链表中，存在则返回Client地址，不存在返回NULL
 	CClient* SearchClient(CONNID dwConnectId);
 
+	// 删除一个主socket对应的全部子socket
+	// 在Client链表中搜索与之相同IP的其他client, 如果不是主socket，那么就认定为是这个主socket的子socket, 一同断开连接
+	// 这里假定一个IP只上线一个主socket, 不然其他的子socket实在无法区分所属的主socket.
+	VOID DeleteAllChildClientByOneIP(CClient *pClient);
+
 
 public:
 
