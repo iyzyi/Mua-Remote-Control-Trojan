@@ -6,8 +6,8 @@
 
 
 
-#define SERVER_ADDRESS L"192.168.0.101"
-//#define SERVER_ADDRESS L"81.70.160.41"
+//#define SERVER_ADDRESS L"192.168.0.101"
+#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
 
@@ -128,7 +128,7 @@ BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
 	BOOL bRet;
 	// 鬼知道怎么析构的，明明析构的时候将m_bIsRunning设为false了，为啥debug时居然是0xdddddddd
-	if (m_bIsRunning!=false && m_bIsRunning!=0xdddddddd) {
+	if (m_bIsRunning == 1) {
 		bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
 	}
 	else {

@@ -87,7 +87,13 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 			break;
 		}
 		else {
-			BOOL bRet = m_pChildSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
+			// TODO ºÃÏñÃ»ÓÃ
+			if (WAIT_OBJECT_0 != WaitForSingleObject(pPacket->m_pSocketClient->m_hChildSocketClientExitEvent, 0)) {
+				BOOL bRet = m_pChildSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
+			}
+			else {
+				MessageBox(0, L"ClientSocket exit", L"", 0);
+			}
 		}
 
 		memset(SendBuf, 0, sizeof(SendBuf));
