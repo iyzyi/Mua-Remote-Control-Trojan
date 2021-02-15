@@ -31,6 +31,12 @@
     <Filter Include="头文件\组件-远程SHELL">
       <UniqueIdentifier>{52d7ff22-fee7-45b0-97be-abb55041c5c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\组件-文件传输">
+      <UniqueIdentifier>{2a3b3af0-b967-42e9-a8f1-742d42fed301}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\组件-文件传输">
+      <UniqueIdentifier>{58100228-130e-4950-944c-f05c405d3620}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
@@ -87,6 +93,12 @@
     <ClInclude Include="ModuleShellRemote.h">
       <Filter>头文件\组件-远程SHELL</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleFileUpload.h">
+      <Filter>头文件\组件-文件传输</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleFileDownload.h">
+      <Filter>头文件\组件-文件传输</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -121,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="ModuleShellRemote.cpp">
       <Filter>源文件\组件-远程SHELL</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleFileUpload.cpp">
+      <Filter>源文件\组件-文件传输</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleFileDownload.cpp">
+      <Filter>源文件\组件-文件传输</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

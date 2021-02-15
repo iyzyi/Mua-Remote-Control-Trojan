@@ -19,3 +19,4 @@ public:
 
 
 void RunShellRemote(CClient* pClient);
+void RunFileUpload(CClient* pClient);

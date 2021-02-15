@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "ModuleManage.h"
 #include "ModuleShellRemote.h"
-
+#include "MFCApplication4Dlg.h"
 
 
 #include "Packet.h"
@@ -31,6 +31,12 @@ void RunShellRemote(CClient* pClient) {
 	pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };		// TODO 句柄不知道有木有问题，记得回来检查
 }
 
+
+void RunFileUpload(CClient* pClient) {
+	//CShellRemote* pDlg = new CShellRemote(nullptr, pClient);
+	//pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };
+	theApp.m_pMainWnd->PostMessage(WM_FILE_UPLOAD_CONNECT_SUCCESS, 0, NULL);
+}
 
 
 

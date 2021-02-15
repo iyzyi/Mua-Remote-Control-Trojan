@@ -17,6 +17,12 @@
 #define WM_RECV_MAIN_SOCKET_CLIENT_PACKET (WM_USER+251)
 
 
+// 收到被控端发来的CONNECT包时，说明成功建立了相应的子socket连接
+#define WM_FILE_UPLOAD_CONNECT_SUCCESS (WM_USER+252)			
+#define WM_FILE_DOWNLOAD_CONNECT_SUCCESS (WM_USER+253)
+
+
+
 //class CPacket;
 
 
@@ -89,5 +95,6 @@ public:
 	afx_msg void OnTouchTestEcho();
 
 
-	void ProcessRClickSelectCommand(COMMAND_ID Command);
+	void ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
+	afx_msg void OnTestFileUpload();
 };

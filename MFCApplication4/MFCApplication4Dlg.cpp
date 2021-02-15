@@ -106,6 +106,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 
 	ON_COMMAND(ID_32772, &CMFCApplication4Dlg::OnOpenRemoteShell)
 	ON_COMMAND(ID_32773, &CMFCApplication4Dlg::OnTouchTestEcho)
+	ON_COMMAND(ID_32774, &CMFCApplication4Dlg::OnTestFileUpload)
 END_MESSAGE_MAP()
 
 
@@ -545,7 +546,7 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 // 右键菜单-远程SHELL
 void CMFCApplication4Dlg::OnOpenRemoteShell()
 {
-	ProcessRClickSelectCommand(SHELL_CONNECT);
+	ProcessRClickSelectCommand(SHELL_CONNECT, NULL, 0);
 }
 
 
@@ -590,7 +591,7 @@ void CMFCApplication4Dlg::OnTouchTestEcho()
 
 
 // 向被控端(支持多选被控端)发送右键菜单中选择的命令，如远程SHELL
-void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command) {
+void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
 	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
 	int  nItem = -1;
 
@@ -611,7 +612,7 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command) {
 
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 			if (pClient != NULL) {
-				theApp.m_Server.SendPacket(pClient, Command, NULL, 0);		// 发送命令包（只有包头没有包体）
+				theApp.m_Server.SendPacket(pClient, Command, pbPacketBody, dwPacketBodyLength);		// 发送命令包（只有包头没有包体）
 			}
 		}
 	}
@@ -681,6 +682,10 @@ BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 	case SHELL_CONNECT:
 		RunShellRemote(pClient);
 		break;
+		
+	case FILE_UPLOAD_CONNECT:
+		RunFileUpload(pClient);
+		break;
 
 	default:
 		return false;
@@ -704,4 +709,43 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM
 	}
 
 	return 0;
+}
+
+
+// 测试文件上传
+void CMFCApplication4Dlg::OnTestFileUpload()
+{	
+	WCHAR pszFile[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\server\\发送\\测试文件传输，可删.7z";
+	if (!PathFileExists(pszFile)) {
+		MessageBox(L"文件不存在");
+		return ;
+	}
+
+	HANDLE hFile = CreateFile(pszFile, FILE_READ_EA, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+	if (hFile == INVALID_HANDLE_VALUE)
+	{
+		MessageBox(L"文件句柄打开失败");
+		return ;
+	}
+
+	QWORD qwFileSize = 0;
+	DWORD dwFileSizeLowDword = 0;
+	DWORD dwFileSizeHighDword = 0;
+	dwFileSizeLowDword = GetFileSize(hFile, &dwFileSizeHighDword);
+	qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;		// 直接dwFileSizeHighDword << 32的话就等于0了
+
+
+	#define FILE_UPLOAD_PACKET_BODY_LENGTH 16
+	BYTE pbPacketBody[FILE_UPLOAD_PACKET_BODY_LENGTH];
+	memset(pbPacketBody, 0, FILE_UPLOAD_PACKET_BODY_LENGTH);
+	// 包体：文件大小（8Byte）+ 分片数（4字节）+ 暂未分配（4字节）
+
+	// 除非文件16383TB, 否则dwPacketSplitNum不可能上溢。所以不用担心整数溢出。担心这个还不如担心文件完整性校验。
+	DWORD dwPacketSplitNum = (qwFileSize % PACKET_MAX_LENGTH) ? qwFileSize / PACKET_MAX_LENGTH + 1 : qwFileSize / PACKET_MAX_LENGTH;
+	WriteQwordToBuffer(pbPacketBody, qwFileSize, 0);
+	WriteDwordToBuffer(pbPacketBody, dwPacketSplitNum, 8);
+
+	ProcessRClickSelectCommand(FILE_UPLOAD_CONNECT, (PBYTE)pbPacketBody, FILE_UPLOAD_PACKET_BODY_LENGTH);
+
+	WaitForSingleObject(m_FileUploadConnectSuccessEvent, INFINITE);
 }

@@ -78,6 +78,12 @@ BOOL IsLittleEndding() {
 }
 
 
+QWORD GetQwordFromBuffer(PBYTE pbData, DWORD dwPos) {
+	PBYTE pbData2 = pbData + dwPos;
+	return pbData2[0] + (pbData2[1] << 8) + (pbData2[2] << 16) + (pbData2[3] << 24) + (pbData2[4] << 32) + (pbData2[5] << 40) + (pbData2[6] << 48) + (pbData2[7] << 56);
+}
+
+
 // 从buffer中偏移dwPos处取出一个DWORD，暂时默认小端存储，以后再完善吧。
 DWORD GetDwordFromBuffer(PBYTE pbData, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
@@ -94,6 +100,20 @@ BYTE GetByteFromBuffer(PBYTE pbData, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
 	return pbData2[0];
 }
+
+
+VOID WriteQwordToBuffer(PBYTE pbData, QWORD qwNum, DWORD dwPos) {
+	PBYTE pbData2 = pbData + dwPos;
+	pbData2[0] = qwNum & 0xff;
+	pbData2[1] = (qwNum >> 8) & 0xff;
+	pbData2[2] = (qwNum >> 16) & 0xff;
+	pbData2[3] = (qwNum >> 24) & 0xff;
+	pbData2[4] = (qwNum >> 32) & 0xff;
+	pbData2[5] = (qwNum >> 40) & 0xff;
+	pbData2[6] = (qwNum >> 48) & 0xff;
+	pbData2[7] = (qwNum >> 56) & 0xff;
+}
+
 
 
 VOID WriteDwordToBuffer(PBYTE pbData, DWORD dwNum, DWORD dwPos) {
