@@ -58,6 +58,9 @@ public:
 	CClient();
 	~CClient();
 
+	VOID ChangeNoChildSocketClientEvent();
+	VOID WaitForNoChildSocketClientEvent();
+
 	// 断开该client的全部子socket的连接
 	VOID DisConnectedAllChildSocketClient();
 
@@ -84,6 +87,6 @@ public:
 
 
 private:
-	CRITICAL_SECTION		m_Lock;					// 链表操作的锁
-
+	CRITICAL_SECTION		m_Lock;								// 链表操作的锁
+	HANDLE					m_hNoChildSocketClientEvent;		// 没有子socket时触发本事件
 };

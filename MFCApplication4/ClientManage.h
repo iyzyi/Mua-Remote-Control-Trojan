@@ -45,9 +45,9 @@ public:
 	// Client是否存在于链表中，存在则返回Client地址，不存在返回NULL
 	CClient* SearchClient(CONNID dwConnectId);
 
-	//// CSocketClient是否存在，存在则返回其地址，不存在返回nullptr
-	//// 注意，这个查找的是CSocketClient，原理是遍历每个CClient中的存放CSocketClient的链表
-	//CSocketClient* CClientManage::SearchSocketClient(CONNID dwConnectId);
+	// CSocketClient是否存在，存在则返回其地址，不存在返回nullptr
+	// 注意，这个查找的是CSocketClient，原理是遍历每个CClient中的存放CSocketClient的链表
+	CSocketClient* CClientManage::SearchSocketClient(CONNID dwConnectId);
 
 	// 我们假定一台机子只运行一个Mua客户端（被控端），所以一个IP就是一个客户端。
 	// 子socket属于哪个客户端，完全就是靠IP来分辨的
@@ -67,34 +67,39 @@ public:
 
 
 
-
-
-// 存放CSocketClient的链表，均为子socket。如果需要用到主socket，请遍历存放CClient的链表，然后找到m_pMainSocketClient
-
-// 先删掉主socket，再删子socket时，由于CClient析构了，存子socket的链表就没了，就没法删子socket了。
-// 如果删主socket前，先把子socket全删了。这样的话，子socket OnClose()回调时，又要删一次，
-// 此时主socket没了，所以由于存CSocketClient的链表没了，找不到相应的子socket，程序崩溃
-// 所以这里还要搞一个链表，存所有的socket，包括主socket和子socket
-public:
-	CSocketClient*			m_pChildSocketClientListHead;
-	CSocketClient*			m_pChildSocketClientListTail;
-	DWORD					m_dwChildSocketClientNum;
-	CRITICAL_SECTION		m_ChildSocketClientLock;			// 锁
-	
-
-	// 双向链表，新结点插在列表尾部
-	VOID AddNewChildSocketClientToList(CSocketClient *pSocketClient);
-
-	// 删除SocketClient, 返回是否删除成功
-	BOOL DeleteChildSocketClientFromList(CONNID dwConnectId);
-
-	// 内含CSocketClient的析构，所以有令子socket下线的作用
-	VOID DeleteChildSocketClientFromList(CSocketClient *pSocketClient);
-
-	// 内含CSocketClient的析构，所以有令全部子socket下线的作用
-	VOID DeleteAllChildSocketClientFromList();
-
-	// SocketClient是否存在于链表中，存在则返回SocketClient地址，不存在返回nullptr
-	CSocketClient* SearchSocketClient(CONNID dwConnectId);
+//
+//
+//// 存放CSocketClient的链表，均为子socket。如果需要用到主socket，请遍历存放CClient的链表，然后找到m_pMainSocketClient
+//
+//// 先删掉主socket，再删子socket时，由于CClient析构了，存子socket的链表就没了，就没法删子socket了。
+//// 如果删主socket前，先把子socket全删了。这样的话，子socket OnClose()回调时，又要删一次，
+//// 此时主socket没了，所以由于存CSocketClient的链表没了，找不到相应的子socket，程序崩溃
+//// 所以这里还要搞一个链表，存所有的socket，包括主socket和子socket
+//public:
+//	CSocketClient*			m_pChildSocketClientListHead;
+//	CSocketClient*			m_pChildSocketClientListTail;
+//	DWORD					m_dwChildSocketClientNum;
+//	CRITICAL_SECTION		m_ChildSocketClientLock;			// 锁
+//	
+//
+//	// 双向链表，新结点插在列表尾部
+//	VOID AddNewChildSocketClientToList(CSocketClient *pSocketClient);
+//
+//	// 删除SocketClient, 返回是否删除成功
+//	BOOL DeleteChildSocketClientFromList(CONNID dwConnectId);
+//
+//	// 内含CSocketClient的析构，所以有令子socket下线的作用
+//	VOID DeleteChildSocketClientFromList(CSocketClient *pSocketClient);
+//
+//	// 内含CSocketClient的析构，所以有令全部子socket下线的作用
+//	VOID DeleteAllChildSocketClientFromList();
+//
+//	// SocketClient是否存在于链表中，存在则返回SocketClient地址，不存在返回nullptr
+//	CSocketClient* SearchSocketClient(CONNID dwConnectId);
 
 };
+
+
+
+
+

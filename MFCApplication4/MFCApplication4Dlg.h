@@ -98,3 +98,8 @@ public:
 	void ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 	afx_msg void OnTestFileUpload();
 };
+
+
+
+
+DWORD WINAPI WaitChildSocketCloseThreadFunc(LPVOID lparam);

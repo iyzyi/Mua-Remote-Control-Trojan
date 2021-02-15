@@ -78,6 +78,10 @@ CClient::CClient(CSocketClient* pSocketClient) {
 	memcpy(m_lpszIpAddress, pSocketClient->m_lpszIpAddress, 20*2);
 
 	InitializeCriticalSection(&m_Lock);
+
+	// 第二个参数表示手动重置事件
+	m_hNoChildSocketClientEvent = CreateEvent(NULL, true, false, NULL);
+	SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
 }
 
 
@@ -91,6 +95,9 @@ CClient::CClient() {
 	m_dwChildSocketClientNum = 0;
 
 	InitializeCriticalSection(&m_Lock);
+
+	m_hNoChildSocketClientEvent = CreateEvent(NULL, true, false, NULL);
+	SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
 }
 
 
@@ -106,6 +113,28 @@ CClient::~CClient() {
 		delete m_pChildSocketClientListHead;
 		m_pChildSocketClientListHead = nullptr;
 	}
+
+	if (m_hNoChildSocketClientEvent != nullptr) {
+		CloseHandle(m_hNoChildSocketClientEvent);
+		m_hNoChildSocketClientEvent = nullptr;
+	}
+}
+
+
+VOID CClient::ChangeNoChildSocketClientEvent() {
+	if (m_dwChildSocketClientNum == 0) {
+		SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
+		//MessageBox(0, L"Set", L"", 0);
+	}
+	else {
+		ResetEvent(m_hNoChildSocketClientEvent);		// 设为非信号状态
+		//MessageBox(0, L"Reset", L"", 0);
+	}
+}
+
+
+VOID CClient::WaitForNoChildSocketClientEvent() {
+	WaitForSingleObject(m_hNoChildSocketClientEvent, INFINITE);
 }
 
 
@@ -117,7 +146,8 @@ VOID CClient::DisConnectedAllChildSocketClient() {
 	CSocketClient *pSocketClientNode = m_pChildSocketClientListHead;
 	while (pSocketClientNode->m_pNextChildSocketClient != nullptr) {
 		DWORD dwConnectId = pSocketClientNode->m_pNextChildSocketClient->m_dwConnectId;
-		theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId);
+		// 只是disconnect链接，没有析构哦
+		theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId, true);
 
 		pSocketClientNode = pSocketClientNode->m_pNextChildSocketClient;
 	}
@@ -137,13 +167,14 @@ VOID CClient::AddNewChildSocketClientToList(CSocketClient *pSocketClient) {
 	m_pChildSocketClientListTail = pSocketClient;
 
 	m_dwChildSocketClientNum++;
-
+	
 #ifdef _DEBUG
 	USES_CONVERSION;
 	printf("[子socket上线 - %s:%d] 本IP共%d条子socket连接\n",
 		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 
+	ChangeNoChildSocketClientEvent();
 	LeaveCriticalSection(&m_Lock);
 }
 
@@ -189,9 +220,11 @@ VOID CClient::DeleteChildSocketClientFromList(CSocketClient *pSocketClient) {
 		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 
-	//delete pSocketClient;				// SocketClient在这里释放内存
+	delete pSocketClient;				// SocketClient在这里释放内存
 	// 这个链表仅用于缓存主socket拥有哪些子socket。析构的话，请在CClientManage的存放CSocketClient的链表中进行
+	// 上面一行注释作废。
 
+	ChangeNoChildSocketClientEvent();
 	LeaveCriticalSection(&m_Lock);
 }
 

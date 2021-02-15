@@ -156,12 +156,17 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 
 			// 主socket
 			if (bIsMainSocketClient) {
-				// 新建客户端CClient
-				CClient* pNewClient = new CClient(pNewSocketClient);
-				// 将该CClient添加到CClientManage中存CClient的链表
-				m_pClientManage->AddNewClientToList(pNewClient);
-				// 设置该socket所属于的client
-				pNewSocketClient->m_pClient = pNewClient;
+				
+				// 一个IP只能启动一个客户端
+				if (m_pClientManage->SearchClientByIp(dwConnID) == nullptr) {
+					// 新建客户端CClient
+					CClient* pNewClient = new CClient(pNewSocketClient);
+					// 将该CClient添加到CClientManage中存CClient的链表
+					m_pClientManage->AddNewClientToList(pNewClient);
+					// 设置该socket所属于的client
+					pNewSocketClient->m_pClient = pNewClient;
+				}
+				
 			}
 			// 子socket
 			else {
@@ -169,8 +174,8 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 				CClient* pClient = m_pClientManage->SearchClientByIp(dwConnID);
 				// 将该CSocketClient添加到CClient链表
 				pClient->AddNewChildSocketClientToList(pNewSocketClient);
-				// 将该CSocketClient添加到CManageClient中存CSocketClient的链表
-				m_pClientManage->AddNewChildSocketClientToList(pNewSocketClient);
+				//// 将该CSocketClient添加到CManageClient中存CSocketClient的链表
+				//m_pClientManage->AddNewChildSocketClientToList(pNewSocketClient);
 			}
 			
 

@@ -382,7 +382,13 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 
 	// 找到该ConnectId对应的CSocketClient对象
 	CSocketClient* pSocketClient = theApp.m_Server.m_pClientManage->SearchSocketClient(dwConnectId);
-	ASSERT(pSocketClient != NULL);
+
+	//ASSERT(pSocketClient != NULL);
+	// 有些建立起来的连接，但是封包被过滤了（比如上线包），这种情况下它的connectId就没有写入链表里，
+	// 但是当它OnClose()的时候，也会走到这一步
+	if (pSocketClient == nullptr) {
+		return 0;
+	}
 
 	CClient* pClientTemp = NULL;
 
@@ -404,11 +410,20 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 			}
 		}
 
-		// 令其所有子socket断开连接（仅disconnect，并没有析构之类的）
-		pClientTemp->DisConnectedAllChildSocketClient();
+		// 这里必须把代码新开一个线程运行，因为实践证明（浪费了两个小时时间），不另起一个线程的话，永远等不到事件WaitForNoChildSocketClientEvent
+		// 因为子socket在通过TcpPackServer发送了Disconnect之后，一直没有OnClose()，也就无法进入删除链表中的节点，就不能触发事件。
+		// 我一直以为HP-Socket的回调是另起一个线程，但是按照上面的情况来推测的话，很可能还是同一个线程。因为这个线程在Wait事件，所以也无法进入OnClose之类的。
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WaitChildSocketCloseThreadFunc, (LPVOID)pClientTemp, 0, NULL);
 
-		// 从CClientManage链表中删除此CClient（有析构m_pMainSocketClient）
-		theApp.m_Server.m_pClientManage->DeleteClientFromList(pClientTemp);
+
+		//// 令其所有子socket断开连接（仅disconnect，并没有析构之类的）
+		//pClientTemp->DisConnectedAllChildSocketClient();
+
+		//// 在这阻塞，直至子socket全部断开连接
+		//pClientTemp->WaitForNoChildSocketClientEvent();
+
+		//// 从CClientManage链表中删除此CClient（有析构m_pMainSocketClient）
+		//theApp.m_Server.m_pClientManage->DeleteClientFromList(pClientTemp);
 
 	}
 	// 子socket
@@ -420,22 +435,43 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 			DialogExTemp->SendMessage(WM_CLOSE);
 		}
 
-		// 从CClient的链表中删除此CSocketClient。仅删结点，无析构。
-		__try {
-			// 下面的判断其实根本没有用，m_pClient析构的时候，delete的哪个指针被我手动置nullptr了，
-			// 但是这个pSocketClient对象中的m_pClient早就把这个指针拷贝了一份，这个没置nullptr，由此指针悬空。
-			// 查了下，也没有什么很好的解决方案，先暂时捕捉异常吧，以后可能改成智能指针之类的。 TODO 
-			if (pSocketClient->m_pClient != nullptr) {
-				pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
-			}
-		}
-		__finally{}
+		// 内含pSocketClient的析构。如果子socket数量为0，则触发信号。
+		pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
 
+		//// 从CClient的链表中删除此CSocketClient。仅删结点，无析构。
+		//__try {
+		//	// 下面的判断其实根本没有用，m_pClient析构的时候，delete的哪个指针被我手动置nullptr了，
+		//	// 但是这个pSocketClient对象中的m_pClient早就把这个指针拷贝了一份，这个没置nullptr，由此指针悬空。
+		//	// 查了下，也没有什么很好的解决方案，先暂时捕捉异常吧，以后可能改成智能指针之类的。 TODO 
+		//	if (pSocketClient->m_pClient != nullptr) {
+		//		pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
+		//	}
+		//}
+		//__finally{}
+		
 		// 从CClientManage的链表中删除此CSocketClient。有析构
-		theApp.m_Server.m_pClientManage->DeleteChildSocketClientFromList(pSocketClient->m_dwConnectId);
+		//theApp.m_Server.m_pClientManage->DeleteChildSocketClientFromList(pSocketClient->m_dwConnectId);
 	}
 	return 0;
 }
+
+
+DWORD WINAPI WaitChildSocketCloseThreadFunc(LPVOID lparam) {
+	CClient* pClientTemp = (CClient*)lparam;
+
+	// 令其所有子socket断开连接（仅disconnect，并没有析构之类的）
+	pClientTemp->DisConnectedAllChildSocketClient();
+
+	// 在这阻塞，直至子socket全部断开连接
+	pClientTemp->WaitForNoChildSocketClientEvent();
+
+	// 从CClientManage链表中删除此CClient（有析构m_pMainSocketClient）
+	theApp.m_Server.m_pClientManage->DeleteClientFromList(pClientTemp);
+
+	return 0;
+}
+
+
 
 
 	//CONNID dwConnectId = (CONNID)wParam;
