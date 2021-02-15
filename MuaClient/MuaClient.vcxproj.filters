@@ -63,6 +63,9 @@
     <ClCompile Include="SocketClientManage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="AntiAntiVirus.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -107,5 +110,16 @@
     <ClInclude Include="SocketClientManage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Infect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiAntiVirus.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="infect.cpp">
+      <Filter>源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

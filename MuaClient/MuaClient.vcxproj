@@ -154,6 +154,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AES.cpp" />
+    <ClCompile Include="AntiAntiVirus.cpp" />
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -172,11 +173,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AES.h" />
+    <ClInclude Include="AntiAntiVirus.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
+    <ClInclude Include="Infect.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModuleManage.h" />
@@ -185,6 +188,9 @@
     <ClInclude Include="ModuleShellRemote.h" />
     <ClInclude Include="SocketClient.h" />
     <ClInclude Include="SocketClientManage.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="infect.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

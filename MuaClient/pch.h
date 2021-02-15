@@ -34,11 +34,10 @@
 
 
 enum COMMAND_ID {
-	CRYPTO_KEY,				// 仅用于主控端收到被控端传来的通信密钥和IV时，发此包告知被控端已接收密钥
-
+	CRYPTO_KEY,				// 传递通信密钥和IV
 	LOGIN,					// 上线包
 
-	ECHO,					// 测试
+	ECHO,					// 测试发包
 
 	// 远程SHELL
 	SHELL_CONNECT,			// 被控端新建一条子socket用于远程SHELL
@@ -46,10 +45,29 @@ enum COMMAND_ID {
 	SHELL_CLOSE,			// 关闭SHELL
 
 
-	FILE_TRANSFOR,			// 文件传输
+	// 文件上传
+	FILE_UPLOAD_CONNECT,	// 新建一条socket连接用于文件传输，每条socket只传一个文件就关闭
+	FILE_UPLOAD_DATA,		// 文件上传的数据包（非最后一个）
+	FILE_UPLOAD_DATA_TAIL,	// 文件上传的数据包，最后一个分片
+	FILE_UPLOAD_CLOSE,		// 关闭文件传输
+
+
+	// 文件下载
+	FILE_DOWNLOAD_CONNECT,
+	FILE_DOWNLOAD_DATA,
+	FILE_DOWNLOAD_DATA_TAIL,
+	FILE_DOWNLOAD_CLOSE,
+
+
+	// 文件管理
+	FILE_MANAGE_CONNECT,
+
+
+
 	SCREEN_MONITOR,			// 屏幕监控
 	MESSAGE_BOX,			// 弹窗
 };
+
 
 
 enum CLIENT_STATUS {
@@ -65,7 +83,9 @@ enum CLIENT_STATUS {
 #define CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET (0xCD)
 
 
-
+#ifndef QWORD
+	#define QWORD int64_t
+#endif
 
 
 

