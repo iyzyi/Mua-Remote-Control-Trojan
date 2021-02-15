@@ -7,10 +7,10 @@
 
 class CModule {
 public:
-	CClient*		m_pSocketClient;
+	CSocketClient*		m_pSocketClient;
 
 public:
-	CModule(CClient* pSocketClient);
+	CModule(CSocketClient* pSocketClient);
 	~CModule();
 
 	virtual void OnRecvChildSocketClientPacket(CPacket* pPacket);
@@ -18,5 +18,5 @@ public:
 
 
 
-void RunShellRemote(CClient* pClient);
-void RunFileUpload(CClient* pClient);
+void RunShellRemote(CSocketClient* pClient);
+void RunFileUpload(CSocketClient* pClient);

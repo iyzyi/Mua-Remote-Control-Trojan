@@ -99,6 +99,9 @@
     <ClInclude Include="ModuleFileDownload.h">
       <Filter>头文件\组件-文件传输</Filter>
     </ClInclude>
+    <ClInclude Include="SocketClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -139,6 +142,9 @@
     </ClCompile>
     <ClCompile Include="ModuleFileDownload.cpp">
       <Filter>源文件\组件-文件传输</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketClient.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

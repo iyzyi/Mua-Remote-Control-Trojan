@@ -6,7 +6,7 @@
 
 #include "Packet.h"
 
-CModule::CModule(CClient* pSocketClient) {
+CModule::CModule(CSocketClient* pSocketClient) {
 	m_pSocketClient = pSocketClient;
 	pSocketClient->m_pModule = this;
 }
@@ -26,16 +26,16 @@ void CModule::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 
 
 
-void RunShellRemote(CClient* pClient) {
-	CShellRemote* pDlg = new CShellRemote(nullptr, pClient);				// 创建对话框
-	pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };		// TODO 句柄不知道有木有问题，记得回来检查
+void RunShellRemote(CSocketClient* pSocketClient) {
+	CShellRemote* pDlg = new CShellRemote(nullptr, pSocketClient);				// 创建对话框
+	pSocketClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };		// TODO 句柄不知道有木有问题，记得回来检查
 }
 
 
-void RunFileUpload(CClient* pClient) {
+void RunFileUpload(CSocketClient* pSocketClient) {
 	//CShellRemote* pDlg = new CShellRemote(nullptr, pClient);
 	//pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };
-	theApp.m_pMainWnd->PostMessage(WM_FILE_UPLOAD_CONNECT_SUCCESS, 0, NULL);
+	//theApp.m_pMainWnd->PostMessage(WM_FILE_UPLOAD_CONNECT_SUCCESS, 0, NULL);
 }
 
 

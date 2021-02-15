@@ -5,7 +5,7 @@
 
 class CFileUpload : public  CModule {
 public:
-	CFileUpload(CClient* pClient);
+	CFileUpload(CSocketClient* pClient);
 	~CFileUpload();
 
 	// ÖØÐ´Ðéº¯Êý

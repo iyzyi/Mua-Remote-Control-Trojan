@@ -42,9 +42,11 @@
 //}
 
 
-CPacket::CPacket(CClient* pClient) {
-	m_pClient					= pClient;			// 客户端对象
-	m_dwConnId					= pClient->m_dwConnectId;			// socket连接的ID，HP-Socket用此来抽象不同socket号
+CPacket::CPacket(CSocketClient* pSocketClient) {
+	m_pSocketClient				= pSocketClient;					// 所属socket
+	m_pClient					= m_pSocketClient->m_pClient;		// 所属客户端
+
+	m_dwConnId					= m_pSocketClient->m_dwConnectId;	// socket连接的ID，HP-Socket用此来抽象不同socket号
 
 	m_dwPacketLength			= 0;				// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
 	m_PacketHead				= PACKET_HEAD();	// 包头
@@ -105,7 +107,7 @@ BOOL CPacket::PacketParse(PBYTE pbData, DWORD dwPacketLength) {
 	// 所以这里直接用密文的长度dwPacketLength就足够了
 	m_pbPacketPlaintext = new BYTE[dwPacketLength];
 	DWORD dwPacketCiphertextLength = dwPacketLength;
-	DWORD dwPacketPlaintextLength = m_pClient->m_Crypto.Decrypt(m_pbPacketCiphertext, dwPacketCiphertextLength, m_pbPacketPlaintext);
+	DWORD dwPacketPlaintextLength = m_pSocketClient->m_Crypto.Decrypt(m_pbPacketCiphertext, dwPacketCiphertextLength, m_pbPacketPlaintext);
 	
 	// 封包长度更新为解密后的明文封包的长度
 	m_dwPacketLength = dwPacketPlaintextLength;	
@@ -161,9 +163,9 @@ VOID CPacket::PacketCombine(COMMAND_ID wCommandId, PBYTE pbPacketBody, DWORD dwP
 
 	// 加密封包
 	DWORD dwPacketPlaintextLength = m_dwPacketLength;
-	DWORD dwPacketCiphertextLength = m_pClient->m_Crypto.GetCiphertextLength(dwPacketPlaintextLength);
+	DWORD dwPacketCiphertextLength = m_pSocketClient->m_Crypto.GetCiphertextLength(dwPacketPlaintextLength);
 	m_pbPacketCiphertext = new BYTE[dwPacketCiphertextLength];
-	m_pClient->m_Crypto.Encrypt(m_pbPacketPlaintext, dwPacketPlaintextLength, m_pbPacketCiphertext);
+	m_pSocketClient->m_Crypto.Encrypt(m_pbPacketPlaintext, dwPacketPlaintextLength, m_pbPacketCiphertext);
 
 	// 封包长度更新为加密后的密文长度，此时m_dwPacketBodyLength包体长度用不到，就不更新了。
 	m_dwPacketLength = dwPacketCiphertextLength;

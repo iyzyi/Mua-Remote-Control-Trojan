@@ -12,7 +12,7 @@
 
 IMPLEMENT_DYNAMIC(CShellRemote, CDialogEx)
 
-CShellRemote::CShellRemote(CWnd* pParent /*=nullptr*/, CClient* pClient /*= nullptr*/)
+CShellRemote::CShellRemote(CWnd* pParent /*=nullptr*/, CSocketClient* pClient /*= nullptr*/)
 	: CDialogEx(IDD_DIALOG2, pParent), CModule(pClient)
 {
 	//m_pClient = pClient;
@@ -81,7 +81,7 @@ void CShellRemote::OnBnClickedButton1()
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
 	theApp.m_Server.SendPacket(m_pSocketClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
 
-	printf("IsConnected = %d\n", theApp.m_Server.m_pServer->IsConnected(m_pSocketClient->m_dwConnectId));
+	printf("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
 }
 
 
@@ -90,7 +90,7 @@ void CShellRemote::OnBnClickedButton1()
 
 // 重写虚函数
 void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
-	CClient* pClient = pPacket->m_pClient;
+	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
 
@@ -152,7 +152,7 @@ BOOL CShellRemote::PreTranslateMessage(MSG* pMsg)
 void CShellRemote::OnClose() {
 
 	DWORD dwConnectId = m_pSocketClient->m_dwConnectId;
-	theApp.m_Server.m_pServer->Disconnect(dwConnectId);		// 断开这条子socket
+	theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId);		// 断开这条子socket
 
 	CDialogEx::OnClose();
 }

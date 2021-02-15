@@ -15,7 +15,7 @@ class CShellRemote : public CDialogEx, public CModule
 	DECLARE_DYNAMIC(CShellRemote)
 
 public:
-	CShellRemote(CWnd* pParent = nullptr, CClient* pClient = nullptr);   // 标准构造函数
+	CShellRemote(CWnd* pParent = nullptr, CSocketClient* pClient = nullptr);   // 标准构造函数
 	virtual ~CShellRemote();
 
 // 对话框数据

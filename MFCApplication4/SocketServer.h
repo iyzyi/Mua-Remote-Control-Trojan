@@ -10,6 +10,8 @@
 typedef void (CALLBACK* NOTIFYPROC)(CPacket *Packet);		// NOTIFYPROC: 通知程序，是回调函数
 
 
+class CClientManage;
+
 
 // 继承自CTcpServerListener
 class CSocketServer : public CTcpServerListener {
@@ -19,7 +21,7 @@ public:
 	~CSocketServer();
 
 	BOOL SendPacket(CONNID dwConnectId, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
-	BOOL SendPacket(CClient* pClient, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
+	BOOL SendPacket(CSocketClient* pClient, COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 	VOID SendPacketToAllClient(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwLength);
 
 	BOOL StartSocketServer(LPCTSTR lpszIpAddress, USHORT wPort);
@@ -28,14 +30,16 @@ public:
 	BOOL IsRunning();
 
 public:
-	CTcpPackServerPtr			m_pServer;
+	CTcpPackServerPtr			m_pTcpPackServer;
 
 	//NOTIFYPROC					m_pfnMainSocketRecvPacket;	// 回调函数，主socket接收到的有效封包均传给这个函数处理，
 															// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
 
 	//NOTIFYPROC					m_pfnChildSocketRecvPacket;	// 处理子函数接收到的有效封包
 
-	CClientManage				m_ClientManage;
+	CClientManage*				m_pClientManage;
+
+	//CRITICAL_SECTION		m_Lock;					// 链表操作的锁
 
 protected:
 	BOOL						m_bIsRunning;

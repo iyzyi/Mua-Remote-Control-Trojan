@@ -94,7 +94,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 
 	// 我自己添加的消息处理
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
-	ON_MESSAGE(WM_CLIENT_DISCONNECT, OnClientDisconnect)
+	ON_MESSAGE(WM_SOCKET_CLIENT_DISCONNECT, OnSocketClientDisconnect)
 
 //	ON_MESSAGE(WM_RECV_SHELL_CONNECT_PACKET, OnRecvShellConnectPacket)
 
@@ -311,7 +311,7 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 		BOOL bRet = theApp.m_Server.StartSocketServer(lpszIpAddress, wPort);
 		if (!bRet) {
 			WCHAR pszErrorDesc[512];
-			MultiByteToWideChar(CP_ACP, 0, (LPCCH)theApp.m_Server.m_pServer->GetLastErrorDesc(), -1, (LPWSTR)pszErrorDesc, 512);
+			MultiByteToWideChar(CP_ACP, 0, (LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), -1, (LPWSTR)pszErrorDesc, 512);
 			MessageBox((LPWSTR)pszErrorDesc, L"启动SocketServer失败", 0);
 		}
 		else {
@@ -346,11 +346,11 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	CPacket* pPacket = (CPacket*)lParam;
 	LOGIN_INFO LoginInfo(pPacket->m_pbPacketBody);
 
-	CHAR szConnectId[15];
-	_itoa_s(pPacket->m_pClient->m_dwConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
+	//CHAR szConnectId[15];
+	//_itoa_s(pPacket->m_pClient->m_dwConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
 
 	CHAR szPort[10];
-	_itoa_s(pPacket->m_pClient->m_wPort, szPort, 10);
+	_itoa_s(pPacket->m_pSocketClient->m_wPort, szPort, 10);
 
 	USES_CONVERSION;									// 使用A2W之前先声明这个
 
@@ -376,19 +376,18 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 }
 
 
-// 与客户端(包括主socket和子socket)的连接中断
-afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lParam) {
-
+// socket连接中断(包括主socket和子socket)
+afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPARAM lParam) {
 	CONNID dwConnectId = (CONNID)wParam;
 
-	// 找到该ConnectId对应的Client对象
-	CClient* pClient = theApp.m_Server.m_ClientManage.SearchClient(dwConnectId);
-	ASSERT(pClient != NULL);			// pClient肯定不为NULL
+	// 找到该ConnectId对应的CSocketClient对象
+	CSocketClient* pSocketClient = theApp.m_Server.m_pClientManage->SearchSocketClient(dwConnectId);
+	ASSERT(pSocketClient != NULL);
 
 	CClient* pClientTemp = NULL;
 
-	// 如果是主socket，那么从ListCtrl列表中删掉该客户端的信息
-	if (pClient->m_bIsMainSocketServer){
+	// 如果是主socket，那么从ListCtrl列表中删掉该客户端的信息，并令其所有子socket断开连接
+	if (pSocketClient->m_bIsMainSocketServer) {
 		DWORD dwIndex;
 		for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
 			// 获取所枚举的这一行的额外信息，pClient
@@ -399,23 +398,82 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 			pClientTemp = (CClient*)lvitemData.lParam;
 
 			// 确定要删除的那行的索引，并删除这一行
-			if (dwConnectId == pClientTemp->m_dwConnectId) {
+			if (dwConnectId == pClientTemp->m_pMainSocketClient->m_dwConnectId) {
 				m_ListCtrl.DeleteItem(dwIndex);
-				//MessageBox(L"下线！");
 				break;
 			}
 		}
+
+		// 令其所有子socket断开连接（仅disconnect，并没有析构之类的）
+		pClientTemp->DisConnectedAllChildSocketClient();
+
+		// 从CClientManage链表中删除此CClient（有析构m_pMainSocketClient）
+		theApp.m_Server.m_pClientManage->DeleteClientFromList(pClientTemp);
+
 	}
-	// 如果是子socket，则关闭相应的打开的对话框。
+	// 子socket
 	else {
-		((CDialogEx*)(pClient->m_DialogInfo.pClassAddress))->SendMessage(WM_CLOSE);
+
+		// 关闭相应的打开的对话框。
+		CDialogEx* DialogExTemp = ((CDialogEx*)(pSocketClient->m_DialogInfo.pClassAddress));
+		if (DialogExTemp != nullptr) {
+			DialogExTemp->SendMessage(WM_CLOSE);
+		}
+
+		// 从CClient的链表中删除此CSocketClient。仅删结点，无析构。
+		__try {
+			// 下面的判断其实根本没有用，m_pClient析构的时候，delete的哪个指针被我手动置nullptr了，
+			// 但是这个pSocketClient对象中的m_pClient早就把这个指针拷贝了一份，这个没置nullptr，由此指针悬空。
+			// 查了下，也没有什么很好的解决方案，先暂时捕捉异常吧，以后可能改成智能指针之类的。 TODO 
+			if (pSocketClient->m_pClient != nullptr) {
+				pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
+			}
+		}
+		__finally{}
+
+		// 从CClientManage的链表中删除此CSocketClient。有析构
+		theApp.m_Server.m_pClientManage->DeleteChildSocketClientFromList(pSocketClient->m_dwConnectId);
 	}
-	
-	// 从Client链表中删掉这个Client，包括delete之类的清理工作
-	theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
-	
 	return 0;
 }
+
+
+	//CONNID dwConnectId = (CONNID)wParam;
+
+	//// 找到该ConnectId对应的Client对象
+	//CSocketClient* pClient = theApp.m_Server.m_ClientManage.SearchClient(dwConnectId);
+	//ASSERT(pClient != NULL);			// pClient肯定不为NULL
+
+	//CSocketClient* pClientTemp = NULL;
+
+	//// 如果是主socket，那么从ListCtrl列表中删掉该客户端的信息
+	//if (pClient->m_bIsMainSocketServer){
+	//	DWORD dwIndex;
+	//	for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
+	//		// 获取所枚举的这一行的额外信息，pClient
+	//		LV_ITEM  lvitemData = { 0 };
+	//		lvitemData.mask = LVIF_PARAM;
+	//		lvitemData.iItem = dwIndex;
+	//		m_ListCtrl.GetItem(&lvitemData);
+	//		pClientTemp = (CSocketClient*)lvitemData.lParam;
+
+	//		// 确定要删除的那行的索引，并删除这一行
+	//		if (dwConnectId == pClientTemp->m_dwConnectId) {
+	//			m_ListCtrl.DeleteItem(dwIndex);
+	//			//MessageBox(L"下线！");
+	//			break;
+	//		}
+	//	}
+	//}
+	//// 如果是子socket，则关闭相应的打开的对话框。
+	//else {
+	//	((CDialogEx*)(pClient->m_DialogInfo.pClassAddress))->SendMessage(WM_CLOSE);
+	//}
+	//
+	//// 从Client链表中删掉这个Client，包括delete之类的清理工作
+	//theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
+	//
+	//return 0;
 
 
 //// 收到SHELL_CONNECT封包时创建相应的对话框
@@ -435,14 +493,14 @@ afx_msg LRESULT CMFCApplication4Dlg::OnClientDisconnect(WPARAM wParam, LPARAM lP
 //void CALLBACK CMFCApplication4Dlg::MainSocketRecvPacket(CPacket *pPacket) {
 //	printf("回调MainSocketRecvPacket\n");
 //
-//	switch (pPacket->m_pClient->m_dwClientStatus) {			// 客户端的不同状态
+//	switch (pPacket->m_pClient->m_dwSocketClientStatus) {			// 客户端的不同状态
 //
 //	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
 //			
 //		// 这个阶段，只要不是上线包，通通丢弃。
 //		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
 //			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
-//			pPacket->m_pClient->m_dwClientStatus = LOGINED;
+//			pPacket->m_pClient->m_dwSocketClientStatus = LOGINED;
 //			theApp.m_Server.SendPacket(pPacket->m_pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
 //		}
 //
@@ -533,10 +591,14 @@ afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 			if (pClient != NULL) {
-				// 先删掉与之IP相同的子socket
-				theApp.m_Server.m_ClientManage.DeleteAllChildClientByOneIP(pClient);
-				// 再删掉这个选中的主socket
-				theApp.m_Server.m_pServer->Disconnect(pClient->m_dwConnectId);
+				// 删掉所有子socket
+				//pClient->DeleteAllSocketClientFromList();
+				// 删掉此客户端
+				//delete pClient;
+
+				// 上面的处理和OnClose()时的处理冲突了，所以这里改成仅关闭socket连接，
+				// 然后OnClose()时再做相应的删链表以及析构相关对象的处理
+				theApp.m_Server.m_pTcpPackServer->Disconnect(pClient->m_pMainSocketClient->m_dwConnectId);
 			}
 		}
 	}
@@ -583,7 +645,7 @@ void CMFCApplication4Dlg::OnTouchTestEcho()
 					"need each other. To me, you will be unique in all the world. To you, I "\
 					"shall be unique in all the world.";
 
-				theApp.m_Server.SendPacket(pClient, ECHO, (PBYTE)pszText, strlen(pszText));
+				theApp.m_Server.SendPacket(pClient->m_pMainSocketClient, ECHO, (PBYTE)pszText, strlen(pszText));
 			}
 		}
 	}
@@ -612,7 +674,7 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE p
 
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 			if (pClient != NULL) {
-				theApp.m_Server.SendPacket(pClient, Command, pbPacketBody, dwPacketBodyLength);		// 发送命令包（只有包头没有包体）
+				theApp.m_Server.SendPacket(pClient->m_pMainSocketClient, Command, pbPacketBody, dwPacketBodyLength);		// 发送命令包（只有包头没有包体）
 			}
 		}
 	}
@@ -629,18 +691,18 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE p
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam) {
 	printf("OnPostMsgRecvMainSocketClientPacket\n");
 	CPacket* pPacket = (CPacket*)lParam;
-	CClient* pClient = pPacket->m_pClient;
+	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
 
 
-	switch (pClient->m_dwClientStatus) {			// 客户端的不同状态
+	switch (pSocketClient->m_dwSocketClientStatus) {			// 客户端的不同状态
 
 	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
 
 		// 这个阶段，只要不是上线包，通通丢弃。
 		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
 			PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
-			pClient->m_dwClientStatus = LOGINED;
-			theApp.m_Server.SendPacket(pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
+			pSocketClient->m_dwSocketClientStatus = LOGINED;
+			theApp.m_Server.SendPacket(pSocketClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
 		}
 		
 		break;
@@ -674,17 +736,17 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM 
 
 // 处理子socket发来的第一个封包，比如SHELL_CONNECT包，返回是否处理了该包
 BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
-	CClient* pClient = pPacket->m_pClient;
-	CModule* pModule = pClient->m_pModule;
+	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
+	CModule* pModule = pSocketClient->m_pModule;
 
 	switch (pPacket->m_PacketHead.wCommandId) {
 
 	case SHELL_CONNECT:
-		RunShellRemote(pClient);
+		RunShellRemote(pSocketClient);
 		break;
 		
 	case FILE_UPLOAD_CONNECT:
-		RunFileUpload(pClient);
+		RunFileUpload(pSocketClient);
 		break;
 
 	default:
@@ -698,8 +760,8 @@ BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam) {
 	printf("OnPostMsgRecvChildSocketClientPacket\n");
 	CPacket* pPacket = (CPacket*)lParam;
-	CClient* pClient = pPacket->m_pClient;
-	CModule* pModule = pClient->m_pModule;
+	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
+	CModule* pModule = pSocketClient->m_pModule;
 
 	BOOL bRet = ProcessConnectPacket(pPacket);				// CONNECT包。因为涉及初始化，所以必须单独拿出来处理
 	
@@ -747,5 +809,5 @@ void CMFCApplication4Dlg::OnTestFileUpload()
 
 	ProcessRClickSelectCommand(FILE_UPLOAD_CONNECT, (PBYTE)pbPacketBody, FILE_UPLOAD_PACKET_BODY_LENGTH);
 
-	WaitForSingleObject(m_FileUploadConnectSuccessEvent, INFINITE);
+	//WaitForSingleObject(m_FileUploadConnectSuccessEvent, INFINITE);
 }
