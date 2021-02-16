@@ -142,4 +142,12 @@ typedef struct _DIALOG_INFO {
 
 
 
+#ifdef _DEBUG
+	#define DebugPrint(...) printf(__VA_ARGS__)
+#else
+	#define DebugPrint(...) 
+#endif
+
+
+
 #endif //PCH_H

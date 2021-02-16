@@ -726,7 +726,7 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE p
 
 // 主socket收到packet时，通过PostMessage传递消息后调用
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam) {
-	printf("OnPostMsgRecvMainSocketClientPacket\n");
+	DebugPrint("OnPostMsgRecvMainSocketClientPacket\n");
 	CPacket* pPacket = (CPacket*)lParam;
 	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
 
@@ -749,7 +749,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM 
 		switch (pPacket->m_PacketHead.wCommandId) {
 
 		case ECHO:
-			printf("接收到ECHO回显包，明文内容如下：\n");
+			DebugPrint("接收到ECHO回显包，明文内容如下：\n");
 			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
 			break;
 
@@ -800,7 +800,7 @@ BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 
 // 子socket收到packet时，通过PostMessage传递消息后调用
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam) {
-	printf("OnPostMsgRecvChildSocketClientPacket\n");
+	DebugPrint("OnPostMsgRecvChildSocketClientPacket\n");
 	CPacket* pPacket = (CPacket*)lParam;
 
 	BOOL bRet = ProcessConnectPacket(pPacket);											// CONNECT包。因为涉及初始化，所以必须单独拿出来处理

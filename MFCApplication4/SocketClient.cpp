@@ -179,7 +179,7 @@ VOID CClient::AddNewChildSocketClientToList(CSocketClient *pSocketClient) {
 	
 #ifdef _DEBUG
 	USES_CONVERSION;
-	printf("[子socket上线 - %s:%d] 本IP共%d条子socket连接\n",
+	DebugPrint("[子socket上线 - %s:%d] 本IP共%d条子socket连接\n",
 		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 
@@ -225,7 +225,7 @@ VOID CClient::DeleteChildSocketClientFromList(CSocketClient *pSocketClient) {
 
 #ifdef _DEBUG
 	USES_CONVERSION;			// 使用A2W之前先声明这个
-	printf("[子socket下线 - %s:%d] 本IP共%d条子socket连接\n",
+	DebugPrint("[子socket下线 - %s:%d] 本IP共%d条子socket连接\n",
 		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 

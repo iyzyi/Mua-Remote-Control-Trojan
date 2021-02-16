@@ -63,7 +63,7 @@ VOID CClientManage::AddNewClientToList(CClient *pClient) {
 		
 #ifdef _DEBUG
 	USES_CONVERSION;
-	printf("[主socket上线 - %s:%d] 当前共有%d个客户端(主socket)在线\n",
+	DebugPrint("[主socket上线 - %s:%d] 当前共有%d个客户端(主socket)在线\n",
 		W2A(pClient->m_pMainSocketClient->m_lpszIpAddress), pClient->m_pMainSocketClient->m_wPort, m_dwClientNum);
 #endif
 
@@ -101,7 +101,7 @@ VOID CClientManage::DeleteClientFromList(CClient *pClient) {
 
 #ifdef _DEBUG
 	USES_CONVERSION;			// 使用A2W之前先声明这个
-	printf("[主socket下线 - %s:%d] 当前共有%d个客户端(主socket)在线\n",
+	DebugPrint("[主socket下线 - %s:%d] 当前共有%d个客户端(主socket)在线\n",
 		W2A(pClient->m_pMainSocketClient->m_lpszIpAddress), pClient->m_pMainSocketClient->m_wPort, m_dwClientNum);
 #endif
 

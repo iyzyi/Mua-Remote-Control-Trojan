@@ -43,7 +43,7 @@ BOOL CSocketServer::StartSocketServer(LPCTSTR lpszIpAddress, USHORT wPort) {
 
 #ifdef _DEBUG
 		USES_CONVERSION;									// 使用A2W之前先声明这个
-		printf("Socket服务端启动成功，IP=%s, PORT=%d\n", W2A(lpszIpAddress), wPort);
+		DebugPrint("Socket服务端启动成功，IP=%s, PORT=%d\n", W2A(lpszIpAddress), wPort);
 #endif
 
 		// 设置回调函数
@@ -113,32 +113,32 @@ BOOL CSocketServer::IsRunning() {
 // 回调函数的实现
 
 EnHandleResult CSocketServer::OnPrepareListen(ITcpServer* pSender, SOCKET soListen) {
-	printf("OnPrepareListen: \n");
+	DebugPrint("OnPrepareListen: \n");
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketServer::OnAccept(ITcpServer* pSender, CONNID dwConnID, SOCKET soClient) {
-	printf("[Client %d] OnAccept: \n", dwConnID);
+	DebugPrint("[Client %d] OnAccept: \n", dwConnID);
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) {
-	printf("[Client %d] OnHandShake: \n", dwConnID);
+	DebugPrint("[Client %d] OnHandShake: \n", dwConnID);
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnSend: \n", dwConnID);
+	DebugPrint("[Client %d] OnSend: \n", dwConnID);
 	//PrintData((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnReceive: \n", dwConnID);
+	DebugPrint("[Client %d] OnReceive: \n", dwConnID);
 	PrintData((PBYTE)pData, iLength);
 	
 	CSocketClient* pSocketClient = m_pClientManage->SearchSocketClient(dwConnID);
@@ -216,7 +216,7 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 
 
 EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
-	printf("[Client %d] OnClose: \n", dwConnID);
+	DebugPrint("[Client %d] OnClose: \n", dwConnID);
 
 	// 包括主socket和子socket
 	// 最后直接关闭主窗口时，theApp.m_pMainWnd就是nullptr了，不能也无需再传消息了
@@ -229,7 +229,7 @@ EnHandleResult CSocketServer::OnClose(ITcpServer* pSender, CONNID dwConnID, EnSo
 
 
 EnHandleResult CSocketServer::OnShutdown(ITcpServer* pSender) {
-	printf("OnShutdown: \n");
-	printf("Socket服务端关闭成功\n");
+	DebugPrint("OnShutdown: \n");
+	DebugPrint("Socket服务端关闭成功\n");
 	return HR_OK;
 }

@@ -81,7 +81,7 @@ void CShellRemote::OnBnClickedButton1()
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
 	theApp.m_Server.SendPacket(m_pSocketClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
 
-	printf("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
+	DebugPrint("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
 }
 
 
