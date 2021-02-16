@@ -117,10 +117,16 @@ DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
 
 	pChildSocketClient->WaitForExitEvent();
 
-	if (pChildSocketClient != nullptr) {
-		delete pChildSocketClient;
-		pChildSocketClient = nullptr;
+	if (pModule != nullptr) {
+		delete pModule;
+		pModule = nullptr;
 	}
+
+	// pModule的析构中有析构pChildSocketClient
+	//if (pChildSocketClient != nullptr) {
+	//	delete pChildSocketClient;
+	//	pChildSocketClient = nullptr;
+	//}
 
 	if (pPacket != nullptr) {
 		delete pPacket;

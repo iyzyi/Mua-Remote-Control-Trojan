@@ -33,6 +33,10 @@ CModuleFileUpload::~CModuleFileUpload() {
 		CloseHandle(m_hWritingEvent);
 		m_hWritingEvent = nullptr;
 	}
+	if (m_hFile) {
+		CloseHandle(m_hFile);
+		m_hFile = nullptr;
+	}
 }
 
 
