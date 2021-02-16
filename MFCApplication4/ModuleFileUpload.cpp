@@ -178,6 +178,8 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 
 	WaitForSingleObject(pFileUpload->m_hRecvPacketFileUploadCloseEvent, INFINITE);
 
+	theApp.m_Server.m_pTcpPackServer->Disconnect(pSocketClient->m_dwConnectId);
+
 	if (pFileUpload != nullptr) {
 		delete pFileUpload;
 		pFileUpload = nullptr;
