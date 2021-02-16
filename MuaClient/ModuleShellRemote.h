@@ -8,6 +8,7 @@ class CSocketClient;
 
 class CModuleShellRemote : public CModule {
 
+
 public:
 	CModuleShellRemote(CSocketClient* pSocketClient);
 	~CModuleShellRemote();

@@ -158,6 +158,7 @@
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="ModuleFileUpload.cpp" />
     <ClCompile Include="ModuleManage.cpp" />
     <ClCompile Include="MuaClient.cpp" />
     <ClCompile Include="Packet.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Infect.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="ModuleFileUpload.h" />
     <ClInclude Include="ModuleManage.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
@@ -190,7 +192,7 @@
     <ClInclude Include="SocketClientManage.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="infect.cpp" />
+    <None Include="Infect.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,10 +14,12 @@ VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen);
 
 BOOL IsLittleEndding();
 
+QWORD GetQwordFromBuffer(PBYTE pbData, DWORD dwPos);
 DWORD GetDwordFromBuffer(PBYTE pbData, DWORD dwPos = 0);
 WORD GetWordFromBuffer(PBYTE pbData, DWORD dwPos = 0);
 BYTE GetByteFromBuffer(PBYTE pbData, DWORD dwPos = 0);
 
+VOID WriteQwordToBuffer(PBYTE pbData, QWORD qwNum, DWORD dwPos);
 VOID WriteDwordToBuffer(PBYTE pbData, DWORD dwNum, DWORD dwPos = 0);
 VOID WriteWordToBuffer(PBYTE pbData, WORD wNum, DWORD dwPos = 0);
 VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos = 0);

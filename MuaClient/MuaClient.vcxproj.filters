@@ -28,6 +28,12 @@
     <Filter Include="头文件\组件-远程SHELL">
       <UniqueIdentifier>{3fa900b4-9ed9-4fdc-807f-3b97242bb080}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\组件-文件传输">
+      <UniqueIdentifier>{ef89c3ce-3bcb-490f-825a-d72be53791b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\组件-文件传输">
+      <UniqueIdentifier>{a959a91b-eb3c-4726-9d70-ea84099180eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MuaClient.cpp">
@@ -65,6 +71,9 @@
     </ClCompile>
     <ClCompile Include="AntiAntiVirus.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleFileUpload.cpp">
+      <Filter>源文件\组件-文件传输</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +125,12 @@
     <ClInclude Include="AntiAntiVirus.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ModuleFileUpload.h">
+      <Filter>头文件\组件-文件传输</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="infect.cpp">
+    <None Include="Infect.cpp">
       <Filter>源文件</Filter>
     </None>
   </ItemGroup>

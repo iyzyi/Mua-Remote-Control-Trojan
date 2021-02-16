@@ -18,7 +18,7 @@ class CSocketClient;
 #define PACKET_MAX_LENGTH 0x3FFFFF
 
 // 包体最大长度。最后减去的DWORD是开头的4字节封包长度
-#define PACKET_BODY_MAX_LENGTH ((PACKET_MAX_LENGTH) - (PACKET_HEAD_LENGTH) - sizeof(DWORD))
+#define PACKET_BODY_MAX_LENGTH ((PACKET_MAX_LENGTH) - (PACKET_HEAD_LENGTH) - sizeof(DWORD) - 0x1000)
 
 
 
