@@ -73,6 +73,7 @@ void CModuleFileUpload::OnRecvivePacket(CPacket* pPacket) {
 	case FILE_UPLOAD_CLOSE:
 		m_pChildSocketClient->SendPacket(FILE_UPLOAD_CLOSE, NULL, 0);
 		SetEvent(m_hRecvPacketFileUploadCloseEvent);
+		delete pPacketCopy;		// pPacket被外面的函数的__finally delete
 		break;
 	}
 }
@@ -160,4 +161,5 @@ VOID WINAPI OnRecvPacketFileUploadData(LPVOID lParam) {
 		break;
 	}
 
+	delete pPacket;
 }

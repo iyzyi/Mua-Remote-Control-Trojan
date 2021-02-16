@@ -27,7 +27,7 @@ int main()
 void MainFunc(CSocketClient* pMainSocketClient) {
 	__try {
 		if (!pMainSocketClient->m_pTcpPackClient->IsConnected()) {
-			printf("正在重连服务端.....\n");
+			DebugPrint("正在重连服务端.....\n");
 			pMainSocketClient->StartSocketClient();
 		}
 		Sleep(1000);			// 若未在线，则3秒重试一次。
@@ -35,6 +35,6 @@ void MainFunc(CSocketClient* pMainSocketClient) {
 	__except (EXCEPTION_EXECUTE_HANDLER){
 		pMainSocketClient->m_pTcpPackClient->Stop();
 		MessageBox(0, L"无视异常，重连服务端", L"无视异常，重连服务端", 0);
-		printf("无视异常，重连服务端\n");				// TODO：之后可以改成重启此程序
+		DebugPrint("无视异常，重连服务端\n");				// TODO：之后可以改成重启此程序
 	}
 }

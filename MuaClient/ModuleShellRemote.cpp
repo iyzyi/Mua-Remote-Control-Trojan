@@ -75,7 +75,7 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 
 	// 创建进程，执行cmd命令
 	if (!CreateProcess(NULL, pszExecuteCommand, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)) {
-		printf("error = 0x%x\n", GetLastError());
+		DebugPrint("error = 0x%x\n", GetLastError());
 		goto Clean;
 	}
 

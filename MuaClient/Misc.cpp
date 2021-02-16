@@ -23,56 +23,56 @@ VOID RandomBytes(LPBYTE pbData, DWORD dwDataLen) {
 VOID PrintBytes(LPBYTE pbPrintData, DWORD dwDataLen)
 {
 	for (DWORD dwCount = 0; dwCount < dwDataLen; dwCount++) {
-		printf("0x%02x ", pbPrintData[dwCount]);
+		DebugPrint("0x%02x ", pbPrintData[dwCount]);
 		if (0 == (dwCount + 1) % 0x10) {
-			putchar('\n');
+			DebugPrint("\n");
 		}
 	}
-	putchar('\n');
+	DebugPrint("\n");
 }
 
 
 VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen) {
 	for (DWORD dwCount = 0; dwCount < dwDataLen; dwCount++) {
-		printf("%c", pbPrintData[dwCount]);
+		DebugPrint("%c", pbPrintData[dwCount]);
 	}
-	putchar('\n');
+	DebugPrint("\n");
 }
 
 
 VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen)
 {
 	if (dwDataLen > 256) {
-		printf("共%d字节，出于效率考虑，仅打印前256字节\n", dwDataLen);
+		DebugPrint("共%d字节，出于效率考虑，仅打印前256字节\n", dwDataLen);
 		dwDataLen = 256;
 	}
 
 	DWORD dwRow = 0, dwColumn = 0;
 	for (dwRow = 0; dwRow < dwDataLen / 16 + 1; dwRow++) {
 		for (dwColumn = 0; (dwRow * 16 + dwColumn < dwDataLen) && (dwColumn < 16); dwColumn++) {
-			printf("0x%02x ", pbPrintData[dwRow * 16 + dwColumn]);
+			DebugPrint("0x%02x ", pbPrintData[dwRow * 16 + dwColumn]);
 		}
 
 		if (dwColumn != 16) {
 			while (dwColumn < 16) {
-				printf("     ");
+				DebugPrint("     ");
 				dwColumn++;
 			}
 		}
-		printf("\t");
+		DebugPrint("\t");
 
 		for (dwColumn = 0; (dwRow * 16 + dwColumn < dwDataLen) && (dwColumn < 16); dwColumn++) {
 			DWORD dwIndex = dwRow * 16 + dwColumn;
 			if (pbPrintData[dwIndex] >= 32 && pbPrintData[dwIndex] <= 126) {
-				printf("%c", pbPrintData[dwIndex]);
+				DebugPrint("%c", pbPrintData[dwIndex]);
 			}
 			else {
-				printf(".");
+				DebugPrint(".");
 			}
 		}
-		printf("\n");
+		DebugPrint("\n");
 	}
-	printf("\n");
+	DebugPrint("\n");
 }
 
 

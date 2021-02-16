@@ -102,7 +102,7 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	}
 
 	Sleep(500);
-	printf("退出RunModuleShellRemote线程\n");
+	DebugPrint("退出RunModuleShellRemote线程\n");
 	return 0;
 }
 
@@ -134,6 +134,6 @@ DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
 	}
 
 	Sleep(500);
-	printf("退出RunModuleFileUpload线程\n");
+	DebugPrint("退出RunModuleFileUpload线程\n");
 	return 0;
 }

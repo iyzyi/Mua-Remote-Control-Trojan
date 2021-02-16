@@ -113,7 +113,7 @@ BOOL CSocketClient::StartSocketClient() {
 	// 向主控端发送密钥
 	bRet = m_pTcpPackClient->Send(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	if (bRet) {
-		printf("成功向服务器发送通信密钥:\n");
+		DebugPrint("成功向服务器发送通信密钥:\n");
 		PrintData(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
 	}
 
@@ -155,28 +155,28 @@ void CSocketClient::DisconnectChildSocketClient() {
 // 回调函数
 
 EnHandleResult CSocketClient::OnPrepareConnect(ITcpClient* pSender, CONNID dwConnID, SOCKET socket) {
-	printf("[Client %d] OnPrepareConnect: \n", dwConnID);
+	DebugPrint("[Client %d] OnPrepareConnect: \n", dwConnID);
 
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketClient::OnConnect(ITcpClient* pSender, CONNID dwConnID) {
-	printf("[Client %d] OnConnect: \n", dwConnID);
+	DebugPrint("[Client %d] OnConnect: \n", dwConnID);
 
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) {
-	printf("[Client %d] OnHandShake: \n", dwConnID);
+	DebugPrint("[Client %d] OnHandShake: \n", dwConnID);
 
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnSend: \n", dwConnID);
+	DebugPrint("[Client %d] OnSend: \n", dwConnID);
 	PrintData((PBYTE)pData, iLength);
 
 	return HR_OK;
@@ -184,7 +184,7 @@ EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const
 
 
 EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	printf("[Client %d] OnReceive: \n", dwConnID);
+	DebugPrint("[Client %d] OnReceive: \n", dwConnID);
 
 	PrintData((PBYTE)pData, iLength);
 
@@ -244,7 +244,7 @@ VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
 			if (!bHaveProcess) {
 				switch (pPacket->m_PacketHead.wCommandId) {
 				case ECHO:
-					printf("接收到ECHO测试包，明文内容如下：\n");
+					DebugPrint("接收到ECHO测试包，明文内容如下：\n");
 					PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
 
 					// 再把这个明文发回给主控端（即服务端），以完成ECHO测试
@@ -272,7 +272,7 @@ VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
 
 
 EnHandleResult CSocketClient::OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
-	printf("[Client %d] OnClose: \n", dwConnID);
+	DebugPrint("[Client %d] OnClose: \n", dwConnID);
 
 	if (!m_bIsMainSocketClient) {
 		DisconnectChildSocketClient();
