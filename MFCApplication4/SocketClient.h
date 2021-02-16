@@ -85,6 +85,16 @@ public:
 	CClient*				m_pLastClient;
 	CClient*				m_pNextClient;
 
+public:
+	HANDLE					m_FileUploadConnectSuccessEvent;	// 收到客户端发来的FILL_UPLOAD_CONNECT包时触发此事件
+	HANDLE					m_FileDownloadConnectSuccessEvent;
+
+
+
+	// 暂存某一次收到CONNECT包时的CSocketClient
+	CSocketClient*			m_pFileUploadConnectSocketClientTemp;
+	CSocketClient*			m_pFileDownloadConnectSocketClientTemp;
+
 
 private:
 	CRITICAL_SECTION		m_Lock;								// 链表操作的锁

@@ -79,9 +79,12 @@ CClient::CClient(CSocketClient* pSocketClient) {
 
 	InitializeCriticalSection(&m_Lock);
 
-	// 第二个参数表示手动重置事件
-	m_hNoChildSocketClientEvent = CreateEvent(NULL, true, false, NULL);
-	SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
+	// 第二个参数表示手动重置事件, 第三个参数设置初始状态为信号状态
+	m_hNoChildSocketClientEvent = CreateEvent(NULL, true, true, NULL);
+	//SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
+
+	// 自动重置事件，初始状态无信号
+	m_FileUploadConnectSuccessEvent = CreateEvent(NULL, false, false, NULL);
 }
 
 
@@ -96,8 +99,9 @@ CClient::CClient() {
 
 	InitializeCriticalSection(&m_Lock);
 
-	m_hNoChildSocketClientEvent = CreateEvent(NULL, true, false, NULL);
-	SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
+	m_hNoChildSocketClientEvent = nullptr;
+
+	m_FileUploadConnectSuccessEvent = nullptr;
 }
 
 
@@ -117,6 +121,11 @@ CClient::~CClient() {
 	if (m_hNoChildSocketClientEvent != nullptr) {
 		CloseHandle(m_hNoChildSocketClientEvent);
 		m_hNoChildSocketClientEvent = nullptr;
+	}
+
+	if (m_FileUploadConnectSuccessEvent != nullptr) {
+		CloseHandle(m_FileUploadConnectSuccessEvent);
+		m_FileUploadConnectSuccessEvent = nullptr;
 	}
 }
 

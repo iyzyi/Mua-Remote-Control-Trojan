@@ -8,10 +8,12 @@
 class CModule {
 public:
 	CSocketClient*		m_pSocketClient;
+	CClient*			m_pClient;
 
 public:
 	CModule(CSocketClient* pSocketClient);
 	~CModule();
+	VOID InitModule(CSocketClient* pSocketClient);
 
 	virtual void OnRecvChildSocketClientPacket(CPacket* pPacket);
 };

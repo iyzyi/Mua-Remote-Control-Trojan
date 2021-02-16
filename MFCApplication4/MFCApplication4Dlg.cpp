@@ -10,6 +10,7 @@
 #include "ModuleShellRemote.h"
 #include "resource.h"
 #include "ModuleManage.h"
+#include "ModuleFileUpload.h"
 
 #include "Misc.h"
 
@@ -772,17 +773,22 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM 
 
 // 处理子socket发来的第一个封包，比如SHELL_CONNECT包，返回是否处理了该包
 BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
+
 	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
-	CModule* pModule = pSocketClient->m_pModule;
+	//CModule* pModule = pSocketClient->m_pModule;
+	CClient* pClient = pPacket->m_pClient;
 
 	switch (pPacket->m_PacketHead.wCommandId) {
 
 	case SHELL_CONNECT:
 		RunShellRemote(pSocketClient);
+
 		break;
 		
 	case FILE_UPLOAD_CONNECT:
-		RunFileUpload(pSocketClient);
+		//RunFileUpload(pSocketClient);
+		pClient->m_pFileUploadConnectSocketClientTemp = pSocketClient;
+		SetEvent(pClient->m_FileUploadConnectSuccessEvent);
 		break;
 
 	default:
@@ -796,14 +802,12 @@ BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam) {
 	printf("OnPostMsgRecvChildSocketClientPacket\n");
 	CPacket* pPacket = (CPacket*)lParam;
-	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
-	CModule* pModule = pSocketClient->m_pModule;
 
-	BOOL bRet = ProcessConnectPacket(pPacket);				// CONNECT包。因为涉及初始化，所以必须单独拿出来处理
-	
+	BOOL bRet = ProcessConnectPacket(pPacket);											// CONNECT包。因为涉及初始化，所以必须单独拿出来处理
+
 	if (!bRet) {
-		ASSERT(pModule != nullptr);	
-		pModule->OnRecvChildSocketClientPacket(pPacket);	// 非CONNECT包
+		ASSERT(pPacket->m_pSocketClient->m_pModule != nullptr);
+		pPacket->m_pSocketClient->m_pModule->OnRecvChildSocketClientPacket(pPacket);	// 非CONNECT包
 	}
 
 	return 0;
@@ -813,37 +817,69 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvChildSocketClientPacket(WPARAM
 // 测试文件上传
 void CMFCApplication4Dlg::OnTestFileUpload()
 {	
-	WCHAR pszFile[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\server\\发送\\测试文件传输，可删.7z";
-	if (!PathFileExists(pszFile)) {
-		MessageBox(L"文件不存在");
-		return ;
-	}
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
 
-	HANDLE hFile = CreateFile(pszFile, FILE_READ_EA, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-	if (hFile == INVALID_HANDLE_VALUE)
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
 	{
-		MessageBox(L"文件句柄打开失败");
-		return ;
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+
+			WCHAR pszFilePath[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\server\\发送\\1.jpg";
+			WCHAR pszUploadFile[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\client\\接收\\2.jpg";
+			UploadFile(pClient, pszFilePath, pszUploadFile);
+		}
 	}
 
-	QWORD qwFileSize = 0;
-	DWORD dwFileSizeLowDword = 0;
-	DWORD dwFileSizeHighDword = 0;
-	dwFileSizeLowDword = GetFileSize(hFile, &dwFileSizeHighDword);
-	qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;		// 直接dwFileSizeHighDword << 32的话就等于0了
 
 
-	#define FILE_UPLOAD_PACKET_BODY_LENGTH 16
-	BYTE pbPacketBody[FILE_UPLOAD_PACKET_BODY_LENGTH];
-	memset(pbPacketBody, 0, FILE_UPLOAD_PACKET_BODY_LENGTH);
-	// 包体：文件大小（8Byte）+ 分片数（4字节）+ 暂未分配（4字节）
 
-	// 除非文件16383TB, 否则dwPacketSplitNum不可能上溢。所以不用担心整数溢出。担心这个还不如担心文件完整性校验。
-	DWORD dwPacketSplitNum = (qwFileSize % PACKET_MAX_LENGTH) ? qwFileSize / PACKET_MAX_LENGTH + 1 : qwFileSize / PACKET_MAX_LENGTH;
-	WriteQwordToBuffer(pbPacketBody, qwFileSize, 0);
-	WriteDwordToBuffer(pbPacketBody, dwPacketSplitNum, 8);
 
-	ProcessRClickSelectCommand(FILE_UPLOAD_CONNECT, (PBYTE)pbPacketBody, FILE_UPLOAD_PACKET_BODY_LENGTH);
+	
+
+	//WCHAR pszFile[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\server\\发送\\测试文件传输，可删.7z";
+	//if (!PathFileExists(pszFile)) {
+	//	MessageBox(L"文件不存在");
+	//	return ;
+	//}
+
+	//HANDLE hFile = CreateFile(pszFile, FILE_READ_EA, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+	//if (hFile == INVALID_HANDLE_VALUE)
+	//{
+	//	MessageBox(L"文件句柄打开失败");
+	//	return ;
+	//}
+
+	//QWORD qwFileSize = 0;
+	//DWORD dwFileSizeLowDword = 0;
+	//DWORD dwFileSizeHighDword = 0;
+	//dwFileSizeLowDword = GetFileSize(hFile, &dwFileSizeHighDword);
+	//qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;		// 直接dwFileSizeHighDword << 32的话就等于0了
+
+
+	//#define FILE_UPLOAD_PACKET_BODY_LENGTH 16
+	//BYTE pbPacketBody[FILE_UPLOAD_PACKET_BODY_LENGTH];
+	//memset(pbPacketBody, 0, FILE_UPLOAD_PACKET_BODY_LENGTH);
+	//// 包体：文件大小（8Byte）+ 分片数（4字节）+ 暂未分配（4字节）
+
+	//// 除非文件16383TB, 否则dwPacketSplitNum不可能上溢。所以不用担心整数溢出。担心这个还不如担心文件完整性校验。
+	//DWORD dwPacketSplitNum = (qwFileSize % PACKET_MAX_LENGTH) ? qwFileSize / PACKET_MAX_LENGTH + 1 : qwFileSize / PACKET_MAX_LENGTH;
+	//WriteQwordToBuffer(pbPacketBody, qwFileSize, 0);
+	//WriteDwordToBuffer(pbPacketBody, dwPacketSplitNum, 8);
+
+	//ProcessRClickSelectCommand(FILE_UPLOAD_CONNECT, (PBYTE)pbPacketBody, FILE_UPLOAD_PACKET_BODY_LENGTH);
 
 	//WaitForSingleObject(m_FileUploadConnectSuccessEvent, INFINITE);
 }

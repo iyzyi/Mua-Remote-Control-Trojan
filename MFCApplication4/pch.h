@@ -49,6 +49,7 @@ enum COMMAND_ID {
 
 	// 文件上传
 	FILE_UPLOAD_CONNECT,	// 新建一条socket连接用于文件传输，每条socket只传一个文件就关闭
+	FILE_UPLOAD_INFO,		// 文件大小、分片数等信息
 	FILE_UPLOAD_DATA,		// 文件上传的数据包（非最后一个）
 	FILE_UPLOAD_DATA_TAIL,	// 文件上传的数据包，最后一个分片
 	FILE_UPLOAD_CLOSE,		// 关闭文件传输
