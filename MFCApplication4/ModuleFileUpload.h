@@ -16,8 +16,8 @@ public:
 
 	WCHAR						m_pszUploadPath[MAX_PATH];			// 要上传到什么目录下
 
-	HANDLE						m_hFileUploadInfoSuccessEvent;
-	HANDLE						m_hFileUploadCloseSuccessEvent;
+	HANDLE						m_hRecvPacketFileUploadInfoEvent;
+	HANDLE						m_hRecvPacketFileUploadCloseEvent;
 
 public:
 	CFileUpload(CSocketClient* pSocketClient);

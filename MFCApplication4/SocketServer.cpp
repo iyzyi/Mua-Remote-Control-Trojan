@@ -132,7 +132,7 @@ EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) 
 
 EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
 	printf("[Client %d] OnSend: \n", dwConnID);
-	PrintBytes((LPBYTE)pData, iLength);
+	//PrintData((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 

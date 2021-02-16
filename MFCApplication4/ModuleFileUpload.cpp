@@ -7,22 +7,22 @@ CFileUpload::CFileUpload(CSocketClient* pSocketClient) : CModule(pSocketClient) 
 	//InitializeCriticalSection(&m_WriteLock);
 
 	// 自动重置事件，初始状态无信号
-	m_hFileUploadInfoSuccessEvent = CreateEvent(NULL, false, false, NULL);
-	m_hFileUploadCloseSuccessEvent = CreateEvent(NULL, false, false, NULL);
+	m_hRecvPacketFileUploadInfoEvent = CreateEvent(NULL, false, false, NULL);
+	m_hRecvPacketFileUploadCloseEvent = CreateEvent(NULL, false, false, NULL);
 }
 
 
 CFileUpload::~CFileUpload() {
 	//DeleteCriticalSection(&m_WriteLock);
 
-	if (m_hFileUploadInfoSuccessEvent != nullptr) {
-		CloseHandle(m_hFileUploadInfoSuccessEvent);
-		m_hFileUploadInfoSuccessEvent = nullptr;
+	if (m_hRecvPacketFileUploadInfoEvent != nullptr) {
+		CloseHandle(m_hRecvPacketFileUploadInfoEvent);
+		m_hRecvPacketFileUploadInfoEvent = nullptr;
 	}
 
-	if (m_hFileUploadCloseSuccessEvent != nullptr) {
-		CloseHandle(m_hFileUploadCloseSuccessEvent);
-		m_hFileUploadCloseSuccessEvent = nullptr;
+	if (m_hRecvPacketFileUploadCloseEvent != nullptr) {
+		CloseHandle(m_hRecvPacketFileUploadCloseEvent);
+		m_hRecvPacketFileUploadCloseEvent = nullptr;
 	}
 }
 
@@ -39,7 +39,7 @@ void CFileUpload::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 	//	SetEvent(pClient->m_FileUploadConnectSuccessEvent);		// 触发信号
 	//	break;
 	case FILE_UPLOAD_INFO:
-		SetEvent(m_hFileUploadInfoSuccessEvent);
+		SetEvent(m_hRecvPacketFileUploadInfoEvent);
 		break;
 
 	case FILE_UPLOAD_DATA:
@@ -49,7 +49,7 @@ void CFileUpload::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 		break;
 
 	case FILE_UPLOAD_CLOSE:
-		SetEvent(m_hFileUploadCloseSuccessEvent);
+		SetEvent(m_hRecvPacketFileUploadCloseEvent);
 		break;
 	}
 }
@@ -125,7 +125,7 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 
 
 	CFile File;
-	BOOL bRet = File.Open(pszFilePath, File.modeRead, NULL);			// 只读
+	BOOL bRet = File.Open(pszFilePath, File.shareDenyNone, NULL);			// 共享读
 	if (!bRet) {
 		MessageBox(0, L"文件打开失败", L"文件打开失败", 0);
 		return false;
@@ -147,8 +147,7 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 	theApp.m_Server.SendPacket(pSocketClient, FILE_UPLOAD_INFO, (PBYTE)pbPacketBody, FILE_UPLOAD_INFO_PACKET_BODY_LENGTH);
 
 	// 等待被控端发回FILE_UPLOAD_INFO包
-	WaitForSingleObject(pFileUpload->m_hFileUploadInfoSuccessEvent, INFINITE);
-	CloseHandle(pFileUpload->m_hFileUploadInfoSuccessEvent);
+	WaitForSingleObject(pFileUpload->m_hRecvPacketFileUploadInfoEvent, INFINITE);
 
 	PBYTE pbBuffer = new BYTE[PACKET_BODY_MAX_LENGTH];
 
@@ -162,8 +161,9 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 		}
 		// 最后一个分片
 		else {
-			File.Read(pbBuffer, qwFileSize % PACKET_BODY_MAX_LENGTH);
-			theApp.m_Server.SendPacket(pSocketClient, FILE_UPLOAD_DATA_TAIL, pbBuffer, qwFileSize % PACKET_BODY_MAX_LENGTH);
+			DWORD dwReadBytes = qwFileSize % PACKET_BODY_MAX_LENGTH ? qwFileSize % PACKET_BODY_MAX_LENGTH : PACKET_BODY_MAX_LENGTH;
+			File.Read(pbBuffer, dwReadBytes);
+			theApp.m_Server.SendPacket(pSocketClient, FILE_UPLOAD_DATA_TAIL, pbBuffer, dwReadBytes);
 		}
 	}
 
@@ -176,8 +176,7 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 
 	theApp.m_Server.SendPacket(pSocketClient, FILE_UPLOAD_CLOSE, NULL, 0);
 
-	WaitForSingleObject(pFileUpload->m_hFileUploadCloseSuccessEvent, INFINITE);
-	CloseHandle(pFileUpload->m_hFileUploadCloseSuccessEvent);
+	WaitForSingleObject(pFileUpload->m_hRecvPacketFileUploadCloseEvent, INFINITE);
 
 	if (pFileUpload != nullptr) {
 		delete pFileUpload;

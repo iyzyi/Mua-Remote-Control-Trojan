@@ -42,6 +42,11 @@ VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen) {
 
 VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen)
 {
+	if (dwDataLen > 128) {
+		printf("共%d字节，出于效率考虑，仅打印前128字节\n", dwDataLen);
+		dwDataLen = 128;
+	}
+
 	DWORD dwRow = 0, dwColumn = 0;
 	for (dwRow = 0; dwRow < dwDataLen / 16 + 1; dwRow++) {
 		for (dwColumn = 0; (dwRow * 16 + dwColumn < dwDataLen) && (dwColumn < 16); dwColumn++) {
