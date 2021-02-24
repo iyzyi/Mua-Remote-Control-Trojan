@@ -175,7 +175,7 @@ EnHandleResult CSocketClient::OnHandShake(ITcpClient* pSender, CONNID dwConnID) 
 
 
 EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	DebugPrint("[Client %d] OnSend: \n", dwConnID);
+	DebugPrint("[Client %d] OnSend: %d Bytes \n", dwConnID, iLength);
 	PrintData((PBYTE)pData, iLength);
 
 	return HR_OK;
@@ -183,7 +183,7 @@ EnHandleResult CSocketClient::OnSend(ITcpClient* pSender, CONNID dwConnID, const
 
 
 EnHandleResult CSocketClient::OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	DebugPrint("[Client %d] OnReceive: \n", dwConnID);
+	DebugPrint("[Client %d] OnReceive: %d Bytes \n", dwConnID, iLength);
 
 	PrintData((PBYTE)pData, iLength);
 

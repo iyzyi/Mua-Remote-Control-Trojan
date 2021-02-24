@@ -42,9 +42,9 @@ VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen) {
 
 VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen)
 {
-	if (dwDataLen > 256) {
-		DebugPrint("共%d字节，出于效率考虑，仅打印前256字节\n", dwDataLen);
-		dwDataLen = 256;
+	if (dwDataLen > 1024) {
+		DebugPrint("共%d字节，出于效率考虑，仅打印前1024字节\n", dwDataLen);
+		dwDataLen = 1024;
 	}
 
 	DWORD dwRow = 0, dwColumn = 0;
