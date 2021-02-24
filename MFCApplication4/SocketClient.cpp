@@ -86,6 +86,7 @@ CClient::CClient(CSocketClient* pSocketClient) {
 
 	// 自动重置事件，初始状态无信号
 	m_FileUploadConnectSuccessEvent = CreateEvent(NULL, false, false, NULL);
+	m_FileDownloadConnectSuccessEvent = CreateEvent(NULL, false, false, NULL);
 }
 
 
@@ -103,6 +104,7 @@ CClient::CClient() {
 	m_hNoChildSocketClientEvent = nullptr;
 
 	m_FileUploadConnectSuccessEvent = nullptr;
+	m_FileDownloadConnectSuccessEvent = nullptr;
 }
 
 
@@ -127,6 +129,11 @@ CClient::~CClient() {
 	if (m_FileUploadConnectSuccessEvent != nullptr) {
 		CloseHandle(m_FileUploadConnectSuccessEvent);
 		m_FileUploadConnectSuccessEvent = nullptr;
+	}
+
+	if (m_FileDownloadConnectSuccessEvent != nullptr) {
+		CloseHandle(m_FileDownloadConnectSuccessEvent);
+		m_FileDownloadConnectSuccessEvent = nullptr;
 	}
 }
 

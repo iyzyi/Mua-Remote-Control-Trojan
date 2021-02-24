@@ -128,6 +128,8 @@ void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 			SendMessage(WM_CLOSE);
 			break;
 	}
+
+	delete pPacket;
 }
 
 

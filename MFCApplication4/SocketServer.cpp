@@ -204,6 +204,9 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 				PostMessage(theApp.m_pMainWnd->m_hWnd, WM_RECV_CHILD_SOCKET_CLIENT_PACKET, NULL, (LPARAM)pPacket);
 			}
 		}
+		else {
+			delete pPacket;
+		}
 
 		// TODO： 丢弃的包达到一定次数即判定为拒绝服务
 	}

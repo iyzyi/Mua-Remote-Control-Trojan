@@ -52,6 +52,8 @@ void CFileUpload::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 		SetEvent(m_hRecvPacketFileUploadCloseEvent);
 		break;
 	}
+
+	delete pPacket;
 }
 
 
