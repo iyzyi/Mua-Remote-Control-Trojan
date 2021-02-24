@@ -15,6 +15,9 @@ class CCrypto {
 public:
 	CRYPTO_ALGORITHM_ID	m_dwCryptoAlgorithmId;
 
+	// 使用RSA加密了的 对称密码/序列密码的密钥（key+iv）
+	BYTE m_pbRsaEncrypted[256];
+
 	AES  m_AesEncrypt;
 	AES  m_AesDecrypt;
 
@@ -33,4 +36,7 @@ public:
 
 	// 不同加密算法的填充长度不同。该函数输入明文长度，返回密文长度
 	DWORD GetCiphertextLength(DWORD dwPlaintextLength);
+
+	// 使用RSA加密 对称密码/序列密码的密钥
+	int RsaEncryptKey(PBYTE pbKey, DWORD dwKeyLength, PBYTE pbCiphertext, PDWORD pdwCiphertextLength);
 };

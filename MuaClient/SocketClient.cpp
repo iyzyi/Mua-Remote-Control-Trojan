@@ -6,7 +6,7 @@
 
 
 
-#define SERVER_ADDRESS L"192.168.0.102"
+#define SERVER_ADDRESS L"192.168.0.100"
 //#define SERVER_ADDRESS L"81.70.160.41"
 #define SERVER_PORT 5555;
 
@@ -104,17 +104,16 @@ BOOL CSocketClient::StartSocketClient() {
 	RandomBytes(pbIv, 16);
 	m_Crypto = CCrypto(AES_128_CFB, pbKey, pbIv);
 
-	BYTE pbKeyAndIv[CRYPTO_KEY_PACKET_LENGTH];
+	BYTE pbCipherKeyPacket[CRYPTO_KEY_PACKET_LENGTH];
 	// 第一个字节表示是主socket的密钥还是子socket的密钥
-	pbKeyAndIv[0] = (m_bIsMainSocketClient) ? CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET : CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET;
-	memcpy(pbKeyAndIv + 1, pbKey, 16);
-	memcpy(pbKeyAndIv + 17, pbIv, 16);
+	pbCipherKeyPacket[0] = (m_bIsMainSocketClient) ? CRYPTO_KEY_PACKET_TOKEN_FOR_MAIN_SOCKET : CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET;
+	memcpy(pbCipherKeyPacket + 1, m_Crypto.m_pbRsaEncrypted, 256);
 
 	// 向主控端发送密钥
-	bRet = m_pTcpPackClient->Send(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
+	bRet = m_pTcpPackClient->Send(pbCipherKeyPacket, CRYPTO_KEY_PACKET_LENGTH);
 	if (bRet) {
 		DebugPrint("成功向服务器发送通信密钥:\n");
-		PrintData(pbKeyAndIv, CRYPTO_KEY_PACKET_LENGTH);
+		PrintData(pbCipherKeyPacket, CRYPTO_KEY_PACKET_LENGTH);
 	}
 
 	// 不可以在构造函数里GetConnectionID，一直会是0.估计start之后才有的CONNID吧

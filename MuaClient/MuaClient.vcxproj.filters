@@ -34,6 +34,12 @@
     <Filter Include="头文件\组件-文件传输">
       <UniqueIdentifier>{a959a91b-eb3c-4726-9d70-ea84099180eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Crypto\RSA">
+      <UniqueIdentifier>{253cc5f7-da75-4e4b-b17a-e21a5e55a0bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Crypto\RSA">
+      <UniqueIdentifier>{278a41aa-df48-437b-b80d-281c71734c67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MuaClient.cpp">
@@ -74,6 +80,12 @@
     </ClCompile>
     <ClCompile Include="ModuleFileUpload.cpp">
       <Filter>源文件\组件-文件传输</Filter>
+    </ClCompile>
+    <ClCompile Include="RSA.cpp">
+      <Filter>源文件\Crypto\RSA</Filter>
+    </ClCompile>
+    <ClCompile Include="libccrypto.cpp">
+      <Filter>源文件\Crypto\RSA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="ModuleFileUpload.h">
       <Filter>头文件\组件-文件传输</Filter>
+    </ClInclude>
+    <ClInclude Include="libccrypto.h">
+      <Filter>头文件\Crypto\RSA</Filter>
+    </ClInclude>
+    <ClInclude Include="RSA.h">
+      <Filter>头文件\Crypto\RSA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

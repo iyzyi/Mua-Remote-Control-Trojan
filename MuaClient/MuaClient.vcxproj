@@ -156,6 +156,7 @@
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="AntiAntiVirus.cpp" />
     <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="libccrypto.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="ModuleFileUpload.cpp" />
@@ -169,6 +170,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ModuleShellRemote.cpp" />
+    <ClCompile Include="RSA.cpp" />
     <ClCompile Include="SocketClient.cpp" />
     <ClCompile Include="SocketClientManage.cpp" />
   </ItemGroup>
@@ -181,6 +183,7 @@
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
     <ClInclude Include="Infect.h" />
+    <ClInclude Include="libccrypto.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModuleFileUpload.h" />
@@ -188,6 +191,7 @@
     <ClInclude Include="Packet.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ModuleShellRemote.h" />
+    <ClInclude Include="RSA.h" />
     <ClInclude Include="SocketClient.h" />
     <ClInclude Include="SocketClientManage.h" />
   </ItemGroup>
