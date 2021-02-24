@@ -87,6 +87,9 @@
     <ClCompile Include="libccrypto.cpp">
       <Filter>源文件\Crypto\RSA</Filter>
     </ClCompile>
+    <ClCompile Include="ModuleFileDownload.cpp">
+      <Filter>源文件\组件-文件传输</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -145,6 +148,9 @@
     </ClInclude>
     <ClInclude Include="RSA.h">
       <Filter>头文件\Crypto\RSA</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleFileDownload.h">
+      <Filter>头文件\组件-文件传输</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

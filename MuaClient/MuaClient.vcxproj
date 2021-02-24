@@ -159,6 +159,7 @@
     <ClCompile Include="libccrypto.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="ModuleFileDownload.cpp" />
     <ClCompile Include="ModuleFileUpload.cpp" />
     <ClCompile Include="ModuleManage.cpp" />
     <ClCompile Include="MuaClient.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="libccrypto.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="ModuleFileDownload.h" />
     <ClInclude Include="ModuleFileUpload.h" />
     <ClInclude Include="ModuleManage.h" />
     <ClInclude Include="Packet.h" />

