@@ -15,6 +15,8 @@ class CCrypto {
 public:
 	CRYPTO_ALGORITHM_ID	m_dwCryptoAlgorithmId;
 
+	BOOL m_bInitSuccess;
+
 	AES  m_AesEncrypt;
 	AES  m_AesDecrypt;
 	
@@ -24,7 +26,7 @@ public:
 	
 
 public:
-	CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbKey=NULL, PBYTE pbIv=NULL);
+	CCrypto(CRYPTO_ALGORITHM_ID dwCryptoAlgorithmId, PBYTE pbRsaEncrypted);
 	CCrypto();
 	~CCrypto();
 
@@ -33,4 +35,7 @@ public:
 
 	// 不同加密算法的填充长度不同。该函数输入明文长度，返回密文长度
 	DWORD GetCiphertextLength(DWORD dwPlaintextLength);
+
+	// RSA解密出通信密钥
+	void RsaDecryptKey(PBYTE pbCiphertext, DWORD dwKeyLength, PBYTE pbDecryptedKey, PDWORD pdwDecryptedKeyLength);
 };

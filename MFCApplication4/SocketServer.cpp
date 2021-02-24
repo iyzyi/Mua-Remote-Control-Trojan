@@ -180,14 +180,11 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			
 
 			// 设置该Client的密钥
-			BYTE pbKey[16];
-			BYTE pbIv[16];
-			memcpy(pbKey, pData + 1, 16);
-			memcpy(pbIv, pData + 17, 16);
-			pNewSocketClient->SetCryptoKey(pbKey, pbIv);
+			if (pNewSocketClient->SetCryptoKey((PBYTE)pData + 1)) {
 
-			// 告知客户端，我服务端这边已经接收到宁的密钥了
-			SendPacket(pNewSocketClient, CRYPTO_KEY, NULL, 0);
+				// 告知客户端，我服务端这边已经接收到宁的密钥了
+				SendPacket(pNewSocketClient, CRYPTO_KEY, NULL, 0);
+			}
 		}
 
 	} 

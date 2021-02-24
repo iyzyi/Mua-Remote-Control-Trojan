@@ -52,8 +52,9 @@ CSocketClient::~CSocketClient() {
 
 
 // 设置密钥（key和iv）
-VOID CSocketClient::SetCryptoKey(PBYTE pbCryptoKey, PBYTE pbCryptoIv) {
-	m_Crypto = CCrypto(AES_128_CFB, pbCryptoKey, pbCryptoIv);
+BOOL CSocketClient::SetCryptoKey(PBYTE pbRsaEncrypted) {
+	m_Crypto = CCrypto(AES_128_CFB, pbRsaEncrypted);
+	return m_Crypto.m_bInitSuccess;
 }
 
 
@@ -149,19 +150,21 @@ VOID CClient::WaitForNoChildSocketClientEvent() {
 
 // 断开该client的全部子socket的连接
 VOID CClient::DisConnectedAllChildSocketClient() {
+	__try {
+		EnterCriticalSection(&m_Lock);
 
-	EnterCriticalSection(&m_Lock);
+		CSocketClient *pSocketClientNode = m_pChildSocketClientListHead;
+		while (pSocketClientNode->m_pNextChildSocketClient != nullptr) {
+			DWORD dwConnectId = pSocketClientNode->m_pNextChildSocketClient->m_dwConnectId;
+			// 只是disconnect链接，没有析构哦
+			theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId, true);
 
-	CSocketClient *pSocketClientNode = m_pChildSocketClientListHead;
-	while (pSocketClientNode->m_pNextChildSocketClient != nullptr) {
-		DWORD dwConnectId = pSocketClientNode->m_pNextChildSocketClient->m_dwConnectId;
-		// 只是disconnect链接，没有析构哦
-		theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId, true);
-
-		pSocketClientNode = pSocketClientNode->m_pNextChildSocketClient;
+			pSocketClientNode = pSocketClientNode->m_pNextChildSocketClient;
+		}
 	}
-
-	LeaveCriticalSection(&m_Lock);
+	__finally {
+		LeaveCriticalSection(&m_Lock);
+	}
 }
 
 
@@ -169,22 +172,26 @@ VOID CClient::DisConnectedAllChildSocketClient() {
 VOID CClient::AddNewChildSocketClientToList(CSocketClient *pSocketClient) {
 	ASSERT(m_pMainSocketClient != nullptr);
 
-	EnterCriticalSection(&m_Lock);
+	__try {
+		EnterCriticalSection(&m_Lock);
 
-	m_pChildSocketClientListTail->m_pNextChildSocketClient = pSocketClient;		// 链表为空时m_pChildSocketClientListTail=m_pChildSocketClientListHead
-	pSocketClient->m_pLastChildSocketClient = m_pChildSocketClientListTail;
-	m_pChildSocketClientListTail = pSocketClient;
+		m_pChildSocketClientListTail->m_pNextChildSocketClient = pSocketClient;		// 链表为空时m_pChildSocketClientListTail=m_pChildSocketClientListHead
+		pSocketClient->m_pLastChildSocketClient = m_pChildSocketClientListTail;
+		m_pChildSocketClientListTail = pSocketClient;
 
-	m_dwChildSocketClientNum++;
-	
+		m_dwChildSocketClientNum++;
+
 #ifdef _DEBUG
-	USES_CONVERSION;
-	DebugPrint("[子socket上线 - %s:%d] 本IP共%d条子socket连接\n",
-		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
+		USES_CONVERSION;
+		DebugPrint("[子socket上线 - %s:%d] 本IP共%d条子socket连接\n",
+			W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 
-	ChangeNoChildSocketClientEvent();
-	LeaveCriticalSection(&m_Lock);
+		ChangeNoChildSocketClientEvent();
+	}
+	__finally {
+		LeaveCriticalSection(&m_Lock);
+	}
 }
 
 
@@ -207,34 +214,38 @@ BOOL CClient::DeleteChildSocketClientFromList(CONNID dwConnectId) {
 VOID CClient::DeleteChildSocketClientFromList(CSocketClient *pSocketClient) {
 	ASSERT(m_pMainSocketClient != nullptr);
 
-	EnterCriticalSection(&m_Lock);
+	__try {
+		EnterCriticalSection(&m_Lock);
 
-	if (pSocketClient == m_pChildSocketClientListTail) {			// 要删除的结点是最后一个结点
-		pSocketClient->m_pLastChildSocketClient->m_pNextChildSocketClient = nullptr;
-		m_pChildSocketClientListTail = pSocketClient->m_pLastChildSocketClient;
-		pSocketClient->m_pLastChildSocketClient = nullptr;
-	}
-	else {
-		pSocketClient->m_pLastChildSocketClient->m_pNextChildSocketClient = pSocketClient->m_pNextChildSocketClient;
-		pSocketClient->m_pNextChildSocketClient->m_pLastChildSocketClient = pSocketClient->m_pLastChildSocketClient;
-		pSocketClient->m_pLastChildSocketClient = nullptr;
-		pSocketClient->m_pNextChildSocketClient = nullptr;
-	}
+		if (pSocketClient == m_pChildSocketClientListTail) {			// 要删除的结点是最后一个结点
+			pSocketClient->m_pLastChildSocketClient->m_pNextChildSocketClient = nullptr;
+			m_pChildSocketClientListTail = pSocketClient->m_pLastChildSocketClient;
+			pSocketClient->m_pLastChildSocketClient = nullptr;
+		}
+		else {
+			pSocketClient->m_pLastChildSocketClient->m_pNextChildSocketClient = pSocketClient->m_pNextChildSocketClient;
+			pSocketClient->m_pNextChildSocketClient->m_pLastChildSocketClient = pSocketClient->m_pLastChildSocketClient;
+			pSocketClient->m_pLastChildSocketClient = nullptr;
+			pSocketClient->m_pNextChildSocketClient = nullptr;
+		}
 
-	m_dwChildSocketClientNum--;
+		m_dwChildSocketClientNum--;
 
 #ifdef _DEBUG
-	USES_CONVERSION;			// 使用A2W之前先声明这个
-	DebugPrint("[子socket下线 - %s:%d] 本IP共%d条子socket连接\n",
-		W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
+		USES_CONVERSION;			// 使用A2W之前先声明这个
+		DebugPrint("[子socket下线 - %s:%d] 本IP共%d条子socket连接\n",
+			W2A(pSocketClient->m_lpszIpAddress), pSocketClient->m_wPort, m_dwChildSocketClientNum);
 #endif
 
-	delete pSocketClient;				// SocketClient在这里释放内存
-	// 这个链表仅用于缓存主socket拥有哪些子socket。析构的话，请在CClientManage的存放CSocketClient的链表中进行
-	// 上面一行注释作废。
+		delete pSocketClient;				// SocketClient在这里释放内存
+		// 这个链表仅用于缓存主socket拥有哪些子socket。析构的话，请在CClientManage的存放CSocketClient的链表中进行
+		// 上面一行注释作废。
 
-	ChangeNoChildSocketClientEvent();
-	LeaveCriticalSection(&m_Lock);
+		ChangeNoChildSocketClientEvent();
+	}
+	__finally {
+		LeaveCriticalSection(&m_Lock);
+	}
 }
 
 

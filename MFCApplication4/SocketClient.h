@@ -46,7 +46,7 @@ public:
 	CSocketClient();
 	~CSocketClient();
 
-	VOID SetCryptoKey(PBYTE pbCryptoKey = NULL, PBYTE pbCryptoIv = NULL);
+	BOOL SetCryptoKey(PBYTE pbRsaEncrypted);
 };
 
 

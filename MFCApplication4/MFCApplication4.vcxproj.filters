@@ -37,6 +37,12 @@
     <Filter Include="头文件\组件-文件传输">
       <UniqueIdentifier>{58100228-130e-4950-944c-f05c405d3620}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Crypto\RSA">
+      <UniqueIdentifier>{d53bc317-8677-42c4-b299-1f34f98ea518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Crypto\RSA">
+      <UniqueIdentifier>{569a3719-5978-4c4a-bbee-1a4d43726eff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MFCApplication4.h">
@@ -102,6 +108,12 @@
     <ClInclude Include="SocketClient.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="libccrypto.h">
+      <Filter>头文件\Crypto\RSA</Filter>
+    </ClInclude>
+    <ClInclude Include="RSA.h">
+      <Filter>头文件\Crypto\RSA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MFCApplication4.cpp">
@@ -145,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="SocketClient.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="libccrypto.cpp">
+      <Filter>源文件\Crypto\RSA</Filter>
+    </ClCompile>
+    <ClCompile Include="RSA.cpp">
+      <Filter>源文件\Crypto\RSA</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -196,6 +196,7 @@
     <ClInclude Include="HPSocket\HPSocket.h" />
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
+    <ClInclude Include="libccrypto.h" />
     <ClInclude Include="MFCApplication4.h" />
     <ClInclude Include="MFCApplication4Dlg.h" />
     <ClInclude Include="Misc.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ModuleShellRemote.h" />
+    <ClInclude Include="RSA.h" />
     <ClInclude Include="SocketClient.h" />
     <ClInclude Include="SocketServer.h" />
     <ClInclude Include="targetver.h" />
@@ -214,6 +216,7 @@
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="ClientManage.cpp" />
     <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="libccrypto.cpp" />
     <ClCompile Include="MFCApplication4.cpp" />
     <ClCompile Include="MFCApplication4Dlg.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -228,6 +231,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ModuleShellRemote.cpp" />
+    <ClCompile Include="RSA.cpp" />
     <ClCompile Include="SocketClient.cpp" />
     <ClCompile Include="SocketServer.cpp" />
   </ItemGroup>
