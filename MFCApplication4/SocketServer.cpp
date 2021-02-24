@@ -131,14 +131,14 @@ EnHandleResult CSocketServer::OnHandShake(ITcpServer* pSender, CONNID dwConnID) 
 
 
 EnHandleResult CSocketServer::OnSend(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	DebugPrint("[Client %d] OnSend: \n", dwConnID);
+	DebugPrint("[Client %d] OnSend: %d Bytes \n", dwConnID, iLength);
 	//PrintData((LPBYTE)pData, iLength);
 	return HR_OK;
 }
 
 
 EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, const BYTE* pData, int iLength) {
-	DebugPrint("[Client %d] OnReceive: \n", dwConnID);
+	DebugPrint("[Client %d] OnReceive: %d Bytes \n", dwConnID, iLength);
 	PrintData((PBYTE)pData, iLength);
 	
 	CSocketClient* pSocketClient = m_pClientManage->SearchSocketClient(dwConnID);
