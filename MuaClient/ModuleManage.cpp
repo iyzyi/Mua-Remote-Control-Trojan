@@ -95,9 +95,21 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 
 	pChildSocketClient->WaitForExitEvent();
 
+	//// É±ËÀcmd.exe½ø³Ì
+	//if (pModule->m_hCmdProcess != NULL) {
+	//	BOOL Ret = TerminateProcess(pModule->m_hCmdProcess, 0);
+	//	DWORD Error = GetLastError();
+	//	pModule->m_hCmdProcess = NULL;
+	//}
+
 	if (pChildSocketClient != nullptr) {
 		delete pChildSocketClient;
 		pChildSocketClient = nullptr;
+	}
+
+	if (pModule != nullptr) {
+		delete pModule;
+		pModule = nullptr;
 	}
 
 	if (pPacket != nullptr) {

@@ -51,10 +51,11 @@ CSocketClient::~CSocketClient() {
 			m_pModuleManage = nullptr;
 		}
 
-		if (m_pModule != nullptr) {
-			delete m_pModule;
-			m_pModule = nullptr;
-		}
+		// 这里只析构了基类，没析构派生类，所以还是单独析构吧
+		//if (m_pModule != nullptr) {
+		//	delete m_pModule;
+		//	m_pModule = nullptr;
+		//}
 
 		if (m_hChildSocketClientExitEvent != nullptr) {
 			CloseHandle(m_hChildSocketClientExitEvent);
@@ -123,6 +124,10 @@ BOOL CSocketClient::StartSocketClient() {
 
 
 BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength) {
+	if (!m_pTcpPackClient->IsConnected()) {
+		return false;
+	}
+
 	CPacket Packet = CPacket(this);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
 	BOOL bRet;

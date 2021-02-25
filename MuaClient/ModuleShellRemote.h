@@ -19,6 +19,10 @@ public:
 	HANDLE					m_hRead;
 	HANDLE					m_hWrite;
 
+
+	HANDLE					m_hCmdProcess;
+	HANDLE					m_hCmdMainThread;
+
 public:
 	CModuleShellRemote(CSocketClient* pSocketClient);
 	~CModuleShellRemote();

