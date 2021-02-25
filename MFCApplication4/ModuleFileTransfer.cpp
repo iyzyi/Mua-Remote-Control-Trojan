@@ -235,3 +235,7 @@ BOOL CModuleFileTransfer::PreTranslateMessage(MSG* pMsg)
 	}
 	return   CDialog::PreTranslateMessage(pMsg);
 }
+
+
+// TODO
+// 搞个链表，记录所有的上传和下载的子socket, 文件传输的对话框OnClose()的时候，遍历链表，然后断开所有的子socket
