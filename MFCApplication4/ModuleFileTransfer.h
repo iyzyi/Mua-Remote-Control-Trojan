@@ -33,4 +33,7 @@ public:
 	CEdit m_EditDownloadRemotePath;
 	afx_msg void OnBnClickedUpload();
 	afx_msg void OnBnClickedDownload();
+
+	void OnOK();
+	BOOL PreTranslateMessage(MSG* pMsg);
 };

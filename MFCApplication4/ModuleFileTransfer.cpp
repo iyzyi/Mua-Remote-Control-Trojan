@@ -217,3 +217,21 @@ void CModuleFileTransfer::OnBnClickedDownload()
 	strRemotePath.ReleaseBuffer();
 	strLocalPath.ReleaseBuffer();
 }
+
+
+void CModuleFileTransfer::OnOK()
+{
+	//什么也不写
+}
+
+//然后重载PreTranslateMessage函数  
+//把ESC键的消息，用RETURN键的消息替换，这样，按ESC的时候，也会执行刚才的OnOK函数  
+BOOL CModuleFileTransfer::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
+		pMsg->wParam = VK_RETURN;   //将ESC键的消息替换为回车键的消息，这样，按ESC的时候  
+									//也会去调用OnOK函数，而OnOK什么也不做，这样ESC也被屏蔽  
+	}
+	return   CDialog::PreTranslateMessage(pMsg);
+}
