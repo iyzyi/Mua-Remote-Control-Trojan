@@ -23,6 +23,19 @@ CShellRemote::CShellRemote(CWnd* pParent /*=nullptr*/, CSocketClient* pClient /*
 	WCHAR pszTitle[64];
 	StringCbPrintf(pszTitle, 64, L"远程SHELL    %s:%d\n", pClient->m_lpszIpAddress, pClient->m_wPort);
 	this->SetWindowText(pszTitle);
+	
+	// 修改焦点到编辑框上
+	GetDlgItem(IDC_EDIT2)->SetFocus();
+
+	// 提示框
+	m_MyTip.Create(this);
+	m_MyTip.AddTool(GetDlgItem(IDC_BUTTON1), L"直接在编辑框中按下回车即可发送SHELL，无需额外点击此按钮~");
+	//m_MyTip.SetDelayTime(200);					//设置延迟
+	m_MyTip.SetTipTextColor(RGB(0, 0, 255));	//设置提示文本的颜色
+	m_MyTip.SetTipBkColor(RGB(255, 255, 255));	//设置提示框的背景颜色
+	m_MyTip.Activate(TRUE);						//设置是否启用提示
+	m_MyTip.SetDelayTime(TTDT_INITIAL, 10);		//鼠标指向多久后显示提示，毫秒
+	m_MyTip.SetDelayTime(TTDT_AUTOPOP, 30000);	//鼠标保持指向，提示显示多久，毫秒
 
 	m_dwBufferTail = 0;
 }
@@ -65,11 +78,11 @@ void CShellRemote::OnEnChangeEdit1()
 }
 
 
-
-//void CShellRemote::Start() {
-//	this->Create(IDD_DIALOG2, GetDesktopWindow());
-//	this->ShowWindow(SW_SHOW);
-//}
+// 要想改焦点，仅仅设置了SetFocus()那是不够的，还需要将对话框中的OnInitDialog的最后那句return设置为"FALSE";
+BOOL CShellRemote::OnInitDialog() {
+	CDialogEx::OnInitDialog();
+	return false;
+}
 
 
 // 执行命令
@@ -127,6 +140,11 @@ BOOL CShellRemote::PreTranslateMessage(MSG* pMsg)
 	// 按下回车键并且焦点在输入执行命令的那个编辑框上 等于 按下执行命令按钮
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN && GetFocus() == GetDlgItem(IDC_EDIT2)) {
 		OnBnClickedButton1();
+	}
+
+	// 提示框相关
+	if (pMsg->message == WM_MOUSEMOVE) {
+		m_MyTip.RelayEvent(pMsg);
 	}
 
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)

@@ -85,6 +85,10 @@ BOOL CSocketServer::SendPacket(CSocketClient* pSocketClient, COMMAND_ID dwComman
 	// 发包只需要ConnectId就能发，但是通信的密钥在CClient类对象里面，
 	// CPacket的封包加密需要CSocketClient里面的密钥，所以必须传入CSocketClient参数。
 
+	if (!m_pTcpPackServer->IsConnected(pSocketClient->m_dwConnectId)) {
+		return false;
+	}
+
 	CPacket Packet = CPacket(pSocketClient);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
 	BOOL bRet = m_pTcpPackServer->Send(pSocketClient->m_dwConnectId, Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);

@@ -36,6 +36,8 @@ public:
 	DWORD			m_dwBufferTail;
 	WCHAR			m_pszWideChar[COMMAND_RESULT_BUFFER_LENGTH+1];
 
+	CToolTipCtrl	m_MyTip;		// 提示框
+
 
 public:
 	// 重写虚函数
@@ -44,6 +46,7 @@ public:
 	void OnOK();
 	BOOL PreTranslateMessage(MSG* pMsg);
 	void OnClose();
+	BOOL OnInitDialog();
 
 public:
 	VOID OnRecvPacketShellRemoteExecute(CPacket* pPacket);
