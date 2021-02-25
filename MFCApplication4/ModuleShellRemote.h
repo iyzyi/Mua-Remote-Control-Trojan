@@ -46,6 +46,9 @@ public:
 	void OnClose();
 
 public:
+	VOID OnRecvPacketShellRemoteExecute(CPacket* pPacket);
+
+public:
 	//VOID ShellOpen();
 	afx_msg void OnEnChangeEdit1();
 

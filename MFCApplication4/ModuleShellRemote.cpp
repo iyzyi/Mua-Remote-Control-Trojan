@@ -81,7 +81,8 @@ void CShellRemote::OnBnClickedButton1()
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
 	theApp.m_Server.SendPacket(m_pSocketClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
 
-	DebugPrint("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
+	m_EditCommand.SetWindowTextW(L"");
+	//DebugPrint("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
 }
 
 
@@ -94,39 +95,20 @@ void CShellRemote::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 	
 	switch (pPacket->m_PacketHead.wCommandId) {
 
-		case SHELL_EXECUTE: {
+	case SHELL_EXECUTE: 
+		break;
 
+	case SHELL_EXECUTE_RESULT:
+		OnRecvPacketShellRemoteExecute(pPacket);
+		break;
 
+	case SHELL_EXECUTE_RESULT_OVER:
+		OnRecvPacketShellRemoteExecute(pPacket);
+		break;
 
-			DWORD dwWideCharLength = MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, NULL, 0);
-			WCHAR* pszWideCharTemp = new WCHAR[dwWideCharLength];
-			MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, pszWideCharTemp, dwWideCharLength);
-			
-			if (dwWideCharLength > COMMAND_RESULT_BUFFER_LENGTH) {
-				memcpy(m_pszWideChar, pszWideCharTemp + (dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), COMMAND_RESULT_BUFFER_LENGTH*2);
-				m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
-			}
-			else if (m_dwBufferTail + dwWideCharLength <= COMMAND_RESULT_BUFFER_LENGTH){
-				memcpy(m_pszWideChar + m_dwBufferTail, pszWideCharTemp, dwWideCharLength*2);
-				m_dwBufferTail += dwWideCharLength;
-			}
-			else {
-				memcpy(m_pszWideChar, m_pszWideChar + (m_dwBufferTail + dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength)*2);
-				memcpy(m_pszWideChar + (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength), pszWideCharTemp, dwWideCharLength*2);
-				m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
-			}
-			m_pszWideChar[m_dwBufferTail] = 0;		// 字符串以0结尾
-
-			delete[] pszWideCharTemp;
-			pszWideCharTemp = nullptr;
-
-			m_EditResult.SetWindowText(m_pszWideChar);
-			m_EditResult.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
-			break;
-		}
-		case SHELL_CLOSE:
-			SendMessage(WM_CLOSE);
-			break;
+	case SHELL_CLOSE:
+		SendMessage(WM_CLOSE);
+		break;
 	}
 
 	delete pPacket;
@@ -142,6 +124,11 @@ void CShellRemote::OnOK()
 //把ESC键的消息，用RETURN键的消息替换，这样，按ESC的时候，也会执行刚才的OnOK函数  
 BOOL CShellRemote::PreTranslateMessage(MSG* pMsg)
 {
+	// 按下回车键并且焦点在输入执行命令的那个编辑框上 等于 按下执行命令按钮
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN && GetFocus() == GetDlgItem(IDC_EDIT2)) {
+		OnBnClickedButton1();
+	}
+
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
 	{
 		pMsg->wParam = VK_RETURN;   //将ESC键的消息替换为回车键的消息，这样，按ESC的时候  
@@ -157,4 +144,32 @@ void CShellRemote::OnClose() {
 	theApp.m_Server.m_pTcpPackServer->Disconnect(dwConnectId);		// 断开这条子socket
 
 	CDialogEx::OnClose();
+}
+
+
+VOID CShellRemote::OnRecvPacketShellRemoteExecute(CPacket* pPacket) {
+	DWORD dwWideCharLength = MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, NULL, 0);
+	WCHAR* pszWideCharTemp = new WCHAR[dwWideCharLength];
+	MultiByteToWideChar(CP_ACP, 0, (CHAR*)pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength, pszWideCharTemp, dwWideCharLength);
+
+	if (dwWideCharLength > COMMAND_RESULT_BUFFER_LENGTH) {
+		memcpy(m_pszWideChar, pszWideCharTemp + (dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), COMMAND_RESULT_BUFFER_LENGTH * 2);
+		m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
+	}
+	else if (m_dwBufferTail + dwWideCharLength <= COMMAND_RESULT_BUFFER_LENGTH) {
+		memcpy(m_pszWideChar + m_dwBufferTail, pszWideCharTemp, dwWideCharLength * 2);
+		m_dwBufferTail += dwWideCharLength;
+	}
+	else {
+		memcpy(m_pszWideChar, m_pszWideChar + (m_dwBufferTail + dwWideCharLength - COMMAND_RESULT_BUFFER_LENGTH), (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength) * 2);
+		memcpy(m_pszWideChar + (COMMAND_RESULT_BUFFER_LENGTH - dwWideCharLength), pszWideCharTemp, dwWideCharLength * 2);
+		m_dwBufferTail = COMMAND_RESULT_BUFFER_LENGTH;
+	}
+	m_pszWideChar[m_dwBufferTail] = 0;		// 字符串以0结尾
+
+	delete[] pszWideCharTemp;
+	pszWideCharTemp = nullptr;
+
+	m_EditResult.SetWindowText(m_pszWideChar);
+	m_EditResult.PostMessage(WM_VSCROLL, SB_BOTTOM, 0);
 }
