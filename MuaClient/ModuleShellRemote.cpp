@@ -91,7 +91,7 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 	
 
 	WideCharToMultiByte(CP_ACP, 0, (PWSTR)pPacket->m_pbPacketBody, -1, pszCmd, 512, NULL, NULL);
-	strcat_s(pszCmd, "\n");
+	strcat_s(pszCmd, "\r\n");
 	
 	WriteFile(hWrite, pszCmd, strlen(pszCmd), &dwBytesWritten, NULL);
 
