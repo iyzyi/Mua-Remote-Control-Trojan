@@ -94,9 +94,9 @@ BOOL WINAPI OnRecvPacketFileDownloadInfo(LPVOID lParam) {
 	if (pModuleFileDownload->m_hFile == INVALID_HANDLE_VALUE) {
 		// 被控端发往主控端的INFO包体：被控端文件状态（1字节）+ 文件大小（8字节）
 		BYTE pbPacketBody[9];
-		// TODO 暂时文件打开失败统一状态为0xff, 后续可能会区分文件不存在，文件被占用等不同状态
+		// TODO 暂时文件打开失败统一状态为0xff, 后续可能会区分文件不存在，文件被占用等不同状态(用GetLastError来实现)
 		pbPacketBody[0] = 0xff;			// 0xff表示文件打开失败
-		WriteQwordToBuffer(pbPacketBody+1, 0, 1);
+		WriteQwordToBuffer(pbPacketBody, 0, 1);
 		pSocketClient->SendPacket(FILE_DOWNLOAD_INFO, pbPacketBody, 9);
 
 		pModuleFileDownload->m_hFile = nullptr;
