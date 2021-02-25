@@ -112,6 +112,7 @@ typedef struct _LOGIN_INFO {
 
 
 #include <strsafe.h>
+#include <afxcontrolbars.h>
 
 
 

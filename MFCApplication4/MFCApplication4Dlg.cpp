@@ -12,7 +12,7 @@
 #include "ModuleManage.h"
 #include "ModuleFileUpload.h"
 #include "ModuleFileDownload.h"
-
+#include "ModuleFileTransfer.h"
 #include "Misc.h"
 
 #ifdef _DEBUG
@@ -110,6 +110,7 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_COMMAND(ID_32773, &CMFCApplication4Dlg::OnTouchTestEcho)
 	ON_COMMAND(ID_32774, &CMFCApplication4Dlg::OnTestFileUpload)
 	ON_COMMAND(ID_32775, &CMFCApplication4Dlg::OnTestFileDownload)
+	ON_COMMAND(ID_32776, &CMFCApplication4Dlg::OnTouchFileTransfer)
 END_MESSAGE_MAP()
 
 
@@ -857,6 +858,8 @@ void CMFCApplication4Dlg::OnTestFileUpload()
 	}
 }
 
+
+// 测试文件下载
 void CMFCApplication4Dlg::OnTestFileDownload()
 {
 	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
@@ -879,9 +882,38 @@ void CMFCApplication4Dlg::OnTestFileDownload()
 
 			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
 
-			WCHAR pszRemotePath[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\client\\发送\\3.jpg";
+			WCHAR pszRemotePath[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\client\\发送\\3.jpgg";
 			WCHAR pszLocalFile[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\测试文件传输\\server\\接收\\4.jpg";
 			DownloadFile(pClient, pszRemotePath, pszLocalFile);
+		}
+	}
+}
+
+void CMFCApplication4Dlg::OnTouchFileTransfer()
+{
+	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
+	int  nItem = -1;
+
+	CClient* pClient = NULL;
+
+	if (uSelectedCount > 0)
+	{
+		for (i = 0; i < uSelectedCount; i++)
+		{
+			nItem = m_ListCtrl.GetNextItem(nItem, LVNI_SELECTED);
+			ASSERT(nItem != -1);
+
+			LV_ITEM  lvitemData = { 0 };
+			lvitemData.mask = LVIF_PARAM;
+			lvitemData.iItem = nItem;
+			m_ListCtrl.GetItem(&lvitemData);
+			pClient = (CClient*)lvitemData.lParam;
+
+			ASSERT(pClient != NULL);		// 逻辑上不可能为NULL
+
+			CModuleFileTransfer* pDlg = new CModuleFileTransfer(nullptr, pClient);
+			pDlg->Create(IDD_DIALOG1, GetDesktopWindow());
+			pDlg->ShowWindow(SW_SHOW);
 		}
 	}
 }

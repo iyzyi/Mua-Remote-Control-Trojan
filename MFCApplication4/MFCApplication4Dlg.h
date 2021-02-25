@@ -98,6 +98,7 @@ public:
 	void ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE pbPacketBody, DWORD dwPacketBodyLength);
 	afx_msg void OnTestFileUpload();
 	afx_msg void OnTestFileDownload();
+	afx_msg void OnTouchFileTransfer();
 };
 
 
