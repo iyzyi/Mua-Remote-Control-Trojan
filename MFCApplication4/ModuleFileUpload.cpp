@@ -129,7 +129,7 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 	CFile File;
 	BOOL bRet = File.Open(pszFilePath, File.shareDenyNone, NULL);			// 共享读
 	if (!bRet) {
-		MessageBox(0, L"文件打开失败", L"文件打开失败", 0);
+		MessageBox(0, L"主控端文件打开失败", L"主控端文件打开失败", 0);
 		return false;
 	}
 

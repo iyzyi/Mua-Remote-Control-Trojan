@@ -100,7 +100,61 @@ void CModuleFileTransfer::OnBnClickedButton6()
 // 点击上传
 void CModuleFileTransfer::OnBnClickedUpload()
 {
-	;
+	CString strLocalPath = L"";
+	CString strRemotePath = L"";
+
+	if (m_EditUploadLocalPath.GetWindowTextLength() > MAX_PATH) {
+		AfxMessageBox(L"本地路径过长");
+		return;
+	}
+	if (m_EditUploadLocalPath.GetWindowTextLength() == 0) {
+		AfxMessageBox(L"本地路径为空");
+		return;
+	}
+	// 获取本地路径
+	m_EditUploadLocalPath.GetWindowText(strLocalPath);
+	// 从本地路径中分离出文件名
+	CString strFileName;
+	int n = strLocalPath.GetLength() - strLocalPath.ReverseFind('\\') - 1;
+	strFileName = strLocalPath.Right(n);
+	if (strFileName.GetLength() == 0) {
+		AfxMessageBox(L"未能从本地路径中分离出文件名，请检查本地路径的格式是否正确。");
+		return;
+	}
+
+	if (m_EditUploadRemotePath.GetWindowTextLength() > MAX_PATH) {
+		AfxMessageBox(L"远程目录过长");
+		return;
+	}
+	if (m_EditUploadRemotePath.GetWindowTextLength() == 0) {
+		AfxMessageBox(L"远程目录为空");
+		return;
+	}
+
+	// 获取远程目录
+	m_EditUploadRemotePath .GetWindowText(strRemotePath);
+	WCHAR pszRemotePathTemp[MAX_PATH];
+	wcscpy_s(pszRemotePathTemp, strRemotePath.GetBuffer());
+	strRemotePath.ReleaseBuffer();
+
+
+	// 远程目录+文件名拼接成远程路径
+	HRESULT Ret = PathCchAppend(pszRemotePathTemp, MAX_PATH, strFileName.AllocSysString());
+
+	if (Ret != S_OK) {
+		AfxMessageBox(L"路径拼接出错，请检查");
+		return;
+	}
+	strRemotePath = CString(pszRemotePathTemp);
+
+	if (strRemotePath.GetLength() >= MAX_PATH) {
+		AfxMessageBox(L"拼接后的远程路径过长");
+		return;
+	}
+
+	UploadFile(m_pClient, strLocalPath.GetBuffer(), strRemotePath.GetBuffer());
+	strLocalPath.ReleaseBuffer();
+	strRemotePath.ReleaseBuffer();
 }
 
 
@@ -159,7 +213,7 @@ void CModuleFileTransfer::OnBnClickedDownload()
 		return;
 	}
 
-	//MessageBox(strLocalPath);
-	//MessageBox(strRemotePath);
 	DownloadFile(m_pClient, strRemotePath.GetBuffer(), strLocalPath.GetBuffer());
+	strRemotePath.ReleaseBuffer();
+	strLocalPath.ReleaseBuffer();
 }

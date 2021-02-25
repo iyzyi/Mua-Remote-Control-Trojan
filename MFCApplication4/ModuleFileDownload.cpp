@@ -176,6 +176,7 @@ VOID WINAPI OnRecvPacketFileDownloadInfo(LPVOID lParam) {
 		if (pModuleFileDownload->m_hFile == INVALID_HANDLE_VALUE) {
 			MessageBox(0, L"文件创建失败", L"文件创建失败", 0);
 			// TODO 发送断开连接的封包
+			theApp.m_Server.SendPacket(pSocketClient, FILE_DOWNLOAD_CLOSE, NULL, 0);
 			return;
 		}
 
