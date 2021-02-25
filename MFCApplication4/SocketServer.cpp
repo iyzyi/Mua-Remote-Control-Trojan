@@ -205,7 +205,9 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			}
 			else {
 				//m_pfnChildSocketRecvPacket(pPacket);
-				PostMessage(theApp.m_pMainWnd->m_hWnd, WM_RECV_CHILD_SOCKET_CLIENT_PACKET, NULL, (LPARAM)pPacket);
+				if (theApp.m_pMainWnd != nullptr) {
+					PostMessage(theApp.m_pMainWnd->m_hWnd, WM_RECV_CHILD_SOCKET_CLIENT_PACKET, NULL, (LPARAM)pPacket);
+				}
 			}
 		}
 		else {
