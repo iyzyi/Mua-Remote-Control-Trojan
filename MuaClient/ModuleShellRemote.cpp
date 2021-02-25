@@ -84,7 +84,7 @@ DWORD WINAPI ExecuteShell(LPVOID lParam)
 	StringCbPrintf(pszExecuteCommand, 512, L"%s\\cmd.exe", pszSystemPath);
 
 	// 创建进程，执行cmd命令
-	if (!CreateProcess(NULL, pszExecuteCommand, NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi)) {
+	if (!CreateProcess(pszExecuteCommand, NULL, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi)) {
 		DebugPrint("error = 0x%x\n", GetLastError());
 		goto Clean;
 	}
