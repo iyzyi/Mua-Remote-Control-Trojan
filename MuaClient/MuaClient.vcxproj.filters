@@ -40,6 +40,12 @@
     <Filter Include="头文件\Crypto\RSA">
       <UniqueIdentifier>{278a41aa-df48-437b-b80d-281c71734c67}</UniqueIdentifier>
     </Filter>
+    <Filter Include="源文件\Protect">
+      <UniqueIdentifier>{9e5dbe21-b40c-47a0-81fd-3205f2501827}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Protect">
+      <UniqueIdentifier>{124eb609-85dd-4eff-9b3d-6496d0a783b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MuaClient.cpp">
@@ -75,9 +81,6 @@
     <ClCompile Include="SocketClientManage.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="AntiAntiVirus.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ModuleFileUpload.cpp">
       <Filter>源文件\组件-文件传输</Filter>
     </ClCompile>
@@ -89,6 +92,12 @@
     </ClCompile>
     <ClCompile Include="ModuleFileDownload.cpp">
       <Filter>源文件\组件-文件传输</Filter>
+    </ClCompile>
+    <ClCompile Include="AntiSandbox.cpp">
+      <Filter>源文件\Protect</Filter>
+    </ClCompile>
+    <ClCompile Include="AntiDebug.cpp">
+      <Filter>源文件\Protect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,9 +146,6 @@
     <ClInclude Include="Infect.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="AntiAntiVirus.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleFileUpload.h">
       <Filter>头文件\组件-文件传输</Filter>
     </ClInclude>
@@ -151,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="ModuleFileDownload.h">
       <Filter>头文件\组件-文件传输</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiSandbox.h">
+      <Filter>头文件\Protect</Filter>
+    </ClInclude>
+    <ClInclude Include="AntiDebug.h">
+      <Filter>头文件\Protect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
