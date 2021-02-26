@@ -73,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_Release;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);HPSOCKET_STATIC_LIB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_RELEASE;_DLL;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);HPSOCKET_STATIC_LIB</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
