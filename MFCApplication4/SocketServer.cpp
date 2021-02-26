@@ -175,6 +175,7 @@ EnHandleResult CSocketServer::OnReceive(ITcpServer* pSender, CONNID dwConnID, co
 			// 子socket
 			else {
 				// 找到该新的子socket所属的客户端（通过IP分辨）
+				// TODO 后续要改成通过TOKEN分辨，这样一个IP就可以有多个主socket了
 				CClient* pClient = m_pClientManage->SearchClientByIp(dwConnID);
 				// 将该CSocketClient添加到CClient链表
 				pClient->AddNewChildSocketClientToList(pNewSocketClient);
