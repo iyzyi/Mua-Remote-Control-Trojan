@@ -8,33 +8,52 @@
 #include "Login.h"
 #include "SocketClientManage.h"
 
-void MainFunc(CSocketClient* pMainSocketClient);
+void WINAPI StartClientThreadFunc(LPVOID lParam);
+CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient);
 
 
 int main()
 {
+	HANDLE hRebornThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartClientThreadFunc, NULL, 0, NULL);
 
-	CSocketClient MainSocketClient;
-	MainSocketClient.StartSocketClient();
-	
+	// 之前hRebornThread进程里面的new CSocketClient()一直很奇怪地失败，我还以为是CSocketClient的构造函数的问题，
+	// 没想到只是我的主线程退出了而已。小丑竟是我自己。
+	WaitForSingleObject(hRebornThread, INFINITE);
+}
+
+
+void WINAPI StartClientThreadFunc(LPVOID lParam) {
+	CSocketClient* pMainSocketClient = nullptr;
 	while (true) {
-		MainFunc(&MainSocketClient);
+		__try {
+			pMainSocketClient = StartClientFuncBody(pMainSocketClient);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			pMainSocketClient = nullptr;
+			DebugPrint("无视异常，重连服务端\n");
+		}
 	}
 }
 
 
 // SEH所在函数不能有对象展开，所以单独放到一个函数里
-void MainFunc(CSocketClient* pMainSocketClient) {
-	__try {
-		if (!pMainSocketClient->m_pTcpPackClient->IsConnected()) {
-			DebugPrint("正在重连服务端.....\n");
-			pMainSocketClient->StartSocketClient();
-		}
-		Sleep(1000);			// 若未在线，则3秒重试一次。
+CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClientTemp) {
+	CSocketClient* pMainSocketClient = pMainSocketClientTemp;
+
+	if (pMainSocketClient == nullptr) {
+		pMainSocketClient = new CSocketClient();
+		pMainSocketClient->StartSocketClient();
 	}
-	__except (EXCEPTION_EXECUTE_HANDLER){
-		pMainSocketClient->m_pTcpPackClient->Stop();
-		MessageBox(0, L"无视异常，重连服务端", L"无视异常，重连服务端", 0);
-		DebugPrint("无视异常，重连服务端\n");				// TODO：之后可以改成重启此程序
+	
+	// 未连接时新建一个连接
+	if (!pMainSocketClient->m_pTcpPackClient->IsConnected()) {
+		delete pMainSocketClient;
+		pMainSocketClient = new CSocketClient();
+		DebugPrint("正在重连服务端.....\n");
+		pMainSocketClient->StartSocketClient();
 	}
+
+	// 1秒重试一次
+	Sleep(1000);			
+	return pMainSocketClient;
 }

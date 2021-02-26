@@ -95,13 +95,6 @@ DWORD WINAPI RunModuleShellRemote(CPacket* pPacket)
 
 	pChildSocketClient->WaitForExitEvent();
 
-	//// 杀死cmd.exe进程
-	//if (pModule->m_hCmdProcess != NULL) {
-	//	BOOL Ret = TerminateProcess(pModule->m_hCmdProcess, 0);
-	//	DWORD Error = GetLastError();
-	//	pModule->m_hCmdProcess = NULL;
-	//}
-
 	if (pChildSocketClient != nullptr) {
 		delete pChildSocketClient;
 		pChildSocketClient = nullptr;
@@ -137,12 +130,6 @@ DWORD WINAPI RunModuleFileUpload(CPacket* pPacket) {
 		delete pModule;
 		pModule = nullptr;
 	}
-
-	// pModule的析构中有析构pChildSocketClient
-	//if (pChildSocketClient != nullptr) {
-	//	delete pChildSocketClient;
-	//	pChildSocketClient = nullptr;
-	//}
 
 	if (pPacket != nullptr) {
 		delete pPacket;

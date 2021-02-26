@@ -92,11 +92,11 @@ enum CLIENT_STATUS {
 #endif
 
 
-#ifdef _DEBUG
-	#define DebugPrint(...) printf(__VA_ARGS__)
-#else
-	#define DebugPrint(...) 
-#endif
-
+//#ifdef _DEBUG
+//	#define DebugPrint(...) printf(__VA_ARGS__)
+//#else
+//	#define DebugPrint(...) 
+//#endif
+#define DebugPrint(...) printf(__VA_ARGS__)
 
 #endif //PCH_H

@@ -59,6 +59,8 @@ public:
 	virtual EnHandleResult OnReceive(ITcpClient* pSender, CONNID dwConnID, const BYTE* pData, int iLength);
 	virtual EnHandleResult OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode);
 
+	static VOID OnCloseThreadFunc(CSocketClient* pThis);
+
 public:
 	VOID ReceiveFunc(CPacket* pPacket);	
 };

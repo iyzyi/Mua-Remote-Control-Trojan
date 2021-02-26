@@ -46,6 +46,27 @@ CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : 
 
 CSocketClient::~CSocketClient() {
 	if (!m_bIsMainSocketClient) {
+
+		// 直到m_pTcpPackClient完全关闭才停止阻塞
+		BOOL bJmp = false;
+		while (!bJmp) {
+			En_HP_ServiceState eStatus = m_pTcpPackClient->GetState();
+			switch (eStatus) {
+
+			case SS_STARTING:
+			case SS_STARTED:
+				m_pTcpPackClient->Stop();
+				break;
+				
+			case SS_STOPPING:
+				break;
+
+			case SS_STOPPED:
+				bJmp = true;
+				break;
+			};
+		}
+
 		if (m_pModuleManage != nullptr) {
 			delete m_pModuleManage;
 			m_pModuleManage = nullptr;
@@ -278,9 +299,15 @@ VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
 EnHandleResult CSocketClient::OnClose(ITcpClient* pSender, CONNID dwConnID, EnSocketOperation enOperation, int iErrorCode) {
 	DebugPrint("[Client %d] OnClose: \n", dwConnID);
 
-	if (!m_bIsMainSocketClient) {
-		DisconnectChildSocketClient();
-	}
+	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OnCloseThreadFunc, this, 0, NULL);
+	// 也是莫名奇妙的崩在return，另起一个线程就好了，估计还是老问题：HPSocket作者强调的回调函数内不要做高IO的事情。
 
 	return HR_OK;
+}
+
+
+VOID CSocketClient::OnCloseThreadFunc(CSocketClient* pThis) {
+	if (!pThis->m_bIsMainSocketClient) {
+		pThis->DisconnectChildSocketClient();
+	}
 }
