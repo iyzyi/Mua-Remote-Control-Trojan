@@ -315,8 +315,8 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 		BOOL bRet = theApp.m_Server.StartSocketServer(lpszIpAddress, wPort);
 		if (!bRet) {
 			WCHAR pszErrorDesc[512];
-			MultiByteToWideChar(CP_ACP, 0, (LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), -1, (LPWSTR)pszErrorDesc, 512);
-			MessageBox((LPWSTR)pszErrorDesc, L"启动SocketServer失败", 0);
+			//MultiByteToWideChar(CP_ACP, 0, (LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), -1, (LPWSTR)pszErrorDesc, 512);
+			MessageBox((LPWSTR)(LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), L"启动SocketServer失败", 0);
 		}
 		else {
 			m_ButtonStartSocketServer.EnableWindow(false);		// 按钮变灰
