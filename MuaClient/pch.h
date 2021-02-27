@@ -19,16 +19,22 @@
 
 
 // 之后要做一些免杀，所以就不支持x64了，下面两个就都用x86的吧。
+//#ifdef _DEBUG
+//	#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
+//#else
+//	#pragma comment(lib, "./HPSocket/HPSocket_U.lib")
+//#endif
+
 #ifdef _DEBUG
-	#pragma comment(lib, "./HPSocket/HPSocket_UD.lib")
+	#pragma comment(lib, "./HPSocket/MTd/HPSocket_UD.lib")
 #else
-	#pragma comment(lib, "./HPSocket/HPSocket_U.lib")
+	#pragma comment(lib, "./HPSocket/MD/HPSocket_U.lib")
 #endif
 
 
 #include <iostream>
 #include <Windows.h>
-#include  "strsafe.h"
+#include <strsafe.h>
 #include <assert.h>
 
 

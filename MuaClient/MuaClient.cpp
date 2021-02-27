@@ -11,6 +11,7 @@
 //				水平有限，请您批评指正O(∩_∩)O					//
 //////////////////////////////////////////////////////////////////
 
+
 #include "pch.h"
 #include <iostream>
 #include "SocketClient.h"
@@ -35,6 +36,8 @@ void WINAPI StartClientThreadFunc(REBORN_THREAD_PARAM* pThreadParam);
 CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient, LPCTSTR pszAddress, WORD wPort);
 
 
+
+
 #ifdef _DEBUG
 int wmain(int argc, wchar_t *argv[]) {
 	if (argc < 3)
@@ -56,7 +59,36 @@ int wmain(int argc, wchar_t *argv[]) {
 #endif
 
 
+
+
+
 #ifdef _RELEASE
+
+extern "C" __declspec(dllexport) void RunMuaClient();
+
+
+BOOL APIENTRY DllMain(HMODULE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	return TRUE;
+}
+
+
+_declspec(dllexport) void RunMuaClient() {
+	MessageBox(0, L"TOP!", L"", 0);
+}
+
+
 #endif
 
 
