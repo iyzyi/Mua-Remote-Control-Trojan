@@ -1,5 +1,15 @@
-﻿// MuaClient.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//
+﻿//////////////////////////////////////////////////////////////////
+//				Mua远控木马被控端								//
+//																//
+//				Author: iyzyi(狗小剩)							//
+//				From  : BXS @ CUMT								//
+//				Blog  : http://iyzyi.com						//
+//				QQ    : 295982055								//
+//				Email : kljxn@qq.com							//
+//																//
+//				仅供交流学习，请勿用于非法用途					//
+//				水平有限，请您批评指正O(∩_∩)O					//
+//////////////////////////////////////////////////////////////////
 
 #include "pch.h"
 #include <iostream>
@@ -48,6 +58,11 @@ int wmain(int argc, wchar_t *argv[]) {
 
 #ifdef _RELEASE
 #endif
+
+
+
+
+
 
 
 void WINAPI StartClientThreadFunc(REBORN_THREAD_PARAM* pThreadParam) {
