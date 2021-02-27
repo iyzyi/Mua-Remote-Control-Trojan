@@ -183,8 +183,8 @@ CClient* CClientManage::SearchClientByIp(CONNID dwConnectId) {
 		EnterCriticalSection(&m_ClientLock);
 
 		// 获取该dwConnectId所属的IP
-		WCHAR lpszIpAddress[20];
-		int dwIpAddressLength = 20;
+		WCHAR lpszIpAddress[IP_ADDRESS_MAX_LENGTH];
+		int dwIpAddressLength = IP_ADDRESS_MAX_LENGTH;
 		USHORT wPort = 0;
 		theApp.m_Server.m_pTcpPackServer->GetRemoteAddress(dwConnectId, lpszIpAddress, dwIpAddressLength, wPort);
 

@@ -25,7 +25,7 @@ public:
 
 	CCrypto					m_Crypto;
 
-	WCHAR					m_lpszIpAddress[20];
+	WCHAR					m_lpszIpAddress[IP_ADDRESS_MAX_LENGTH];
 	WORD					m_wPort;
 
 	BOOL					m_bIsMainSocketServer;	// 是否是主socket
@@ -78,7 +78,7 @@ public:
 	CSocketClient*			m_pChildSocketClientListTail;
 	DWORD					m_dwChildSocketClientNum;
 
-	WCHAR					m_lpszIpAddress[20];
+	WCHAR					m_lpszIpAddress[IP_ADDRESS_MAX_LENGTH];
 	
 public:
 	// 构成双向链表，方便CClientManage管理

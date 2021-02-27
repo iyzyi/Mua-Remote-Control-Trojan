@@ -139,6 +139,8 @@ typedef struct _DIALOG_INFO {
 #define CRYPTO_KEY_PACKET_TOKEN_FOR_CHILD_SOCKET (0xCD)
 
 
+#define IP_ADDRESS_MAX_LENGTH 40
+
 
 #ifndef QWORD
 	#define QWORD int64_t

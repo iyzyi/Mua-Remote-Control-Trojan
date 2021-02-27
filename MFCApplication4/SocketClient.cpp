@@ -18,8 +18,9 @@ CSocketClient::CSocketClient(CONNID dwConnectId, BOOL bIsMainSocketClient, CModu
 		ASSERT(m_pClient != nullptr);
 	}	
 
+	
 	// 通过ConnectId获取IP地址和端口
-	int dwIpAddressLength = 20;
+	int dwIpAddressLength = IP_ADDRESS_MAX_LENGTH;
 	theApp.m_Server.m_pTcpPackServer->GetRemoteAddress(m_dwConnectId, m_lpszIpAddress, dwIpAddressLength, m_wPort);
 
 	// 被控端发来的第一个包是传递密钥的封包，接收密钥后，状态就是等待上线包
@@ -76,7 +77,7 @@ CClient::CClient(CSocketClient* pSocketClient) {
 
 	m_dwChildSocketClientNum		= 0;
 
-	memcpy(m_lpszIpAddress, pSocketClient->m_lpszIpAddress, 20*2);
+	wcscpy_s(m_lpszIpAddress, pSocketClient->m_lpszIpAddress);
 
 	InitializeCriticalSection(&m_Lock);
 
