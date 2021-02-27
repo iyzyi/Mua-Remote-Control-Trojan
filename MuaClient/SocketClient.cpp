@@ -5,12 +5,6 @@
 #include "Login.h"
 
 
-
-#define SERVER_ADDRESS L"192.168.0.103"
-//#define SERVER_ADDRESS L"81.70.160.41"
-#define SERVER_PORT 5555;
-
-
 CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : m_pTcpPackClient(this) {
 	
 	m_bIsRunning = false;
@@ -18,6 +12,15 @@ CSocketClient::CSocketClient(CSocketClient* pMainSocketClient /* = nullptr*/) : 
 	m_bIsMainSocketClient = (pMainSocketClient == nullptr) ? true : false;
 
 	m_pMainSocketClient = m_bIsMainSocketClient ? this : pMainSocketClient;
+
+	if (!m_bIsMainSocketClient) {
+		m_pszAddress = m_pMainSocketClient->m_pszAddress;
+		m_wPort = m_pMainSocketClient->m_wPort;
+	}
+	else {
+		m_pszAddress = L"127.0.0.1";
+		m_wPort = 5555;
+	}
 
 	m_pModuleManage = nullptr;
 	
@@ -93,15 +96,19 @@ CSocketClient::~CSocketClient() {
 }
 
 
+VOID CSocketClient::SetRemoteAddress(LPCTSTR pszAddress, WORD wPort) {
+	m_pszAddress = pszAddress;
+	m_wPort = wPort;
+}
+
+
 BOOL CSocketClient::StartSocketClient() {
 
-	LPCTSTR lpszRemoteAddress = SERVER_ADDRESS;
-	WORD wPort = SERVER_PORT;
 	BOOL bRet;
 
 	if (!(m_pTcpPackClient->IsConnected())) {
 		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
-		bRet = m_pTcpPackClient->Start(lpszRemoteAddress, wPort, 0);		
+		bRet = m_pTcpPackClient->Start(m_pszAddress, m_wPort, 0);
 		if (!bRet) {
 			return false;
 		}

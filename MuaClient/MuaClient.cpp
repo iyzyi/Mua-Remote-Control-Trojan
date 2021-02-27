@@ -8,25 +8,57 @@
 #include "Login.h"
 #include "SocketClientManage.h"
 
-void WINAPI StartClientThreadFunc(LPVOID lParam);
-CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient);
+
+typedef struct _REBORN_THREAD_PARAM {
+	WCHAR m_pszAddress[20];
+	WORD m_wPort;
+	_REBORN_THREAD_PARAM(wchar_t* pszAddress, wchar_t* pwszPort) {
+		wcscpy_s(m_pszAddress, pszAddress);
+		char pszPort[10];
+		WideCharToMultiByte(CP_ACP, NULL, pwszPort, -1, pszPort, 10, NULL, NULL);
+		m_wPort = atoi(pszPort);
+	}
+}REBORN_THREAD_PARAM;
 
 
-int main()
-{
-	HANDLE hRebornThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartClientThreadFunc, NULL, 0, NULL);
+void WINAPI StartClientThreadFunc(REBORN_THREAD_PARAM* pThreadParam);
+CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient, LPCTSTR pszAddress, WORD wPort);
+
+
+#ifdef _DEBUG
+int wmain(int argc, wchar_t *argv[]) {
+	printf("%d\n", argc);
+	if (argc < 3)
+	{
+		CHAR pszPath[MAX_PATH];
+		WideCharToMultiByte(CP_ACP, NULL, argv[0], -1, pszPath, MAX_PATH, NULL, NULL);
+		printf("Usage:\n %s <Host> <Port>\n", pszPath);
+		system("pause");
+		return -1;
+	}
+
+	REBORN_THREAD_PARAM* pThreadParam = new REBORN_THREAD_PARAM(argv[1], argv[2]);
+	HANDLE hRebornThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartClientThreadFunc, pThreadParam, 0, NULL);
 
 	// 之前hRebornThread进程里面的new CSocketClient()一直很奇怪地失败，我还以为是CSocketClient的构造函数的问题，
 	// 没想到只是我的主线程退出了而已。小丑竟是我自己。
 	WaitForSingleObject(hRebornThread, INFINITE);
 }
+#endif
 
 
-void WINAPI StartClientThreadFunc(LPVOID lParam) {
+#ifdef _RELEASE
+#endif
+
+
+void WINAPI StartClientThreadFunc(REBORN_THREAD_PARAM* pThreadParam) {
+	PWSTR pszAddress = pThreadParam->m_pszAddress;
+	WORD wPort = pThreadParam->m_wPort;
+
 	CSocketClient* pMainSocketClient = nullptr;
 	while (true) {
 		__try {
-			pMainSocketClient = StartClientFuncBody(pMainSocketClient);
+			pMainSocketClient = StartClientFuncBody(pMainSocketClient, pszAddress, wPort);
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 			pMainSocketClient = nullptr;
@@ -37,11 +69,12 @@ void WINAPI StartClientThreadFunc(LPVOID lParam) {
 
 
 // SEH所在函数不能有对象展开，所以单独放到一个函数里
-CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClientTemp) {
+CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClientTemp, LPCTSTR pszAddress, WORD wPort) {
 	CSocketClient* pMainSocketClient = pMainSocketClientTemp;
 
 	if (pMainSocketClient == nullptr) {
 		pMainSocketClient = new CSocketClient();
+		pMainSocketClient->SetRemoteAddress(pszAddress, wPort);
 		pMainSocketClient->StartSocketClient();
 	}
 	
@@ -49,6 +82,7 @@ CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClientTemp) {
 	if (!pMainSocketClient->m_pTcpPackClient->IsConnected()) {
 		delete pMainSocketClient;
 		pMainSocketClient = new CSocketClient();
+		pMainSocketClient->SetRemoteAddress(pszAddress, wPort);
 		DebugPrint("正在重连服务端.....\n");
 		pMainSocketClient->StartSocketClient();
 	}

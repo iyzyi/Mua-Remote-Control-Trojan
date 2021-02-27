@@ -13,6 +13,9 @@ class CPacket;
 class CSocketClient : public CTcpClientListener {
 
 public:
+	LPCTSTR					m_pszAddress;
+	WORD					m_wPort;
+
 	BOOL					m_bIsMainSocketClient;
 	CSocketClient*			m_pMainSocketClient;
 
@@ -43,6 +46,7 @@ public:
 	CSocketClient(CSocketClient* pMainSocketClient = nullptr);
 	~CSocketClient();
 
+	VOID SetRemoteAddress(LPCTSTR pszAddress, WORD wPort);
 	BOOL StartSocketClient();
 
 	BOOL SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD dwPacketBodyLength);

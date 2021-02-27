@@ -144,7 +144,7 @@ VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos) {
 }
 
 
-// 这段代码不能在Release版中出现
+// 这段代码不要在Release版本中出现
 #ifdef _DEBUG
 CHAR* EncodeString(CHAR plain[]) {
 	CHAR key[] = "iyzyi@BXS";
