@@ -96,7 +96,7 @@ VOID WINAPI OnRecvPacketFileUploadInfo(LPVOID lParam) {
 	pModuleFileUpload->m_hFile = CreateFile(pModuleFileUpload->m_pszFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (pModuleFileUpload->m_hFile == INVALID_HANDLE_VALUE) {
-		MessageBox(0, L"文件创建失败", L"文件创建失败", 0);
+		//MessageBox(0, L"文件创建失败", L"文件创建失败", 0);
 		// TODO 发送断开连接的封包
 		return;
 	}
@@ -138,7 +138,7 @@ VOID WINAPI OnRecvPacketFileUploadData(LPVOID lParam) {
 			NULL);									// no overlapped structure
 
 		if (!bRet) {
-			MessageBox(0, L"写入失败", L"写入失败", 0);
+			//MessageBox(0, L"写入失败", L"写入失败", 0);
 		}
 
 		LeaveCriticalSection(&pModuleFileUpload->m_WriteLock);

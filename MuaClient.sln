@@ -10,19 +10,36 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestRunMuaClientDll", "Test
 		{6A28A286-A202-49F7-A97F-414CA0E77A28} = {6A28A286-A202-49F7-A97F-414CA0E77A28}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InstallMuaClient", "InstallMuaClient\InstallMuaClient.vcxproj", "{63FBB36D-584B-4BF3-9A4D-6194AD702170}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Debug|x64.ActiveCfg = Debug|Win32
 		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Debug|x86.ActiveCfg = Debug|Win32
 		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Debug|x86.Build.0 = Debug|Win32
+		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Release|x64.ActiveCfg = Release|Win32
 		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Release|x86.ActiveCfg = Release|Win32
 		{6A28A286-A202-49F7-A97F-414CA0E77A28}.Release|x86.Build.0 = Release|Win32
+		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Debug|x64.ActiveCfg = Debug|x64
+		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Debug|x64.Build.0 = Debug|x64
 		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Debug|x86.ActiveCfg = Debug|Win32
+		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Release|x64.ActiveCfg = Release|x64
+		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Release|x64.Build.0 = Release|x64
 		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Release|x86.ActiveCfg = Release|Win32
 		{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}.Release|x86.Build.0 = Release|Win32
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Debug|x64.ActiveCfg = Debug|x64
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Debug|x64.Build.0 = Debug|x64
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Debug|x86.ActiveCfg = Debug|Win32
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Release|x64.ActiveCfg = Release|x64
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Release|x64.Build.0 = Release|x64
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Release|x86.ActiveCfg = Release|Win32
+		{63FBB36D-584B-4BF3-9A4D-6194AD702170}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

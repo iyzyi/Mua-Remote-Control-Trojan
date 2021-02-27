@@ -93,7 +93,9 @@
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="AntiDebug.cpp" />
     <ClCompile Include="AntiSandbox.cpp" />
+    <ClCompile Include="BypassUAC.cpp" />
     <ClCompile Include="Crypto.cpp" />
+    <ClCompile Include="SystemService.cpp" />
     <ClCompile Include="libccrypto.cpp" />
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -115,12 +117,14 @@
     <ClInclude Include="AES.h" />
     <ClInclude Include="AntiDebug.h" />
     <ClInclude Include="AntiSandbox.h" />
+    <ClInclude Include="BypassUAC.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
     <ClInclude Include="Infect.h" />
+    <ClInclude Include="SystemService.h" />
     <ClInclude Include="libccrypto.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="Misc.h" />

