@@ -64,6 +64,7 @@ int wmain(int argc, wchar_t *argv[]) {
 
 #ifdef _RELEASE
 
+//不写extern "C"的话，函数名就被VC给改了，就没法用我们定义的函数名来通过rundll32执行该函数了
 extern "C" __declspec(dllexport) void RunMuaClient();
 
 
