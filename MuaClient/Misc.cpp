@@ -144,25 +144,103 @@ VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos) {
 }
 
 
+// 这段代码不能在Release版中出现
+#ifdef _DEBUG
+CHAR* EncodeString(CHAR plain[]) {
+	CHAR key[] = "iyzyi@BXS";
+	DWORD dwKeyLength = strlen(key);
+	DWORD dwPlainLength = strlen(plain);
 
-//// 返回拷贝好的地址
-//// dwLength要复制的长度
-//// pbSrc + dwPos 复制的起始地址
-//VOID MyMemcpy(PBYTE pbDest, PBYTE pbSrc, DWORD dwLength, DWORD dwPos) {
-//
-//	memcpy(pbDest, pbSrc+dwPos, dwLength);
-//
-//	//PBYTE pbDest;
-//
-//	//if (dwLength > 0) {
-//	//	//pbDest = (PBYTE)xmalloc(dwLength);
-//	//	pbDest = new BYTE[dwLength];
-//	//	memcpy(pbDest, pbSrc + dwPos, dwLength);
-//	//}
-//	//else {
-//	//	// 封包包体可能长度为0，此时申请长为1的缓冲区
-//	//	pbDest = new BYTE[1];
-//	//}
-//
-//	//return pbDest;
-//}
+	// 得用BYTE来计算，用CHAR来进行移位运算，会有0x87>>4=-8
+	BYTE* buffer = new BYTE[dwPlainLength];
+	memcpy(buffer, plain, dwPlainLength);
+
+	int j = 0;
+	bool NeedBecomeZero = false;
+	for (int i = 0; i < dwPlainLength; i++)
+	{
+		if (j == 1 && NeedBecomeZero)
+		{
+			j = 0;
+			NeedBecomeZero = false;
+		}
+		if (j == dwKeyLength)
+		{
+			j = 0;
+			NeedBecomeZero = true;
+		}
+		buffer[i] ^= key[j];
+		j++;
+	}
+
+
+	CHAR temp = buffer[dwPlainLength - 1] >> 3;
+	for (int i = dwPlainLength - 1; i > 0; i--)
+	{
+		buffer[i] = (buffer[i] << 5) | (buffer[i - 1] >> 3);
+	}
+	buffer[0] = (buffer[0] << 5) | temp;
+
+
+	DWORD dwCipherLength = dwPlainLength * 2;
+	CHAR* cipher = new CHAR[dwCipherLength + 1];
+	memset(cipher, 0, dwCipherLength + 1);
+	for (int i = 0; i < dwPlainLength; i++) {
+		cipher[2 * i] = ((buffer[i] >> 4) >= 0 && (buffer[i] >> 4) <= 9) ? ((buffer[i] >> 4) + '0') : ((buffer[i] >> 4) - 10 + 'A');
+		cipher[2 * i + 1] = ((buffer[i] & 0xf) >= 0 && (buffer[i] & 0xf) <= 9) ? ((buffer[i] & 0xf) + '0') : ((buffer[i] & 0xf) - 10 + 'A');
+	}
+
+	printf("%s 加密为 %s\n", plain, cipher);
+	delete[] buffer;
+	return cipher;
+}
+#endif
+
+
+VOID DecodeString(CHAR str[]) {
+	CHAR key[] = "iyzyi@BXS";
+	DWORD dwKeyLength = strlen(key);
+	DWORD dwCipherLength = strlen(str);
+
+	assert(dwCipherLength % 2 == 0);
+	DWORD dwPlainLength = dwCipherLength / 2;
+	BYTE* buffer = new BYTE[dwPlainLength + 1];
+	CHAR hex[] = "0123456789ABCDEF";
+	memset(buffer, 0, dwPlainLength + 1);
+	for (int i = 0; i < dwCipherLength; i += 2) {
+		assert((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'F'));
+		assert((str[i + 1] >= '0' && str[i + 1] <= '9') || (str[i + 1] >= 'A' && str[i + 1] <= 'F'));
+		buffer[i / 2] = ((strchr(hex, str[i]) - hex) << 4) + (strchr(hex, str[i + 1]) - hex);
+	}
+
+
+	CHAR temp = buffer[0] << 3;
+	for (int i = 0; i < dwPlainLength - 1; i++)
+	{
+		buffer[i] = (buffer[i] >> 5) | (buffer[i + 1] << 3);
+	}
+	buffer[dwPlainLength - 1] = (buffer[dwPlainLength - 1] >> 5) | temp;
+
+
+	int j = 0;
+	bool NeedBecomeZero = false;
+	for (int i = 0; i < dwPlainLength; i++)
+	{
+		if (j == 1 && NeedBecomeZero)
+		{
+			j = 0;
+			NeedBecomeZero = false;
+		}
+		if (j == dwKeyLength)
+		{
+			j = 0;
+			NeedBecomeZero = true;
+		}
+		buffer[i] ^= key[j];
+		j++;
+	}
+
+	memset(str, 0, dwCipherLength);
+	memcpy(str, buffer, dwPlainLength);
+	delete[] buffer;
+}
