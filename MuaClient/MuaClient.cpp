@@ -86,6 +86,15 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
 _declspec(dllexport) void RunMuaClient() {
 	MessageBox(0, L"TOP!", L"", 0);
+
+	WCHAR pszAddress[20] = L"192.168.0.102";
+	WCHAR pszPort[10] = L"5555";
+
+	REBORN_THREAD_PARAM* pThreadParam = new REBORN_THREAD_PARAM(pszAddress, pszPort);
+	HANDLE hRebornThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartClientThreadFunc, pThreadParam, 0, NULL);
+
+	WaitForSingleObject(hRebornThread, INFINITE);
+	MessageBox(0, L"TOP2", L"", 0);
 }
 
 
