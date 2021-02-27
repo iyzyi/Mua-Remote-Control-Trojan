@@ -27,7 +27,6 @@ CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient, LPCTSTR psz
 
 #ifdef _DEBUG
 int wmain(int argc, wchar_t *argv[]) {
-	printf("%d\n", argc);
 	if (argc < 3)
 	{
 		CHAR pszPath[MAX_PATH];
