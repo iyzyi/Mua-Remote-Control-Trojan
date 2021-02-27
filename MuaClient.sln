@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MuaClient", "MuaClient\MuaClient.vcxproj", "{6A28A286-A202-49F7-A97F-414CA0E77A28}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestRunMuaClientDll", "TestRunMuaClientDll\TestRunMuaClientDll.vcxproj", "{C7659F8F-6D95-4378-A4DB-F5D6603AF8B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6A28A286-A202-49F7-A97F-414CA0E77A28} = {6A28A286-A202-49F7-A97F-414CA0E77A28}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
