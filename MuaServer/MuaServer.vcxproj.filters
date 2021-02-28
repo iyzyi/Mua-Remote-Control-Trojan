@@ -175,6 +175,9 @@
     <Image Include="res\MuaServer.ico">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="..\..\..\..\..\Desktop\favicon.ico">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MuaServer.rc">
