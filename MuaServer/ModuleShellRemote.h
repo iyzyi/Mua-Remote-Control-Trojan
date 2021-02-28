@@ -55,7 +55,6 @@ public:
 	afx_msg void OnEnChangeEdit1();
 
 	CEdit m_EditResult;
-	CEdit m_EditResult;
 	CEdit m_EditCommand;
 	afx_msg void OnBnClickedButton1();
 };
