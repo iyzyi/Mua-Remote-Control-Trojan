@@ -30,9 +30,6 @@ public:
 
 	// ÖØÐ´Ðéº¯Êý
 	void OnRecvivePacket(CPacket* pPacket);
-
-	//VOID RecvPacketFileUploadInfo(CPacket* pPacket);
-
 };
 
 

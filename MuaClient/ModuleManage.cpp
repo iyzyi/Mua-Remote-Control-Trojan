@@ -37,9 +37,6 @@ void CModule::OnRecvivePacket(CPacket* pPacket) {
 
 CModuleManage::CModuleManage(CSocketClient* pMainSocketClient) {
 	m_pSocketClient = pMainSocketClient;
-
-	//memset(m_ahThread, 0, sizeof(m_ahThread));
-	//m_dwThreadNum = 0;
 }
 
 
@@ -67,8 +64,6 @@ BOOL CModuleManage::OnReceiveConnectPacket(CPacket* pPacket) {
 		break;
 
 	default:
-		//pPacket->
-
 		return false;
 	}
 

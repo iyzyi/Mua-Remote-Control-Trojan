@@ -5,7 +5,7 @@
 #include "Packet.h"
 
 
-class CModuleManage;			// 头文件相互包含，不提前声明这个类的和，会报错C3646: 未知重写说明符
+class CModuleManage;
 class CModule;
 class CPacket;
 
@@ -20,9 +20,6 @@ public:
 	CSocketClient*			m_pMainSocketClient;
 
 	CModuleManage*			m_pModuleManage;				// 组件管理对象，只有主socket可以创建
-															// 原本想用m_ModuleManage而非m_pModuleManage的，但是编译死活通不过，
-															// 两个头文件相互包含，递归来探寻需要分配的内存。但是指针就不需要递归探寻所需内存大小
-															// 现在这个m_pModuleManage是new来的，记得delete
 
 	CTcpPackClientPtr		m_pTcpPackClient;
 

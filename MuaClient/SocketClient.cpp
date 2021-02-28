@@ -75,12 +75,6 @@ CSocketClient::~CSocketClient() {
 			m_pModuleManage = nullptr;
 		}
 
-		// 这里只析构了基类，没析构派生类，所以还是单独析构吧
-		//if (m_pModule != nullptr) {
-		//	delete m_pModule;
-		//	m_pModule = nullptr;
-		//}
-
 		if (m_hChildSocketClientExitEvent != nullptr) {
 			CloseHandle(m_hChildSocketClientExitEvent);
 		}
@@ -107,7 +101,7 @@ BOOL CSocketClient::StartSocketClient() {
 	BOOL bRet;
 
 	if (!(m_pTcpPackClient->IsConnected())) {
-		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了
+		// 默认是异步connect，bRet返回true不一定代表成功连接。坑死我了，现改成同步connect
 		bRet = m_pTcpPackClient->Start(m_pszAddress, m_wPort, 0);
 		if (!bRet) {
 			return false;
@@ -159,7 +153,7 @@ BOOL CSocketClient::SendPacket(COMMAND_ID dwCommandId, PBYTE pbPacketBody, DWORD
 	CPacket Packet = CPacket(this);
 	Packet.PacketCombine(dwCommandId, pbPacketBody, dwPacketBodyLength);
 	BOOL bRet;
-	// 鬼知道怎么析构的，明明析构的时候将m_bIsRunning设为false了，为啥debug时居然是0xdddddddd
+
 	if (m_bIsRunning == 1) {
 		bRet = m_pTcpPackClient->Send(Packet.m_pbPacketCiphertext, Packet.m_dwPacketLength);
 	}
@@ -235,7 +229,7 @@ VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
 		// 处理主socket以及和子socket共有部分，主要是登录相关的包
 		switch (pPacket->m_PacketHead.wCommandId) {
 
-			// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
+		// Server接收到Client的发出的密钥后，给Client响应一个CRYPTO_KEY包。
 		case CRYPTO_KEY:
 
 			if (m_bIsMainSocketClient) {				// 如果是Client的主socket发来的，那么Client发出上线包
@@ -254,7 +248,7 @@ VOID CSocketClient::ReceiveFunc(CPacket* pPacket) {
 			m_dwClientStatus = LOGINED;
 			__leave;
 
-			// 这里一定不要写default, 不然后面的代码就不继续走下去了。
+		// 这里一定不要写default, 不然后面的代码就不继续走下去了。
 
 		} // switch (pPacket->m_PacketHead.wCommandId)
 

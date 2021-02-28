@@ -1,23 +1,5 @@
 #pragma once
 
-
-//class CModule {
-//
-//	CModule();
-//	~CModule();
-//
-//	virtual void OnRecvivePacket();
-//
-//
-//	void WaitForClose();
-//
-//
-//
-//
-//};
-//
-
-
 #include "Packet.h"
 #include "SocketClient.h"
 

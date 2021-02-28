@@ -7,15 +7,14 @@
 #include "RSA.h"
 
 
-//<key_size>		The key size in bits, must be either 2048 or 4096
-//<public_key>		Name of the public key file
-//<private_key>		Name of the private key file
+//iKeySize						密钥长度，2048位或4096位
+//lpszPublicKeyFileName			生成的公钥保存在此文件中
+//lpszPrivateKeyFileName		生成的私钥保存在此文件中
 int RsaKeyGen(int iKeySize, LPSTR lpszPublicKeyFileName, LPSTR lpszPrivateKeyFileName) {
 	BCRYPT_ALG_HANDLE hAlgo = NULL;
 	BCRYPT_KEY_HANDLE hKey = NULL;
 	NTSTATUS status;
 
-	// Simple sanity check
 	if (iKeySize != 2048 && iKeySize != 4096) {
 		printf("The key size must be either 2048 or 4096!\n");
 		return -1;
@@ -86,7 +85,7 @@ int RsaEncrypt(PBYTE pbPlaintext, DWORD dwPlaintextLength, PBYTE pbCiphertext, P
 	PBYTE pbCiphertextTemp = NULL;
 	CCRYPT_STATUS status;
 
-	// Import our RSA public key
+	// 导入RSA公钥
 	if (CCRYPT_STATUS_SUCCESS != (status = RSAImportKeyFromBuffer(&hAlgo, &hKey, pbKeyBuffer, dwKeyBufferSize, BCRYPT_RSAPUBLIC_BLOB))) {
 		printf("RSAImportKey error (public): %x\n", status);
 		return -1;
@@ -113,7 +112,7 @@ int RsaDecrypt(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbPlaintext, 
 	PBYTE pbPlaintextTemp = NULL;
 	CCRYPT_STATUS status;
 
-	// Import our RSA private key
+	// 导入RSA私钥
 	if (CCRYPT_STATUS_SUCCESS != (status = RSAImportKeyFromBuffer(&hAlgo, &hKey, pbKeyBuffer, dwKeyBufferSize, BCRYPT_RSAPRIVATE_BLOB))) {
 		printf("RSAImportKey error (private): %x\n", status);
 		return -1;

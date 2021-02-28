@@ -35,7 +35,7 @@ private:
 
 	void ShiftRows(unsigned char **state);
 
-	unsigned char xtime(unsigned char b);    // multiply on x
+	unsigned char xtime(unsigned char b);					// multiply on x
 
 	unsigned char mul_bytes(unsigned char a, unsigned char b);
 
@@ -82,35 +82,15 @@ public:
 
 	//AES(int keyLen = 256);
 
-  // 原来的类不能持久化加解密，每次加解密都要额外带上key和iv，
-  // 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
-  // 并新增m_pbEncryptIv, m_pbDecryptIv, m_pbKey三个类成员变量
+	// 原来的类不能持久化加解密，每次加解密都要额外带上key和iv，
+	// 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
+	// 并新增m_pbEncryptIv, m_pbDecryptIv, m_pbKey三个类成员变量
 	AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv);
 	AES();
 	~AES();
 
 	unsigned int EncryptCFB(unsigned char pbPlaintext[], unsigned int dwPlaintextLength, unsigned char pbCiphertext[]);
-
 	unsigned int DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCiphertextLength, unsigned char pbPlaintext[]);
-
-
-	//unsigned char *EncryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned int &outLen);
-
-	//unsigned char *DecryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[]);
-
-	//unsigned char *EncryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen);
-
-	//unsigned char *DecryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv);
-
-	//unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen);
-
-	//unsigned char *DecryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv);
-
-	//unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pOutLen);
-
-	//void printHexArray (unsigned char a[], unsigned int n);
-
-
 };
 
 const unsigned char sbox[16][16] = {

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "SocketClientManage.h"
-//#include "Packet.h"
 
 
 class CSocketClient;
@@ -42,12 +41,6 @@ VOID CSocketClientManage::AddNewSocketClientToList(CSocketClient *pSocketClient)
 		m_dwChildSocketClientNum++;
 	}
 
-//#ifdef _DEBUG
-//	USES_CONVERSION;
-//	printf("[上线] IP=%s, PORT=%d, 当前共%d个socket连接：%d条主socket连接，%d条子socket连接\n",
-//		W2A(pClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum, m_dwMainSocketClientNum, m_dwChildSocketClientNum);
-//#endif
-
 	LeaveCriticalSection(&m_Lock);
 }
 
@@ -87,12 +80,6 @@ VOID CSocketClientManage::DeleteSocketClientFromList(CSocketClient *pSocketClien
 	else {
 		m_dwChildSocketClientNum--;
 	}
-
-//#ifdef _DEBUG
-//	USES_CONVERSION;			// 使用A2W之前先声明这个
-//	printf("[下线] IP=%s, PORT=%d, 当前共%d个socket连接：%d条主socket连接，%d条子socket连接\n",
-//		W2A(pSocketClient->m_lpszIpAddress), pClient->m_wPort, m_dwClientNum, m_dwMainSocketClientNum, m_dwChildSocketClientNum);
-//#endif
 
 	delete pSocketClient;				// Client在这里释放内存
 

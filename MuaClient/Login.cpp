@@ -32,14 +32,14 @@ BOOL HaveCamera()
 
 
 
-// ---- get cpu info ---- //  
-// save 4 register variables  
+// 获取CPU信息
+// 保存4个寄存器变量
 DWORD deax;
 DWORD debx;
 DWORD decx;
 DWORD dedx;
 
-// init cpu in assembly language  
+// 用汇编语言初始化cpu
 void initCpu(DWORD veax)
 {
 	__asm

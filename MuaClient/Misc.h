@@ -7,9 +7,7 @@
 VOID RandomBytes(LPBYTE pbData, DWORD dwDataLen);
 
 VOID PrintBytes(LPBYTE pbPrintData, DWORD dwDataLen);
-
 VOID PrintChars(CHAR *pbPrintData, DWORD dwDataLen);
-
 VOID PrintData(LPBYTE pbPrintData, DWORD dwDataLen);
 
 BOOL IsLittleEndding();
@@ -23,5 +21,3 @@ VOID WriteQwordToBuffer(PBYTE pbData, QWORD qwNum, DWORD dwPos);
 VOID WriteDwordToBuffer(PBYTE pbData, DWORD dwNum, DWORD dwPos = 0);
 VOID WriteWordToBuffer(PBYTE pbData, WORD wNum, DWORD dwPos = 0);
 VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos = 0);
-
-//VOID MyMemcpy(PBYTE pbDest, PBYTE pbSrc, DWORD dwLength, DWORD dwPos);

@@ -2,6 +2,9 @@
 #include "ModuleFileDownload.h"
 
 
+// 下载是指主控端下载。被控端这里做的其实是上传的工作
+
+
 CModuleFileDownload::CModuleFileDownload(CSocketClient* pSocketClient) : CModule(pSocketClient) {
 	// 自动重置事件，初始状态无信号
 	m_hRecvPacketFileDownloadInfoEvent = CreateEvent(NULL, false, false, NULL);
@@ -108,7 +111,7 @@ BOOL WINAPI OnRecvPacketFileDownloadInfo(LPVOID lParam) {
 	DWORD dwFileSizeLowDword = 0;
 	DWORD dwFileSizeHighDword = 0;
 	dwFileSizeLowDword = GetFileSize(pModuleFileDownload->m_hFile, &dwFileSizeHighDword);
-	qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;		// 直接dwFileSizeHighDword << 32的话就等于0了
+	qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;
 
 	// 被控端发往主控端的INFO包体：被控端文件状态（1字节）+ 文件大小（8字节）
 	BYTE pbPacketBody[9];

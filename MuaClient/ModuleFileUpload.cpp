@@ -11,9 +11,6 @@ CModuleFileUpload::CModuleFileUpload(CSocketClient* pSocketClient) : CModule(pSo
 	m_hRecvPacketFileUploadInfoEvent = CreateEvent(NULL, true, false, NULL);
 	m_hRecvPacketFileUploadCloseEvent = CreateEvent(NULL, true, false, NULL);
 
-	// 自动重置信号
-	//m_hWritingEvent = CreateEvent(NULL, false, false, NULL);
-
 	InitializeCriticalSection(&m_WriteLock);
 }
 
@@ -73,7 +70,7 @@ void CModuleFileUpload::OnRecvivePacket(CPacket* pPacket) {
 	case FILE_UPLOAD_CLOSE:
 		m_pChildSocketClient->SendPacket(FILE_UPLOAD_CLOSE, NULL, 0);
 		SetEvent(m_hRecvPacketFileUploadCloseEvent);
-		delete pPacketCopy;		// pPacket被外面的函数的__finally delete
+		delete pPacketCopy;										// pPacket被外面的函数的__finally delete
 		break;
 	}
 }
@@ -96,7 +93,6 @@ VOID WINAPI OnRecvPacketFileUploadInfo(LPVOID lParam) {
 	pModuleFileUpload->m_hFile = CreateFile(pModuleFileUpload->m_pszFilePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (pModuleFileUpload->m_hFile == INVALID_HANDLE_VALUE) {
-		//MessageBox(0, L"文件创建失败", L"文件创建失败", 0);
 		// TODO 发送断开连接的封包
 		return;
 	}
@@ -131,15 +127,11 @@ VOID WINAPI OnRecvPacketFileUploadData(LPVOID lParam) {
 
 		DWORD dwBytesWritten = 0;
 		BOOL bRet = WriteFile(
-			pModuleFileUpload->m_hFile,				// open file handle
-			pPacket->m_pbPacketBody,				// start of data to write
-			pPacket->m_dwPacketBodyLength,			// number of bytes to write
-			&dwBytesWritten,						// number of bytes that were written
-			NULL);									// no overlapped structure
-
-		if (!bRet) {
-			//MessageBox(0, L"写入失败", L"写入失败", 0);
-		}
+			pModuleFileUpload->m_hFile,
+			pPacket->m_pbPacketBody,
+			pPacket->m_dwPacketBodyLength,
+			&dwBytesWritten,
+			NULL);
 
 		LeaveCriticalSection(&pModuleFileUpload->m_WriteLock);
 

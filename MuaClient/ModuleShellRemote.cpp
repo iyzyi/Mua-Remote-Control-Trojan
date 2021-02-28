@@ -52,8 +52,6 @@ void CModuleShellRemote::OnRecvivePacket(CPacket* pPacket) {
 	case SHELL_EXECUTE: {
 		SHELL_REMOTE_EXECUTE_THREAD_PARAM* pThreadParam = new SHELL_REMOTE_EXECUTE_THREAD_PARAM(this, pPacketCopy);
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)OnRecvPacketShellRemoteExecute, (LPVOID)pThreadParam, 0, NULL);
-		// 最终发现，创建个子线程运行ExecuteShell函数就能发包了。我猜测应该也和OnReceive回调中
-		// 不要绘制对话框一个原因，因为ExecuteShell函数内有ReadFile,有管道交互等大量IO操作。
 		break;
 	}
 		
@@ -211,13 +209,12 @@ VOID CModuleShellRemote::LoopReadAndSendCommandReuslt() {
 			// 而在管道中没有数据时，ReadFile会阻塞掉，所以我用PeekNamedPipe来判断管道中有数据，以免阻塞。
 			PeekNamedPipe(m_hRead, SendBuf, sizeof(SendBuf), &dwBytesRead, &dwTotalBytesAvail, NULL);
 			if (dwBytesRead == 0) {
-				//m_pChildSocketClient->SendPacket(SHELL_EXECUTE_RESULT_OVER, NULL, 0);
 				break;
 			}
 			dwBytesRead = 0;
 			dwTotalBytesAvail = 0;
 
-			// 我的需求是取一次运行结果就请一次已读取的缓冲区，所以PeekNamedPipe仅用来判断管道是否为空，取数据还是用ReadFile
+			// 我的需求是取一次运行结果就清空一次已读取的缓冲区，所以PeekNamedPipe仅用来判断管道是否为空，取数据还是用ReadFile
 			BOOL bReadSuccess = ReadFile(m_hRead, SendBuf, sizeof(SendBuf), &dwBytesRead, NULL);
 
 			// TODO 好像没用
