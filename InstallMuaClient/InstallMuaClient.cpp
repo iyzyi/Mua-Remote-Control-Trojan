@@ -24,7 +24,8 @@ int main()
 
 	// 安装早已完成，直接退出
 	WCHAR pszTempPathInstallCompleted[MAX_PATH];
-	GetTempPath(MAX_PATH, pszTempPathInstallCompleted);
+	// C:\Users\iyzyi\AppData\Local\Temp
+	GetTempPath(MAX_PATH, pszTempPathInstallCompleted);	
 	wcscat_s(pszTempPathInstallCompleted, pszInstallCompleted);
 	if (PathFileExists(pszTempPathInstallCompleted)) {
 		return -1;
@@ -34,24 +35,24 @@ int main()
 	GetTempPath(MAX_PATH, pszTempPathWillBypassUAC);
 	wcscat_s(pszTempPathWillBypassUAC, pszWillBypassUAC);
 
-	//// 第一次，未提权
-	//if (!PathFileExists(pszTempPathWillBypassUAC)) {
-	//	// 创建 %TEMP%\pszWillBypassUAC 文件，表示即将BypassUAC
-	//	HANDLE hFile = CreateFile(pszTempPathWillBypassUAC, GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-	//	if (hFile != nullptr) {
-	//		CloseHandle(hFile);
-	//	}		
+	// 第一次，未提权
+	if (!PathFileExists(pszTempPathWillBypassUAC)) {
+		// 创建 %TEMP%\pszWillBypassUAC 文件，表示即将BypassUAC
+		HANDLE hFile = CreateFile(pszTempPathWillBypassUAC, GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile != nullptr) {
+			CloseHandle(hFile);
+		}
 
-	//	// 本程序所在路径
-	//	WCHAR pszThisProgramPath[MAX_PATH];
-	//	GetModuleFileName(NULL, pszThisProgramPath, MAX_PATH);
+		// 本程序所在路径
+		WCHAR pszThisProgramPath[MAX_PATH];
+		GetModuleFileName(NULL, pszThisProgramPath, MAX_PATH);
 
-	//	// 提权后再次运行此程序
-	//	CMLuaUtilBypassUAC(pszThisProgramPath);
-	//}
+		// 提权后再次运行此程序
+		CMLuaUtilBypassUAC(pszThisProgramPath);
+	}
 
-	//// 非第一次，已提权
-	//else {
+	// 非第一次，已提权
+	else {
 
 		// 程序所在目录
 		WCHAR pszFileDir[MAX_PATH];
@@ -105,21 +106,17 @@ int main()
 			DeleteFile(pszTempPathWillBypassUAC);
 		}
 			
-		// 这里暂时注释，等完成install的代码后，再解开注释
-		//// 安装完了，创建 %TEMP%\pszInstallCompleted文件
-		//HANDLE hFile = CreateFile(pszTempPathInstallCompleted, GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
-		//if (hFile != nullptr) {
-		//	CloseHandle(hFile);
-		//}
-	
-
-	//}
+		// 安装完了，创建 %TEMP%\pszInstallCompleted文件
+		HANDLE hFile = CreateFile(pszTempPathInstallCompleted, GENERIC_READ, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile != nullptr) {
+			CloseHandle(hFile);
+		}
+	}
 
 	// 释放互斥量
 	ReleaseMutex(hMutex);
 	CloseHandle(hMutex);
 	hMutex = nullptr;
 
-
-	system("pause");
+	return 0;
 }
