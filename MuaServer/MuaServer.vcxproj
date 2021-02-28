@@ -244,7 +244,7 @@
     <None Include="res\MuaServer.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\..\Desktop\favicon.ico" />
+    <Image Include="res\favicon.ico" />
     <Image Include="res\MuaServer.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
