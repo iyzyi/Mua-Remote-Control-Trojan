@@ -21,14 +21,14 @@ BOOL RegisterSystemService(WCHAR lpszDriverPath[]) {
 	shOSCM = ::OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 	if (!shOSCM)
 	{
-		MessageBox(0, L"OpenSCManager", L"", 0);
+		//MessageBox(0, L"OpenSCManager Failed", L"", 0);
 		return FALSE;
 	}
 
 	// 创建服务
 	// SERVICE_AUTO_START   随系统自动启动
 	// SERVICE_DEMAND_START 手动启动
-	shCS = ::CreateService(shOSCM, pszServiceName, pszServiceDesc,
+	shCS = ::CreateService(shOSCM, pszServiceName, pszServiceName,
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
 		SERVICE_AUTO_START,
@@ -36,15 +36,20 @@ BOOL RegisterSystemService(WCHAR lpszDriverPath[]) {
 		lpBinaryPathName, NULL, NULL, NULL, NULL, NULL);
 	if (!shCS)
 	{
-		MessageBox(0, L"CreateService Failed", L"", 0);
+		//MessageBox(0, L"CreateService Failed", L"", 0);
 		DWORD d = GetLastError();
 		return FALSE;
 	}
 
+	// 设置服务的描述
+	SERVICE_DESCRIPTION ServiceDesc;
+	ServiceDesc.lpDescription = pszServiceDesc;
+	ChangeServiceConfig2(shCS, SERVICE_CONFIG_DESCRIPTION, &ServiceDesc);
+
 	// 启动服务
 	if (!::StartService(shCS, 0, NULL))
 	{
-		MessageBox(0, L"StartService Failed", L"", 0);
+		//MessageBox(0, L"StartService Failed", L"", 0);
 		return FALSE;
 	}
 
