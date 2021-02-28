@@ -99,12 +99,6 @@
     <ClCompile Include="AntiDebug.cpp">
       <Filter>源文件\Protect</Filter>
     </ClCompile>
-    <ClCompile Include="BypassUAC.cpp">
-      <Filter>源文件\Protect</Filter>
-    </ClCompile>
-    <ClCompile Include="SystemService.cpp">
-      <Filter>源文件\Protect</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -165,12 +159,6 @@
       <Filter>头文件\Protect</Filter>
     </ClInclude>
     <ClInclude Include="AntiDebug.h">
-      <Filter>头文件\Protect</Filter>
-    </ClInclude>
-    <ClInclude Include="BypassUAC.h">
-      <Filter>头文件\Protect</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemService.h">
       <Filter>头文件\Protect</Filter>
     </ClInclude>
     <ClInclude Include="Infect.h">

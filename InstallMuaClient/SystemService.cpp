@@ -8,9 +8,14 @@ BOOL RegisterSystemService(WCHAR lpszDriverPath[]) {
 	BOOL bRet = TRUE;
 	WCHAR szName[MAX_PATH] = { 0 };
 
-	::lstrcpy(szName, lpszDriverPath);
+	::wcscpy_s(szName, lpszDriverPath);
 	// 过滤掉文件目录，获取文件名
 	::PathStripPath(szName);
+
+	// 为路径加上引号，因为CreateService中的lpBinaryPathName要求带引号，除非路径中没空格
+	WCHAR lpBinaryPathName[MAX_PATH + 2];
+	wsprintf(lpBinaryPathName, L"\"%s\"", lpszDriverPath);
+	//MessageBox(0, lpBinaryPathName, L"", 0);
 
 	SC_HANDLE shOSCM = NULL, shCS = NULL;
 	SERVICE_STATUS ss;
@@ -32,10 +37,11 @@ BOOL RegisterSystemService(WCHAR lpszDriverPath[]) {
 		SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
 		SERVICE_AUTO_START,
 		SERVICE_ERROR_NORMAL,
-		lpszDriverPath, NULL, NULL, NULL, NULL, NULL);
+		lpBinaryPathName, NULL, NULL, NULL, NULL, NULL);
 	if (!shCS)
 	{
 		MessageBox(0, L"CreateService", L"", 0);
+		DWORD d = GetLastError();
 		return FALSE;
 	}
 

