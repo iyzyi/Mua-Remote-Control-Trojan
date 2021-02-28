@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ModuleFileDownload.h"
-#include "MFCApplication4.h"
+#include "MuaServer.h"
 
 
 CModuleFileDownload::CModuleFileDownload(CSocketClient* pSocketClient, PBYTE pszRemotePath, PBYTE pszLocalPath) : CModule(pSocketClient) {

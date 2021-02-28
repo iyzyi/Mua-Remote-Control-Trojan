@@ -3,8 +3,8 @@
 
 #include "pch.h"
 #include "framework.h"
-#include "MFCApplication4.h"
-#include "MFCApplication4Dlg.h"
+#include "MuaServer.h"
+#include "MuaServerDlg.h"
 #include "afxdialogex.h"
 #include "ModuleShellRemote.h"
 #include "resource.h"

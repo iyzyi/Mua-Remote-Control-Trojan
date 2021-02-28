@@ -2,7 +2,7 @@
 #include "ClientManage.h"
 #include "Packet.h"
 #include "ModuleManage.h"
-#include "MFCApplication4.h"
+#include "MuaServer.h"
 #include "SocketClient.h"
 
 

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "SocketServer.h"
-#include "MFCApplication4.h"
-#include "MFCApplication4Dlg.h"
+#include "MuaServer.h"
+#include "MuaServerDlg.h"
 #include "SocketClient.h"
 
 

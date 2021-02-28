@@ -197,8 +197,8 @@
     <ClInclude Include="HPSocket\HPTypeDef.h" />
     <ClInclude Include="HPSocket\SocketInterface.h" />
     <ClInclude Include="libccrypto.h" />
-    <ClInclude Include="MFCApplication4.h" />
-    <ClInclude Include="MFCApplication4Dlg.h" />
+    <ClInclude Include="MuaServer.h" />
+    <ClInclude Include="MuaServerDlg.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="ModuleFileDownload.h" />
     <ClInclude Include="ModuleFileTransfer.h" />

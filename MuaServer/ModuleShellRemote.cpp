@@ -5,7 +5,7 @@
 #include "ModuleShellRemote.h"
 #include "afxdialogex.h"
 #include "resource.h"
-#include "MFCApplication4.h"
+#include "MuaServer.h"
 
 
 // CShellRemote 对话框

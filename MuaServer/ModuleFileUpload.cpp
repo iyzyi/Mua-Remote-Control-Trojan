@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ModuleFileUpload.h"
-#include "MFCApplication4.h"
+#include "MuaServer.h"
 
 
 CFileUpload::CFileUpload(CSocketClient* pSocketClient) : CModule(pSocketClient) {

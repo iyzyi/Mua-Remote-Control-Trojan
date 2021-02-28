@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "ModuleManage.h"
 #include "ModuleShellRemote.h"
-#include "MFCApplication4Dlg.h"
+#include "MuaServerDlg.h"
 
 
 #include "Packet.h"
