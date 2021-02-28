@@ -48,51 +48,12 @@ typedef struct _PACKET_HEAD {
 
 }PACKET_HEAD, *PPACKET_HEAD;
 
-//
-//typedef struct _PACKET {
-//	DWORD				dwPacketLength;			// 整个封包的长度(包括包头和包体，但不包括封包中表示长度的4个字节)
-//	PACKET_HEAD			PacketHead;				// 包头
-//	PBYTE				pPacketBody;			// 包体
-//
-//	DWORD				dwPacketBodyLength;		// 包体长度
-//
-//
-//	_PACKET(DWORD dwPacketLength, PACKET_HEAD PacketHead, PBYTE pPacketBody) {
-//		this->dwPacketLength			= dwPacketLength;
-//		this->PacketHead				= PacketHead;
-//		this->pPacketBody				= pPacketBody;
-//
-//		this->dwPacketBodyLength		= dwPacketLength - PACKET_HEAD_LENGTH;
-//	}
-//
-//	// 一个引起C2512错的原因:当主类(类A)含有其他类（类B)的对象（注意是对象），
-//	// 且未定义构造参数的时候，运行开始时调用了类A编译器自动给的默认构造函数，
-//	// 该构造函数会自动调用类A里的所有成员的默认构造函数，
-//	// 此时若类B无默认构造函数（比如当只定义了带参数的构造函数时，编译器为保证
-//	// 构造函数的唯一性使得对象使用起来安全，是不会有自动给的隐藏的默认构造函数的）
-//	_PACKET() {
-//		this->dwPacketLength			= 0;
-//		this->PacketHead				= PACKET_HEAD();
-//		this->pPacketBody				= NULL;
-//
-//		this->dwPacketBodyLength		= 0;
-//	}
-//
-//} PACKET, *PPACKET;
-
-
 
 
 
 class CPacket {
 
 public:
-
-	// 接收到的封包用这个构造函数
-	//CPacket(PBYTE pbData, DWORD dwLength);
-
-	// 要发送的封包用这个构造函数
-	//CPacket(COMMAND_ID wCommandId, PBYTE pbPacketBody, BYTE bySplitNum = 0);
 
 	CPacket(CSocketClient* pSocketClient);
 	CPacket();

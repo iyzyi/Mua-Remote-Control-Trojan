@@ -32,14 +32,7 @@ public:
 public:
 	CTcpPackServerPtr			m_pTcpPackServer;
 
-	//NOTIFYPROC					m_pfnMainSocketRecvPacket;	// 回调函数，主socket接收到的有效封包均传给这个函数处理，
-															// 在StartSocketServer的时候，通过参数，把回调函数的地址传进来
-
-	//NOTIFYPROC					m_pfnChildSocketRecvPacket;	// 处理子函数接收到的有效封包
-
 	CClientManage*				m_pClientManage;
-
-	//CRITICAL_SECTION		m_Lock;					// 链表操作的锁
 
 protected:
 	BOOL						m_bIsRunning;

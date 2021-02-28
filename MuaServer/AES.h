@@ -16,60 +16,60 @@ using namespace std;
 class AES
 {
 private:
-  BYTE m_pbKey[AES_KEY_BUFFER_LENGTH];		// AES-128只用前16BYTE
-  BYTE m_pbIv[16];
+	BYTE m_pbKey[AES_KEY_BUFFER_LENGTH];		// AES-128只用前16BYTE
+	BYTE m_pbIv[16];
 
-  CRITICAL_SECTION m_cs;
+	CRITICAL_SECTION m_cs;
 
-  int Nb;
-  int Nk;
-  int Nr;
+	int Nb;
+	int Nk;
+	int Nr;
 
-  unsigned char* PaddingPKCS7(unsigned char in[], unsigned int inLen, unsigned int alignLen);
+	unsigned char* PaddingPKCS7(unsigned char in[], unsigned int inLen, unsigned int alignLen);
 
-  unsigned int blockBytesLen;
+	unsigned int blockBytesLen;
 
-  void SubBytes(unsigned char **state);
+	void SubBytes(unsigned char **state);
 
-  void ShiftRow(unsigned char **state, int i, int n);    // shift row i on n positions
+	void ShiftRow(unsigned char **state, int i, int n);    // shift row i on n positions
 
-  void ShiftRows(unsigned char **state);
+	void ShiftRows(unsigned char **state);
 
-  unsigned char xtime(unsigned char b);    // multiply on x
+	unsigned char xtime(unsigned char b);					// multiply on x
 
-  unsigned char mul_bytes(unsigned char a, unsigned char b);
+	unsigned char mul_bytes(unsigned char a, unsigned char b);
 
-  void MixColumns(unsigned char **state);
+	void MixColumns(unsigned char **state);
 
-  void MixSingleColumn(unsigned char *r);
+	void MixSingleColumn(unsigned char *r);
 
-  void AddRoundKey(unsigned char **state, unsigned char *key);
+	void AddRoundKey(unsigned char **state, unsigned char *key);
 
-  void SubWord(unsigned char *a);
+	void SubWord(unsigned char *a);
 
-  void RotWord(unsigned char *a);
+	void RotWord(unsigned char *a);
 
-  void XorWords(unsigned char *a, unsigned char *b, unsigned char *c);
+	void XorWords(unsigned char *a, unsigned char *b, unsigned char *c);
 
-  void Rcon(unsigned char * a, int n);
+	void Rcon(unsigned char * a, int n);
 
-  void InvSubBytes(unsigned char **state);
+	void InvSubBytes(unsigned char **state);
 
-  void InvMixColumns(unsigned char **state);
+	void InvMixColumns(unsigned char **state);
 
-  void InvShiftRows(unsigned char **state);
+	void InvShiftRows(unsigned char **state);
 
-  unsigned char* PaddingNulls(unsigned char in[], unsigned int inLen, unsigned int alignLen);
+	unsigned char* PaddingNulls(unsigned char in[], unsigned int inLen, unsigned int alignLen);
   
-  //unsigned int GetPaddingLength(unsigned int len);
+	//unsigned int GetPaddingLength(unsigned int len);
 
-  void KeyExpansion(unsigned char key[], unsigned char w[]);
+	void KeyExpansion(unsigned char key[], unsigned char w[]);
 
-  void EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char key[]);
+	void EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char key[]);
 
-  void DecryptBlock(unsigned char in[], unsigned char out[], unsigned  char key[]);
+	void DecryptBlock(unsigned char in[], unsigned char out[], unsigned  char key[]);
 
-  void XorBlocks(unsigned char *a, unsigned char * b, unsigned char *c, unsigned int len);
+	void XorBlocks(unsigned char *a, unsigned char * b, unsigned char *c, unsigned int len);
 
 public:
 	// 因为要填充1~16字节，所以密文比明文长，所以加密前要先用这个函数获取密文长度，来设置密文缓冲区大小。
@@ -82,35 +82,17 @@ public:
   
 	//AES(int keyLen = 256);
 
-  // 原来的类不能持久化加解密，每次加解密都要额外带上key和iv，
-  // 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
-  // 并新增m_pbEncryptIv, m_pbDecryptIv, m_pbKey三个类成员变量
-  AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv);
-  AES();
-  ~AES();
+	// 原来的类不能持久化加解密，每次加解密都要额外带上key和iv，
+	// 但是我需要的是能初始化一次，一直加解密的那种，所以添加这种构造方式，
+	// 并新增m_pbEncryptIv, m_pbDecryptIv, m_pbKey三个类成员变量
 
-  unsigned int EncryptCFB(unsigned char pbPlaintext[], unsigned int dwPlaintextLength, unsigned char pbCiphertext[]);
+	AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv);
+	AES();
+	~AES();
 
-  unsigned int DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCiphertextLength, unsigned char pbPlaintext[]);
+	unsigned int EncryptCFB(unsigned char pbPlaintext[], unsigned int dwPlaintextLength, unsigned char pbCiphertext[]);
 
-
-  //unsigned char *EncryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned int &outLen);
-
-  //unsigned char *DecryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[]);
-
-  //unsigned char *EncryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen);
-
-  //unsigned char *DecryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv);
-
-  //unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen);
-
-  //unsigned char *DecryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv);
-
-  //unsigned char *EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pOutLen);
-  
-  //void printHexArray (unsigned char a[], unsigned int n);
-
-
+	unsigned int DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCiphertextLength, unsigned char pbPlaintext[]);
 };
 
 const unsigned char sbox[16][16] = {

@@ -51,52 +51,8 @@ public:
 
 	// 我们假定一台机子只运行一个Mua客户端（被控端），所以一个IP就是一个客户端。
 	// 子socket属于哪个客户端，完全就是靠IP来分辨的
+	// TODO 以后可以改成TOKEN分辨。主socket上线前发来TOKEN，然后后续的子socket都用这个TOKEN。实现起来不麻烦的。
 	CClient* CClientManage::SearchClientByIp(CONNID dwConnectId);
-
-
-
-	// 删除一个主socket对应的全部子socket
-	// 在Client链表中搜索与之相同IP的其他client, 如果不是主socket，那么就认定为是这个主socket的子socket, 一同断开连接
-	// 这里假定一个IP只上线一个主socket, 不然其他的子socket实在无法区分所属的主socket.
-	//VOID DeleteAllChildClientByOneIP(CClient *pClient);
-
-
-
-
-	
-
-
-
-//
-//
-//// 存放CSocketClient的链表，均为子socket。如果需要用到主socket，请遍历存放CClient的链表，然后找到m_pMainSocketClient
-//
-//// 先删掉主socket，再删子socket时，由于CClient析构了，存子socket的链表就没了，就没法删子socket了。
-//// 如果删主socket前，先把子socket全删了。这样的话，子socket OnClose()回调时，又要删一次，
-//// 此时主socket没了，所以由于存CSocketClient的链表没了，找不到相应的子socket，程序崩溃
-//// 所以这里还要搞一个链表，存所有的socket，包括主socket和子socket
-//public:
-//	CSocketClient*			m_pChildSocketClientListHead;
-//	CSocketClient*			m_pChildSocketClientListTail;
-//	DWORD					m_dwChildSocketClientNum;
-//	CRITICAL_SECTION		m_ChildSocketClientLock;			// 锁
-//	
-//
-//	// 双向链表，新结点插在列表尾部
-//	VOID AddNewChildSocketClientToList(CSocketClient *pSocketClient);
-//
-//	// 删除SocketClient, 返回是否删除成功
-//	BOOL DeleteChildSocketClientFromList(CONNID dwConnectId);
-//
-//	// 内含CSocketClient的析构，所以有令子socket下线的作用
-//	VOID DeleteChildSocketClientFromList(CSocketClient *pSocketClient);
-//
-//	// 内含CSocketClient的析构，所以有令全部子socket下线的作用
-//	VOID DeleteAllChildSocketClientFromList();
-//
-//	// SocketClient是否存在于链表中，存在则返回SocketClient地址，不存在返回nullptr
-//	CSocketClient* SearchSocketClient(CONNID dwConnectId);
-
 };
 
 

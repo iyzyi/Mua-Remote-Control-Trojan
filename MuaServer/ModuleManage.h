@@ -1,7 +1,5 @@
 #pragma once
 
-//VOID OnRecvShellRemotePacket(CPacket* pPacket);
-
 #include "Packet.h"
 #include "ClientManage.h"
 

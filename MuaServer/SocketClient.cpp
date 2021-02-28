@@ -28,9 +28,6 @@ CSocketClient::CSocketClient(CONNID dwConnectId, BOOL bIsMainSocketClient, CModu
 
 	m_pLastChildSocketClient = nullptr;
 	m_pNextChildSocketClient = nullptr;
-
-
-	// TODO pModule在哪里赋值来着？等下我回来补充
 }
 
 
@@ -142,11 +139,9 @@ CClient::~CClient() {
 VOID CClient::ChangeNoChildSocketClientEvent() {
 	if (m_dwChildSocketClientNum == 0) {
 		SetEvent(m_hNoChildSocketClientEvent);			// 设为信号状态
-		//MessageBox(0, L"Set", L"", 0);
 	}
 	else {
 		ResetEvent(m_hNoChildSocketClientEvent);		// 设为非信号状态
-		//MessageBox(0, L"Reset", L"", 0);
 	}
 }
 
@@ -246,8 +241,6 @@ VOID CClient::DeleteChildSocketClientFromList(CSocketClient *pSocketClient) {
 #endif
 
 		delete pSocketClient;				// SocketClient在这里释放内存
-		// 这个链表仅用于缓存主socket拥有哪些子socket。析构的话，请在CClientManage的存放CSocketClient的链表中进行
-		// 上面一行注释作废。
 
 		ChangeNoChildSocketClientEvent();
 	}
@@ -281,7 +274,7 @@ CSocketClient* CClient::SearchChildSocketClient(CONNID dwConnectId) {
 		while (pSocketClientNode->m_pNextChildSocketClient != nullptr) {
 			if (pSocketClientNode->m_pNextChildSocketClient->m_dwConnectId == dwConnectId) {
 				Ret = pSocketClientNode->m_pNextChildSocketClient;
-				__leave;			// 原本这里直接返回，没有释放锁。。。坑死我了
+				__leave;			// 原本这里直接返回，没有释放锁。。。
 			}
 			pSocketClientNode = pSocketClientNode->m_pNextChildSocketClient;
 		}
@@ -293,28 +286,3 @@ CSocketClient* CClient::SearchChildSocketClient(CONNID dwConnectId) {
 	
 	return Ret;
 }
-
-
-
-
-
-
-
-
-//// 删除一个主socket对应的全部子socket
-//// 在Client链表中搜索与之相同IP的其他client, 如果不是主socket，那么就认定为是这个主socket的子socket, 一同断开连接
-//// 这里假定一个IP只上线一个主socket, 不然其他的子socket实在无法区分所属的主socket.
-//VOID CClient::DeleteAllChildClientByOneIP(CSocketClient *pSocketClient) {
-//	ASSERT(m_pMainSocketClient != nullptr);
-//
-//	CSocketClient *pSocketClientNode = m_pChildSocketClientListHead;
-//	while (pSocketClientNode->m_pNextChildSocketClient != NULL) {
-//		if (!pSocketClientNode->m_pNextChildSocketClient->m_bIsMainSocketServer) {		// 子socket
-//			DWORD bRet = wcscmp(pSocketClient->m_lpszIpAddress, pSocketClientNode->m_pNextChildSocketClient->m_lpszIpAddress);
-//			if (bRet == 0) {// IP相同
-//				theApp.m_Server.m_pServer->Disconnect(pSocketClientNode->m_pNextChildSocketClient->m_dwConnectId);
-//			}
-//		}
-//		pSocketClientNode = pSocketClientNode->m_pNextChildSocketClient;
-//	}
-//}

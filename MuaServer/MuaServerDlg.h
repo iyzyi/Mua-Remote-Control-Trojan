@@ -1,5 +1,5 @@
 ﻿
-// MFCApplication4Dlg.h: 头文件
+// MuaServerDlg.h: 头文件
 //
 
 #pragma once
@@ -20,10 +20,6 @@
 // 收到被控端发来的CONNECT包时，说明成功建立了相应的子socket连接
 #define WM_FILE_UPLOAD_CONNECT_SUCCESS (WM_USER+252)			
 #define WM_FILE_DOWNLOAD_CONNECT_SUCCESS (WM_USER+253)
-
-
-
-//class CPacket;
 
 
 // CMFCApplication4Dlg 对话框
@@ -65,17 +61,10 @@ public:
 	CButton m_ButtonStopSocketServer;
 
 
-public:
-	// 这里必须是static，不然ManageRecvPacket实参与 "NOTIFYPROC" 类型的形参不兼容。
-	// 而且static只能在声明中添加，不能在定义中添加哦。
-	//static void CALLBACK MainSocketRecvPacket(CPacket *Packet);
-	//static void CALLBACK ChildSocketRecvPacket(CPacket *Packet);
-
 protected:
 	afx_msg LRESULT OnRecvLoginPacket(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnSocketClientDisconnect(WPARAM wParam, LPARAM lParam);
 
-	//afx_msg LRESULT OnRecvShellConnectPacket(WPARAM wParam, LPARAM lParam);		// 收到SHELL_CONNECT封包时创建相应的对话框
 public:
 	afx_msg LRESULT OnPostMsgRecvChildSocketClientPacket(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam);

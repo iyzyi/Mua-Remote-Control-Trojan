@@ -9,7 +9,6 @@ class CModuleFileTransfer : public CDialogEx
 	DECLARE_DYNAMIC(CModuleFileTransfer)
 public:
 	CClient*				m_pClient;
-	//CSocketClient*				m_pChildSocketClient;
 
 public:
 	CModuleFileTransfer(CWnd* pParent = nullptr, CClient * pClient = nullptr);   // 标准构造函数

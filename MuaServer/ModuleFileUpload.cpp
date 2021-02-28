@@ -4,8 +4,6 @@
 
 
 CFileUpload::CFileUpload(CSocketClient* pSocketClient) : CModule(pSocketClient) {
-	//InitializeCriticalSection(&m_WriteLock);
-
 	// 自动重置事件，初始状态无信号
 	m_hRecvPacketFileUploadInfoEvent = CreateEvent(NULL, false, false, NULL);
 	m_hRecvPacketFileUploadCloseEvent = CreateEvent(NULL, false, false, NULL);
@@ -13,8 +11,6 @@ CFileUpload::CFileUpload(CSocketClient* pSocketClient) : CModule(pSocketClient) 
 
 
 CFileUpload::~CFileUpload() {
-	//DeleteCriticalSection(&m_WriteLock);
-
 	if (m_hRecvPacketFileUploadInfoEvent != nullptr) {
 		CloseHandle(m_hRecvPacketFileUploadInfoEvent);
 		m_hRecvPacketFileUploadInfoEvent = nullptr;
@@ -34,10 +30,6 @@ void CFileUpload::OnRecvChildSocketClientPacket(CPacket* pPacket) {
 
 	switch (pPacket->m_PacketHead.wCommandId) {
 
-	//case FILE_UPLOAD_CONNECT:
-	//	InitModule(pSocketClient);								// 初始化组件。主要作用是把这个pSocketClient和这个组件绑定
-	//	SetEvent(pClient->m_FileUploadConnectSuccessEvent);		// 触发信号
-	//	break;
 	case FILE_UPLOAD_INFO:
 		SetEvent(m_hRecvPacketFileUploadInfoEvent);
 		break;
@@ -105,25 +97,6 @@ BOOL WINAPI UploadFileThreadFunc(LPVOID lParam) {
 	ASSERT(pClient->m_pFileUploadConnectSocketClientTemp != nullptr);
 	CFileUpload* pFileUpload = new CFileUpload(pClient->m_pFileUploadConnectSocketClientTemp);
 	CSocketClient* pSocketClient = pFileUpload->m_pSocketClient;
-
-
-	//if (!PathFileExists(pszFilePath)) {
-	//	MessageBox(0, L"文件不存在", L"", 0);
-	//	return false;
-	//}
-
-	//HANDLE hFile = CreateFile(pszFilePath, FILE_READ_EA, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-	//if (hFile == INVALID_HANDLE_VALUE)
-	//{
-	//	MessageBox(0, L"文件句柄打开失败", L"", 0);
-	//	return false;
-	//}
-
-	//QWORD qwFileSize = 0;
-	//DWORD dwFileSizeLowDword = 0;
-	//DWORD dwFileSizeHighDword = 0;
-	//dwFileSizeLowDword = GetFileSize(hFile, &dwFileSizeHighDword);
-	//qwFileSize = (((QWORD)dwFileSizeHighDword) << 32) + dwFileSizeLowDword;		// 直接dwFileSizeHighDword << 32的话就等于0了
 
 
 	CFile File;

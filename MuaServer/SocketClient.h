@@ -69,7 +69,6 @@ public:
 	VOID DeleteChildSocketClientFromList(CSocketClient *pSocketClient);
 	VOID DeleteAllChildSocketClientFromList();
 	CSocketClient* SearchChildSocketClient(CONNID dwConnectId);
-	//VOID DeleteAllChildClientByOneIP(CSocketClient *pSocketClient);
 
 public:
 	CSocketClient*			m_pMainSocketClient;

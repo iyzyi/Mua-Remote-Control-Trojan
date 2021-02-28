@@ -114,11 +114,6 @@ BOOL CMFCApplication4App::InitInstance()
 	ControlBarCleanUp();
 #endif
 
-
-	// Socket Server的启动代码，如果写在这里，就不会执行，难道是上面的某处代码阻塞了？？
-	// m_Server.StartSocketServer();
-
-
 	// 由于对话框已关闭，所以将返回 FALSE 以便退出应用程序，
 	//  而不是启动应用程序的消息泵。
 	return FALSE;

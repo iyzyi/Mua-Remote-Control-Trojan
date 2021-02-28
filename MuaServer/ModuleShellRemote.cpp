@@ -15,8 +15,6 @@ IMPLEMENT_DYNAMIC(CShellRemote, CDialogEx)
 CShellRemote::CShellRemote(CWnd* pParent /*=nullptr*/, CSocketClient* pClient /*= nullptr*/)
 	: CDialogEx(IDD_DIALOG2, pParent), CModule(pClient)
 {
-	//m_pClient = pClient;
-
 	this->Create(IDD_DIALOG2, GetDesktopWindow());
 	this->ShowWindow(SW_SHOW);
 	
@@ -62,11 +60,6 @@ END_MESSAGE_MAP()
 // CShellRemote 消息处理程序
 
 
-//VOID CShellRemote::ShellOpen() {
-//	//theApp.m_Server.SendPacket(pClient, SHELL_OPEN, NULL, 0);
-//}
-
-
 void CShellRemote::OnEnChangeEdit1()
 {
 	// TODO:  如果该控件是 RICHEDIT 控件，它将不
@@ -90,12 +83,10 @@ void CShellRemote::OnBnClickedButton1()
 {
 	WCHAR pbCommand[256];
 	m_EditCommand.GetWindowText(pbCommand, 256);
-	//MessageBox(pbCommand);
 	DWORD dwCommandLength = (wcslen(pbCommand) + 1) * 2;
 	theApp.m_Server.SendPacket(m_pSocketClient, SHELL_EXECUTE, (PBYTE)pbCommand, dwCommandLength);
 
 	m_EditCommand.SetWindowTextW(L"");
-	//DebugPrint("IsConnected = %d\n", theApp.m_Server.m_pTcpPackServer->IsConnected(m_pSocketClient->m_dwConnectId));
 }
 
 

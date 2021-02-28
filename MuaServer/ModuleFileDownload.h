@@ -31,9 +31,6 @@ public:
 
 	// ÖØÐ´Ðéº¯Êý
 	void OnRecvChildSocketClientPacket(CPacket* pPacket);
-
-	//BOOL CFileUpload::UploadFileFunc();
-
 };
 
 

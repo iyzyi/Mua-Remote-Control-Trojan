@@ -109,6 +109,7 @@ DWORD CCrypto::GetCiphertextLength(DWORD dwPlaintextLength) {
 
 
 void CCrypto::RsaDecryptKey(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbDecryptedKey, PDWORD pdwDecryptedKeyLength) {
+	// 这个密钥可以通过RSA.cpp中的RsaKeyGen()生成
 	BYTE pbPrivateKey[1000] = "UlNBMgAIAAADAAAAAAEAAIAAAACAAAAAAQABvm1ftWn4my/SWAfH9MUG8pAeWCYs"\
 		"ooqG62Mb8NrbiC8iF4E8acmFcFizl35zTpryO18PSSu1PnUrj+4QeWe2kykcudcX"\
 		"Qk13jy43q8VgIiJlzdSWlN81EftyLA/fFw2oT2+qf40wfNf0/VnYi64kLycX3x0v"\

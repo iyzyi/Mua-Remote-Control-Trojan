@@ -10,11 +10,9 @@
 
 class CFileUpload : public  CModule {
 public:
-	//CRITICAL_SECTION			m_WriteLock;
+	WCHAR						m_pszFilePath[MAX_PATH];			// 要上传的文件的本地路径
 
-	WCHAR						m_pszFilePath[MAX_PATH];			// 要上传的文件的路径
-
-	WCHAR						m_pszUploadPath[MAX_PATH];			// 要上传到什么目录下
+	WCHAR						m_pszUploadPath[MAX_PATH];			// 要上传到被控端的什么目录下
 
 	HANDLE						m_hRecvPacketFileUploadInfoEvent;
 	HANDLE						m_hRecvPacketFileUploadCloseEvent;
@@ -25,9 +23,6 @@ public:
 
 	// 重写虚函数
 	void OnRecvChildSocketClientPacket(CPacket* pPacket);
-
-	//BOOL CFileUpload::UploadFileFunc();
-
 };
 
 

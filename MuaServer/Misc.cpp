@@ -141,28 +141,3 @@ VOID WriteByteToBuffer(PBYTE pbData, BYTE byNum, DWORD dwPos) {
 	PBYTE pbData2 = pbData + dwPos;
 	pbData2[0] = byNum;
 }
-
-
-
-//// 返回拷贝好的地址
-//// dwLength要复制的长度
-//// pbSrc + dwPos 复制的起始地址
-//VOID MyMemcpy(PBYTE pbDest, PBYTE pbSrc, DWORD dwLength, DWORD dwPos) {
-//
-//	memcpy(pbDest, pbSrc+dwPos, dwLength);
-//
-//	//PBYTE pbDest;
-//
-//	//if (dwLength > 0) {
-//	//	//pbDest = (PBYTE)xmalloc(dwLength);
-//	//	pbDest = new BYTE[dwLength];
-//	//	memcpy(pbDest, pbSrc + dwPos, dwLength);
-//	//}
-//	//else {
-//	//	// 封包包体可能长度为0，此时申请长为1的缓冲区
-//	//	pbDest = new BYTE[1];
-//	//}
-//
-//	//return pbDest;
-//}
-

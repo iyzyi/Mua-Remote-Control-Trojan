@@ -2,30 +2,6 @@
 #include "AES.h"
 #include "Misc.h"
 
-//AES::AES(int keyLen)
-//{
-//  this->Nb = 4;
-//  switch (keyLen)
-//  {
-//  case 128:
-//    this->Nk = 4;
-//    this->Nr = 10;
-//    break;
-//  case 192:
-//    this->Nk = 6;
-//    this->Nr = 12;
-//    break;
-//  case 256:
-//    this->Nk = 8;
-//    this->Nr = 14;
-//    break;
-//  default:
-//    throw "Incorrect key length";
-//  }
-//
-//  blockBytesLen = 4 * this->Nb * sizeof(unsigned char);
-//}
-
 
 AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 	this->Nb = 4;
@@ -57,11 +33,6 @@ AES::AES(DWORD keyLen, PBYTE pbKey, PBYTE pbIv) {
 }
 
 
-// 这里的构造函数也是要的，不能不实现，不然之后xfree(m_pbKey)崩
-// 因为如果没有通过带参的构造函数定义类对象，比如只是申请了一个
-// 指向类的指针，没有明着写出使用了哪个构造函数，此时会默认调用
-// 这个无参的构造函数。而我们没自己写这个无参构造函数，m_pbKey就
-// 不一定为NULL, 不如debug下就是0xcccccccc, 此时xfree比如崩。
 AES::AES() {
 	Nb					= 0;
 	Nk					= 0;
@@ -74,152 +45,6 @@ AES::AES() {
 AES::~AES() {
 	DeleteCriticalSection(&m_cs);				// 删锁
 }
-
-
-//unsigned char * AES::EncryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned int &outLen)
-//{
-//  outLen = GetPaddingLength(inLen);
-//  unsigned char *alignIn  = PaddingNulls(in, inLen, outLen);
-//  unsigned char *out = new unsigned char[outLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  for (unsigned int i = 0; i < outLen; i+= blockBytesLen)
-//  {
-//    EncryptBlock(alignIn + i, out + i, roundKeys);
-//  }
-//  
-//  delete[] alignIn;
-//  delete[] roundKeys;
-//  
-//  return out;
-//}
-//
-//unsigned char * AES::DecryptECB(unsigned char in[], unsigned int inLen, unsigned  char key[])
-//{
-//  unsigned char *out = new unsigned char[inLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  for (unsigned int i = 0; i < inLen; i+= blockBytesLen)
-//  {
-//    DecryptBlock(in + i, out + i, roundKeys);
-//  }
-//
-//  delete[] roundKeys;
-//  
-//  return out;
-//}
-//
-//
-//unsigned char *AES::EncryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen)
-//{
-//  outLen = GetPaddingLength(inLen);
-//  unsigned char *alignIn  = PaddingNulls(in, inLen, outLen);
-//  unsigned char *out = new unsigned char[outLen];
-//  unsigned char *block = new unsigned char[blockBytesLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  memcpy(block, iv, blockBytesLen);
-//  for (unsigned int i = 0; i < outLen; i+= blockBytesLen)
-//  {
-//    XorBlocks(block, alignIn + i, block, blockBytesLen);
-//    EncryptBlock(block, out + i, roundKeys);
-//    memcpy(block, out + i, blockBytesLen);
-//  }
-//  
-//  delete[] block;
-//  delete[] alignIn;
-//  delete[] roundKeys;
-//
-//  return out;
-//}
-//
-//unsigned char *AES::DecryptCBC(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv)
-//{
-//  unsigned char *out = new unsigned char[inLen];
-//  unsigned char *block = new unsigned char[blockBytesLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  memcpy(block, iv, blockBytesLen);
-//  for (unsigned int i = 0; i < inLen; i+= blockBytesLen)
-//  {
-//    DecryptBlock(in + i, out + i, roundKeys);
-//    XorBlocks(block, out + i, out + i, blockBytesLen);
-//    memcpy(block, in + i, blockBytesLen);
-//  }
-//  
-//  delete[] block;
-//  delete[] roundKeys;
-//
-//  return out;
-//}
-
-//unsigned char *AES::EncryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv, unsigned int &outLen)
-//{
-//  outLen = GetPaddingLength(inLen);
-//  unsigned char *alignIn  = PaddingNulls(in, inLen, outLen);
-//  unsigned char *out = new unsigned char[outLen];
-//  unsigned char *block = new unsigned char[blockBytesLen];
-//  unsigned char *encryptedBlock = new unsigned char[blockBytesLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  memcpy(block, iv, blockBytesLen);
-//  for (unsigned int i = 0; i < outLen; i+= blockBytesLen)
-//  {
-//    EncryptBlock(block, encryptedBlock, roundKeys);
-//    XorBlocks(alignIn + i, encryptedBlock, out + i, blockBytesLen);
-//    memcpy(block, out + i, blockBytesLen);
-//  }
-//  
-//  delete[] block;
-//  delete[] encryptedBlock;
-//  delete[] alignIn;
-//  delete[] roundKeys;
-//
-//  return out;
-//}
-
-
-//// 返回密文的地址，注意这个密文需要手动delete
-//unsigned char *AES::EncryptCFB(unsigned char in[], unsigned int inLen, DWORD *pOutLen)
-//{
-//	EnterCriticalSection(&m_cs);			// 加锁
-//
-//	unsigned int outLen = GetPaddingLength(inLen);
-//	//unsigned char *alignIn = PaddingNulls(in, inLen, outLen);
-//	unsigned char *alignIn = PaddingPKCS7(in, inLen, outLen);
-//	unsigned char *out = new unsigned char[outLen];
-//	//unsigned char *block = new unsigned char[blockBytesLen];
-//	unsigned char *encryptedBlock = new unsigned char[blockBytesLen];
-//	unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//	KeyExpansion(m_pbKey, roundKeys);
-//	//memcpy(block, iv, blockBytesLen);
-//	for (unsigned int i = 0; i < outLen; i += blockBytesLen)
-//	{
-//		// 对上一分组的密文m_pbEncryptIv进行AES加密
-//		EncryptBlock(m_pbIv, encryptedBlock, roundKeys);
-//		// 上一个函数得到的字节流encryptedBlock与填充好的明文alignIn异或，得到本分组的密文
-//		XorBlocks(alignIn + i, encryptedBlock, out + i, blockBytesLen);
-//		// 保存本分组的密文，以供下一分组使用
-//		memcpy(m_pbIv, out + i, blockBytesLen);
-//	}
-//	
-//	// 不出意外的话，接口打算全换成new 和 delete了
-//	// 为了接口的一致，统一使用xmalloc和xfree来管理缓冲区，多拷贝一次吧
-//	//PBYTE pbData = CopyBuffer(out, outLen);
-//
-//	//delete[] block;
-//	delete[] encryptedBlock;
-//	delete[] alignIn;
-//	delete[] roundKeys;
-//	//delete[] out;
-//
-//	*pOutLen = outLen;
-//
-//	LeaveCriticalSection(&m_cs);			// 解锁
-//
-//	return outLen;
-//}
-
 
 
 // 返回密文的地址，注意这个密文需要手动delete
@@ -282,29 +107,6 @@ unsigned int AES::DecryptCFB(unsigned char pbCiphertext[], unsigned int dwCipher
 }
 
 
-
-//unsigned char *AES::DecryptCFB(unsigned char in[], unsigned int inLen, unsigned  char key[], unsigned char * iv)
-//{
-//  unsigned char *out = new unsigned char[inLen];
-//  unsigned char *block = new unsigned char[blockBytesLen];
-//  unsigned char *encryptedBlock = new unsigned char[blockBytesLen];
-//  unsigned char *roundKeys = new unsigned char[4 * Nb * (Nr + 1)];
-//  KeyExpansion(key, roundKeys);
-//  memcpy(block, iv, blockBytesLen);
-//  for (unsigned int i = 0; i < inLen; i+= blockBytesLen)
-//  {
-//    EncryptBlock(block, encryptedBlock, roundKeys);
-//    XorBlocks(in + i, encryptedBlock, out + i, blockBytesLen);
-//    memcpy(block, in + i, blockBytesLen);
-//  }
-//  
-//  delete[] block;
-//  delete[] encryptedBlock;
-//  delete[] roundKeys;
-//
-//  return out;
-//}
-
 unsigned char * AES::PaddingNulls(unsigned char in[], unsigned int inLen, unsigned int alignLen)
 {
   unsigned char *alignIn = new unsigned char[alignLen];
@@ -326,15 +128,6 @@ unsigned char * AES::PaddingPKCS7(unsigned char in[], unsigned int inLen, unsign
 unsigned int AES::GetPaddingLength(unsigned int len)
 {
 	return ((len / blockBytesLen) + 1) * blockBytesLen;
-
-  //unsigned int lengthWithPadding =  (len / blockBytesLen);
-  //if (len % blockBytesLen) {
-	 // lengthWithPadding++;
-  //}
-  //
-  //lengthWithPadding *=  blockBytesLen;
-  //
-  //return lengthWithPadding;
 }
 
 void AES::EncryptBlock(unsigned char in[], unsigned char out[], unsigned  char *roundKeys)
