@@ -153,10 +153,12 @@
   <ItemGroup>
     <ClCompile Include="BypassUAC.cpp" />
     <ClCompile Include="InstallMuaClient.cpp" />
+    <ClCompile Include="SystemService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BypassUAC.h" />
     <ClInclude Include="InstallMuaClient.h" />
+    <ClInclude Include="SystemService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

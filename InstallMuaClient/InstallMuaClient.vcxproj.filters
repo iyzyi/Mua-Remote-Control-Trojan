@@ -21,12 +21,18 @@
     <ClCompile Include="BypassUAC.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SystemService.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BypassUAC.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="InstallMuaClient.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemService.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

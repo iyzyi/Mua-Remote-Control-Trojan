@@ -149,9 +149,6 @@
     <ClInclude Include="SocketClientManage.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Infect.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ModuleFileUpload.h">
       <Filter>头文件\组件-文件传输</Filter>
     </ClInclude>
@@ -176,10 +173,13 @@
     <ClInclude Include="SystemService.h">
       <Filter>头文件\Protect</Filter>
     </ClInclude>
+    <ClInclude Include="Infect.h">
+      <Filter>头文件\Protect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Infect.cpp">
-      <Filter>源文件</Filter>
+      <Filter>源文件\Protect</Filter>
     </None>
   </ItemGroup>
 </Project>
