@@ -93,6 +93,7 @@
     <ClCompile Include="AES.cpp" />
     <ClCompile Include="AntiDebug.cpp" />
     <ClCompile Include="AntiSandbox.cpp" />
+    <ClCompile Include="BypassUAC.cpp" />
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="libccrypto.cpp" />
     <ClCompile Include="Login.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="AES.h" />
     <ClInclude Include="AntiDebug.h" />
     <ClInclude Include="AntiSandbox.h" />
+    <ClInclude Include="BypassUAC.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="HPSocket\HPSocket-SSL.h" />
     <ClInclude Include="HPSocket\HPSocket.h" />

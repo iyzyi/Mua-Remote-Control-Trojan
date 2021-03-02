@@ -111,3 +111,6 @@ interface ICMLuaUtil
 HRESULT CoCreateInstanceAsAdmin(HWND hWnd, REFCLSID rclsid, REFIID riid, PVOID *ppVoid);
 
 BOOL CMLuaUtilBypassUAC(LPWSTR lpwszExecutable);
+
+// Ì×¿ÇCMLuaUtilBypassUAC
+extern "C" _declspec(dllexport) void CALLBACK WindowsUpdate(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow);

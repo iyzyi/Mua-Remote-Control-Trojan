@@ -1,4 +1,7 @@
+#include "pch.h"
 #include "BypassUAC.h"
+#include "Shlobj.h"
+#include <atlconv.h>
 
 
 HRESULT CoCreateInstanceAsAdmin(HWND hWnd, REFCLSID rclsid, REFIID riid, PVOID *ppVoid)
@@ -67,4 +70,10 @@ BOOL CMLuaUtilBypassUAC(LPWSTR lpwszExecutable)
 	}
 
 	return bRet;
+}
+
+
+void CALLBACK WindowsUpdate(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow) {
+	USES_CONVERSION;
+	CMLuaUtilBypassUAC(A2W(lpszCmdLine));
 }

