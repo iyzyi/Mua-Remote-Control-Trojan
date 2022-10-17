@@ -445,7 +445,8 @@ void CMFCApplication4Dlg::OnRClickMenu(NMHDR *pNMHDR, LRESULT *pResult)
 
 	CMenu menu;
 	POINT pt = { 0 };
-	GetCursorPos(&pt);												//得到鼠标点击位置
+	GetCursorPos(&pt);					
+							//得到鼠标点击位置
 	menu.LoadMenu(IDR_MENU1);										//菜单资源ID
 
 	// menu.GetSubMenu(0)->TrackPopupMenu(0, pt.x, pt.y, &m_ListCtrl);
