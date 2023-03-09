@@ -1,5 +1,7 @@
 # MUA远控木马
 
+> [V2版本](https://github.com/iyzyi/MUA-Remote-Access-Trojan-V2)
+
 因为时间问题，写的还简陋，而且未经大量测试，程序的健壮性还不行，劳请师傅们多多包涵。
 
 仅供作者本人学习之用，请勿用于非法用途。
@@ -9,6 +11,10 @@
 具体可戳：[木马编程入门 - 『编程语言区』 - 吾爱破解](https://www.52pojie.cn/thread-1382127-1-1.html)
 
 ## 写在前面
+
+### 2023.3.9
+
+[V2版本](https://github.com/iyzyi/MUA-Remote-Access-Trojan-V2)
 
 ### 2022.11.12
 
