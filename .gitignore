@@ -262,5 +262,5 @@ __pycache__/
 
 
 # I need these dll
-!MuaServer/HPSocket/x64
-!MuaServer/HPSocket/x86
+!MuaServer/MuaServer/HPSocket/x64
+!MuaServer/MuaServer/HPSocket/x86
