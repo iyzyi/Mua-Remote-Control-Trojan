@@ -110,18 +110,18 @@ DWORD CCrypto::GetCiphertextLength(DWORD dwPlaintextLength) {
 
 void CCrypto::RsaDecryptKey(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbDecryptedKey, PDWORD pdwDecryptedKeyLength) {
 	// 这个密钥可以通过RSA.cpp中的RsaKeyGen()生成
-	BYTE pbPrivateKey[1000] = "UlNBMgAIAAADAAAAAAEAAIAAAACAAAAAAQABvm1ftWn4my/SWAfH9MUG8pAeWCYs"\
-		"ooqG62Mb8NrbiC8iF4E8acmFcFizl35zTpryO18PSSu1PnUrj+4QeWe2kykcudcX"\
-		"Qk13jy43q8VgIiJlzdSWlN81EftyLA/fFw2oT2+qf40wfNf0/VnYi64kLycX3x0v"\
-		"GKnSxhSvdaZm0osv62E+er7stKD6pf37LAP4STAxIEgRfrN52aJk0wuFT8//o6Wx"\
-		"kQktygCdcCCn278+sHvdTiefgrMwjL1i2saQNSjOAKTUrInevcR25+piofE8Jq2P"\
-		"RzjeanQxm9urekrdAX1iVie1a223kZyuVz6ys3KNKnibkuzsbSqAhzLm2c0oE+GP"\
-		"ZMgZIdOZswz3Ad3N0BaqNKCCRIN112jwbP1fYIG2QoeH0GUbgz9DEBU10MGXgR+M"\
-		"r4Z32RFhI9PtxAxjfOe/lQY6qkhUJWjUghG0h4p+rKlaIcYSRYsjgU1pMJfV7sjL"\
-		"eWQ8r6qIiW2xtct66mfcfxYFYuc4bb95VB2X7Z7P2QTwwQ1GlNwxirz8mDBjX1sN"\
-		"7A3lgHKtvw1tUaE480+hP0uaU17Da8HflGwpZUt5k3/SvfyPnImuwb6jrYCdZTk0"\
-		"Cvmp5pxzm6mMv8fOSnfIG+Z1NMQ7sWgI5PP2BobnTYGf7veKac2F8RhrY28wwNHY"\
-		"61bMVS/tayHvjQ8=";
+	BYTE pbPrivateKey[1000] = "UlNBMgAIAAADAAAAAAEAAIAAAACAAAAAAQAB0JnyWyZ4HbLMub0vP1Pvqo0/DiYY"\
+		"G16Zv525VQiw39F3YIbcS8v635lxR2qcW9eafrsphmI3wq7SNLxvKXTsVdzCoLCD"\
+		"McAtBjySPsmoOGVL2u+sHcX1Nan3Qn9wyOrAX8oR9hIlml4xszJcKQMpGHkuvy6E"\
+		"X3oR0jmsv6S36CprS4MjOvU1fEnMrZaVJsd8jI09DYZjp4cQZHCKkj8uPJdmwoqJ"\
+		"o72kIDpKXaP89zfnMMjv61rslXQu0ncGH/Yo4nhLxQLL98SzG29i31tNFpZb7xUj"\
+		"3ibSa6zlMNkIRz24MM08wWSbQkBspEpWys3FZ3bVTqxcV2SxkwhVj8kYbfaxisIG"\
+		"HtlAqcoXw4O6x0l5yRpHy17YVPCVv0L+rsy767ayHOAqvojSJc7VaNaVMadNGEY+"\
+		"lPe8i1iUa9MB8RwcWNeU4t1o1ZdQIAOaq37IiY7RLzOfqTgP0O/htwPpWxL7hAF9"\
+		"JP5xI/OlaxP3wO2HdzMrRJwrKPjDlqBhrSav2HiG9m0VgmC9GreyHJWVEYEl5znx"\
+		"Um1b1eYWDqHEBIg8HoWdh/5bVnn1NK9XIcdhOSkD/Ejqtya5Nz7J8qccjoKVPhGM"\
+		"9D/QrWRKUv1r5fUo/F+eID6sE9QgCbkonE3/dvmSKkIgKWNQ5sz0FSHLjFi3HCIz"\
+		"ims3YZOK/LD7uaM=";
 
 	RsaDecrypt(pbCiphertext, dwCiphertextLength, pbDecryptedKey, pdwDecryptedKeyLength, pbPrivateKey, strlen((char*)pbPrivateKey));
 }

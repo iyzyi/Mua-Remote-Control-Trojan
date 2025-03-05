@@ -106,12 +106,12 @@ int CCrypto::RsaEncryptKey(PBYTE pbKey, DWORD dwKeyLength, PBYTE pbCiphertext, P
 	assert(dwKeyLength <= 256 - 11);
 
 	// 这个密钥可以通过RSA.cpp中的RsaKeyGen()生成
-	BYTE pbPublicKey[1000] = "UlNBMQAIAAADAAAAAAEAAAAAAAAAAAAAAQABvm1ftWn4my/SWAfH9MUG8pAeWCYs"\
-		"ooqG62Mb8NrbiC8iF4E8acmFcFizl35zTpryO18PSSu1PnUrj+4QeWe2kykcudcX"\
-		"Qk13jy43q8VgIiJlzdSWlN81EftyLA/fFw2oT2+qf40wfNf0/VnYi64kLycX3x0v"\
-		"GKnSxhSvdaZm0osv62E+er7stKD6pf37LAP4STAxIEgRfrN52aJk0wuFT8//o6Wx"\
-		"kQktygCdcCCn278+sHvdTiefgrMwjL1i2saQNSjOAKTUrInevcR25+piofE8Jq2P"\
-		"RzjeanQxm9urekrdAX1iVie1a223kZyuVz6ys3KNKnibkuzsbSqAhzLm2Q==";
+	BYTE pbPublicKey[1000] = "UlNBMQAIAAADAAAAAAEAAAAAAAAAAAAAAQAB0JnyWyZ4HbLMub0vP1Pvqo0/DiYY"\
+		"G16Zv525VQiw39F3YIbcS8v635lxR2qcW9eafrsphmI3wq7SNLxvKXTsVdzCoLCD"\
+		"McAtBjySPsmoOGVL2u+sHcX1Nan3Qn9wyOrAX8oR9hIlml4xszJcKQMpGHkuvy6E"\
+		"X3oR0jmsv6S36CprS4MjOvU1fEnMrZaVJsd8jI09DYZjp4cQZHCKkj8uPJdmwoqJ"\
+		"o72kIDpKXaP89zfnMMjv61rslXQu0ncGH/Yo4nhLxQLL98SzG29i31tNFpZb7xUj"\
+		"3ibSa6zlMNkIRz24MM08wWSbQkBspEpWys3FZ3bVTqxcV2SxkwhVj8kYbQ==";
 
 	RsaEncrypt(pbKey, dwKeyLength, pbCiphertext, pdwCiphertextLength, pbPublicKey, strlen((char*)pbPublicKey));
 	return 0;

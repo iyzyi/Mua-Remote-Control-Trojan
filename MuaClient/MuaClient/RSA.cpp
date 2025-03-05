@@ -129,3 +129,8 @@ int RsaDecrypt(PBYTE pbCiphertext, DWORD dwCiphertextLength, PBYTE pbPlaintext, 
 
 	return 0;
 }
+
+
+//int main() {
+//	RsaKeyGen(2048, (LPSTR)"d:\\public.key", (LPSTR)"d:\\private.key");
+//}
