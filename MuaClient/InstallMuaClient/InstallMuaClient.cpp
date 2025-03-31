@@ -16,11 +16,11 @@
 int main()
 {
 	// 创建互斥量
-	HANDLE hMutex = CreateMutex(NULL, TRUE, L"{EA102FF5-6BDA-41B3-BD42-028C03193095}");
+	HANDLE hMutex = CreateMutex(NULL, TRUE, L"{7F2E19A4-3D8B-42C6-AD5E-0C9F34B812D7}");
 	WaitForSingleObject(hMutex, INFINITE);
 
-	WCHAR pszWillBypassUAC[] = L"{00E92116-51A2-4538-8228-03EA82922FC2}";
-	WCHAR pszInstallCompleted[] = L"{FDA3820B-5558-4849-A085-D07257C2775F}";
+	WCHAR pszWillBypassUAC[] = L"{4A9B1F2C-D3E6-4F8A-95C7-12B408E76D43}";
+	WCHAR pszInstallCompleted[] = L"{E6C45A1D-9F47-4C2B-B321-8A0D4B89F1E2}";
 
 	// 安装早已完成，直接退出
 	WCHAR pszTempPathInstallCompleted[MAX_PATH];
